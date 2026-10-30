@@ -86,7 +86,7 @@
 
       <section class="section" id="features">
         <div class="section-inner">
-          <div class="section-heading"><div class="eyebrow">Four tiny superpowers</div><h2>Big brand energy.<br>One-person-shop simple.</h2><p>Everything you need to run the table, all in one pocket-sized pass.</p></div>
+          <div class="section-heading"><div class="eyebrow eyebrow-star">Four tiny superpowers</div><h2>Big brand energy.<br>One-person-shop simple.</h2><p>Everything you need to run the table, all in one pocket-sized pass.</p></div>
           <div class="feature-grid">
             <article class="feature"><div class="feature-icon">01</div><h3>Price Helper</h3><p>Turn material, time, and booth cost into a confident price and break-even goal.</p></article>
             <article class="feature"><div class="feature-icon">02</div><h3>Table Tracker</h3><p>Tap to sell, track cash or card, and spot the low-stock favorites in real time.</p></article>
@@ -98,7 +98,7 @@
 
       <section class="section">
         <div class="section-inner">
-          <div class="section-heading"><div class="eyebrow">From setup to sold out</div><h2>A good day, in four little steps.</h2></div>
+          <div class="section-heading"><div class="eyebrow eyebrow-star">From setup to sold out</div><h2>A good day, in four little steps.</h2></div>
           <div class="timeline">
             <article class="time-card"><i class="time-dot"></i><strong>Night before</strong><p>Set your prices. Count your stock. Get some sleep.</p></article>
             <article class="time-card"><i class="time-dot"></i><strong>At the table</strong><p>Tap to track each sale while you meet your people.</p></article>
@@ -110,7 +110,7 @@
 
       <section class="section">
         <div class="section-inner">
-          <div class="section-heading"><div class="eyebrow">A pass for every kind of maker</div><h2>Your niche. Your next big idea.</h2></div>
+          <div class="section-heading"><div class="eyebrow eyebrow-star">A pass for every kind of maker</div><h2>Your niche. Your next big idea.</h2></div>
           <div class="audience" role="tablist" aria-label="Seller type">
             <button class="active" role="tab" aria-selected="true" data-audience="artist">Artists</button>
             <button role="tab" aria-selected="false" data-audience="crafter">Crafters</button>
@@ -123,14 +123,14 @@
 
       <section class="section" id="story">
         <div class="section-inner">
-          <div class="section-heading"><div class="eyebrow">Made with maker magic</div><h2>We’ve been on your side of the table.</h2></div>
+          <div class="section-heading"><div class="eyebrow eyebrow-star">Made with maker magic</div><h2>We’ve been on your side of the table.</h2></div>
           <div class="story-box"><div class="story-quote">“I started selling at conventions when I was nine. I know the excitement of a first sale, and the late-night math after. I wanted every young maker to feel like they had a whole team behind them.”</div><div class="story-attribution">Lilly · artist, maker, and Pop-Up Pass co-creator</div></div>
         </div>
       </section>
 
       <section class="section" id="pricing">
         <div class="section-inner">
-          <div class="section-heading"><div class="eyebrow">Good things grow together</div><h2>Start free. Grow your way.</h2><p>Useful from your very first event. More room when you’re ready.</p></div>
+          <div class="section-heading"><div class="eyebrow eyebrow-star">Good things grow together</div><h2>Start free. Grow your way.</h2><p>Useful from your very first event. More room when you’re ready.</p></div>
           <div class="pricing-grid">
             <article class="price-card"><h3>Free pass</h3><p>Everything you need for your next event.</p><div class="price-value">$0 <small>always</small></div><ul><li>Price helper + break-even math</li><li>One active event & table tracker</li><li>Three post and flyer templates</li></ul><button class="button button-quiet button-small" data-open-app>Get started →</button></article>
             <article class="price-card featured"><h3>Maker Plus</h3><p>For makers ready to keep the momentum.</p><div class="price-value">$6 <small>/ month · coming soon</small></div><ul><li>Unlimited events and sales history</li><li>All templates + saved brand kit</li><li>Card sync and trend alerts</li></ul><button class="button button-accent button-small" data-open-app>Try the demo →</button></article>
@@ -162,30 +162,33 @@
         <section class="app-view active" id="view-home">
           <div class="app-heading"><h1>Hey, maker.</h1><p>Your table is looking good. Here’s the little picture so far.</p></div>
           <div class="stat-grid">
-            <article class="stat-card"><div class="stat-label">Today’s sales</div><div class="stat-value" id="totalSales">$42</div><div class="stat-extra">↗ Your first event is underway</div></article>
-            <article class="stat-card"><div class="stat-label">Items sold</div><div class="stat-value" id="totalItems">6</div><div class="stat-extra">Across your little shop</div></article>
+            <article class="stat-card"><div class="stat-label">Today’s sales</div><div class="stat-value" id="totalSales">$48</div><div class="stat-extra">↗ Your first event is underway</div></article>
+            <article class="stat-card"><div class="stat-label">Items sold</div><div class="stat-value" id="totalItems">5</div><div class="stat-extra">Across your little shop</div></article>
             <article class="stat-card"><div class="stat-label">Stock to watch</div><div class="stat-value" id="lowStockTotal">1 item</div><div class="stat-extra" style="color:var(--pink)">♡ Almost sold out</div></article>
           </div>
           <div class="dashboard-row">
-            <article class="app-card"><div class="card-heading"><strong>Table favorites</strong><button class="back-to-site" data-goto="table">See all →</button></div><div id="homeInventory"></div></article>
-            <article class="app-card"><div class="card-heading"><strong>A little heads-up</strong><span>JUST NOW</span></div><div class="alert-card"><strong>Cat charm is almost gone.</strong><p>You’ve got 2 left. Tap to log a sale or make a note to restock after the rush.</p></div><div class="quick-actions"><button class="button button-accent button-small" data-goto="table">Go to my table</button><button class="button button-quiet button-small" data-goto="insights">See my insights</button></div></article>
+            <article class="app-card"><div class="card-heading"><strong>Fan Favorites</strong><button class="back-to-site" data-goto="table">See all →</button></div><div id="homeInventory"></div><div class="card-heading" style="margin-top:18px"><strong>Not So Popular</strong></div><div id="homeNotPopular"></div></article>
+            <article class="app-card"><div class="card-heading"><strong>A little heads-up</strong><span>JUST NOW</span></div><div class="alert-card"><strong id="alertTitle">Kuroneko Sticker is almost gone.</strong><p id="alertText">You’ve got 2 left. Tap to log a sale or make a note to restock after the rush.</p></div><div class="quick-actions"><button class="button button-accent button-small" data-goto="table">Go to my table</button><button class="button button-quiet button-small" data-goto="insights">See my insights</button></div></article>
           </div>
         </section>
         <section class="app-view" id="view-price">
           <div class="app-heading"><h1>Price with confidence.</h1><p>A fair price for your work, and a clear path to covering your table.</p></div>
           <article class="app-card">
             <div class="form-grid">
-              <div class="field"><label for="itemName">What are you pricing?</label><input id="itemName" value="Cute cat sticker" autocomplete="off"></div>
+              <div class="field"><label for="itemName">What are you pricing?</label><input id="itemName" value="Kuroneko Sticker" autocomplete="off"></div>
               <div class="field"><label for="materialCost">Materials per item ($)</label><input id="materialCost" type="number" min="0" step=".1" value="1.25"></div>
               <div class="field"><label for="workMinutes">Your time (minutes)</label><input id="workMinutes" type="number" min="0" step="1" value="10"><small>Maker time counts. We use $15/hour as a starting point.</small></div>
               <div class="field"><label for="boothFee">Your booth fee ($)</label><input id="boothFee" type="number" min="0" step="1" value="120"></div>
             </div>
-            <div class="result-box" aria-live="polite"><div class="result-label">A sweet spot for your price</div><div class="result-price" id="suggestedPrice">$5–7</div><p id="breakEven">Sell 24 at $6 to cover your $120 table.</p></div>
+            <div class="result-box" aria-live="polite"><div class="result-label">A sweet spot for your price</div><div class="result-price" id="suggestedPrice">$8–$10</div><p id="breakEven">Sell 14 at $9 to cover your $120 table.</p></div>
           </article>
         </section>
         <section class="app-view" id="view-table">
           <div class="app-heading"><h1>Your table, in a tap.</h1><p>One little tap for every sale. We’ll keep count for you.</p></div>
-          <div class="payment-toggle" role="group" aria-label="Payment type"><button class="active" data-payment="Cash" aria-pressed="true">Cash</button><button data-payment="Card" aria-pressed="false">Card</button></div>
+          <div class="table-toolbar">
+            <div class="payment-toggle" role="group" aria-label="Payment type"><button class="active" data-payment="Cash" aria-pressed="true">Cash</button><button data-payment="Card" aria-pressed="false">Card</button></div>
+            <p class="table-note">Tapped +1 sold by mistake? Use −1 sold to take it back. It removes one sale and returns the item to your stock.</p>
+          </div>
           <div class="item-grid" id="itemGrid"></div>
         </section>
         <section class="app-view" id="view-create">
@@ -200,14 +203,14 @@
               <button class="button button-quiet button-small" id="downloadButton" style="margin-left:5px">↓ Save design</button>
               <p style="font-size:10px;line-height:1.5;color:#777682">Demo uses ready-made captions and sample designs. No AI or social account is connected.</p>
             </article>
-            <div class="preview" id="postPreview"><small>MOCHI PAWS STICKERS · MADE WITH LOVE</small><span class="preview-mark" id="previewMark">CAT</span><div><strong id="previewName">Cute cat sticker</strong><p>Find your new favorite at Anime Fest</p></div></div>
+            <div class="preview" id="postPreview"><small>MOCHI PAWS STICKERS · MADE WITH LOVE</small><span class="preview-mark" id="previewMark">CAT</span><div><strong id="previewName">Kuroneko Sticker</strong><p>Find your new favorite at Anime Fest</p></div></div>
           </div>
         </section>
         <section class="app-view" id="view-insights">
           <div class="app-heading"><h1>Look what you did.</h1><p>A little recap of your event, with ideas for the next one.</p></div>
           <div class="stat-grid">
-            <article class="stat-card"><div class="stat-label">Event earnings</div><div class="stat-value" id="insightEarnings">$42</div><div class="stat-extra">Anime Fest · today</div></article>
-            <article class="stat-card"><div class="stat-label">Your top seller</div><div class="stat-value" style="font-size:19px">CAT sticker</div><div class="stat-extra">Little fan favorite</div></article>
+            <article class="stat-card"><div class="stat-label">Event earnings</div><div class="stat-value" id="insightEarnings">$48</div><div class="stat-extra">Anime Fest · today</div></article>
+            <article class="stat-card"><div class="stat-label">Your top seller</div><div class="stat-value" id="topSeller" style="font-size:19px">Kuroneko Sticker</div><div class="stat-extra">Little fan favorite</div></article>
             <article class="stat-card"><div class="stat-label">Room to experiment</div><div class="stat-value" style="font-size:19px">Keychains</div><div class="stat-extra" style="color:var(--blue)">Try a new design</div></article>
           </div>
           <div class="card-heading" style="margin:22px 0 12px"><strong>Fresh from the trend board</strong><span>CURATED STARTER IDEAS</span></div>
@@ -216,7 +219,7 @@
             <article class="trend-card"><div class="trend-mark">B</div><strong>Strawberry milk moments</strong><p>Sweet colors and nostalgic treats are a lovely mini collection.</p></article>
             <article class="trend-card"><div class="trend-mark">C</div><strong>Black cat energy</strong><p>Make a companion to your best-seller with a playful twist.</p></article>
           </div>
-          <div class="report"><strong>Your Anime Fest recap</strong><p id="reportText">You made $42 today. Cute cat stickers are your table favorite, and you’ve only got a couple left. Try a frog-and-mushroom mini set for your next event. You’ve got this!</p></div>
+          <div class="report"><strong>Your Anime Fest recap</strong><p id="reportText">You made $48 today. Kuroneko Sticker is your table favorite, and you’ve got 2 left. Try a frog-and-mushroom mini set for your next event. You’ve got this!</p></div>
           <p style="font-size:10px;line-height:1.5;color:#777682;margin-top:13px">Demo insights use sample sales and a curated trend list; live social trend data isn’t connected.</p>
         </section>
       </main>

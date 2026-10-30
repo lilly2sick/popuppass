@@ -111,7 +111,7 @@
       text-transform: uppercase; display: flex; align-items: center; gap: 8px;
     }
     .eyebrow:before { content: ""; height: 1px; width: 20px; background: currentColor; }
-    .hero-copy-block > .eyebrow:before { content: "★"; width: auto; height: auto; color: #fff; background: none; font-size: 12px; line-height: 1; }
+    .hero-copy-block > .eyebrow:before, .eyebrow-star:before { content: "★"; width: auto; height: auto; color: #fff; background: none; font-size: 12px; line-height: 1; }
     h1 { font-size: clamp(48px, 6.4vw, 78px); line-height: .99; letter-spacing: -5.3px; margin: 22px 0; font-weight: 710; }
     h1 .accent { color: var(--accent); }
     .hero-copy { max-width: 470px; color: #aaa9b4; font-size: 16px; line-height: 1.7; margin: 0 0 27px; }
@@ -360,7 +360,13 @@
     }
     .sell-card strong { display: block; font-size: 12px; }
     .sell-card small { display: block; color: var(--muted); font-size: 10px; margin: 4px 0 11px; }
-    .sell-actions { display: flex; align-items: center; justify-content: space-between; gap: 7px; }
+    .sell-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 7px; }
+    .sell-actions > span { margin-right: auto; }
+    .sell-actions button:disabled { opacity: .45; cursor: not-allowed; }
+    .sell-actions .undo-sale { border-color: var(--line); background: transparent; color: var(--muted); }
+    .table-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin: 0 0 15px; }
+    .table-toolbar .payment-toggle { margin: 0; }
+    .table-note { max-width: 320px; margin: 0; color: #92919e; font-size: 10px; line-height: 1.5; }
     .sell-actions button { padding: 8px 11px; border: 1px solid rgba(193,179,255,.22); background: rgba(193,179,255,.1); color: var(--accent); border-radius: 9px; font-size: 11px; cursor: pointer; }
     .payment-toggle { display: flex; gap: 6px; margin: 0 0 15px; }
     .payment-toggle button { padding: 7px 12px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; }
