@@ -1,21 +1,22 @@
     (() => {
       const sampleItems = [
-        { id: "cat-sticker", name: "Kuroneko Sticker", mark: "CAT", price: 7, stock: 2, sold: 4 },
-        { id: "frog-print", name: "Miku Print", mark: "MIKU", price: 20, stock: 8, sold: 1 },
-        { id: "miku-print-mini", name: "Miku Print Mini", mark: "MINI", price: 12, stock: 8, sold: 0 },
+        { id: "cat-sticker", name: "PUP Sticker", mark: "PUP", price: 7, stock: 2, sold: 4 },
+        { id: "frog-print", name: "Print", mark: "PRINT", price: 20, stock: 8, sold: 1 },
+        { id: "miku-print-mini", name: "Print Mini", mark: "MINI", price: 12, stock: 8, sold: 0 },
         { id: "moon-keychain", name: "Moon keychain", mark: "MOON", price: 10, stock: 5, sold: 0 },
-        { id: "berry-pin", name: "Berry enamel pin", mark: "BERRY", price: 9, stock: 12, sold: 0 },
-        { id: "star-print", name: "Starry mini print", mark: "STAR", price: 15, stock: 6, sold: 0 },
-        { id: "mushroom-sticker", name: "Mushroom sticker", mark: "MUSH", price: 6, stock: 10, sold: 0 }
+        { id: "berry-pin", name: "Enamel Pin", mark: "PIN", price: 9, stock: 12, sold: 0 },
+        { id: "star-print", name: "Mini Print", mark: "MINI", price: 15, stock: 6, sold: 0 },
+        { id: "mushroom-sticker", name: "Logo Sticker", mark: "LOGO", price: 6, stock: 10, sold: 0 }
       ];
       const storageKey = "popUpPassDemoV2";
       let items = sampleItems;
       let sales = [];
       let payment = "Cash";
-      let activeTemplate = "square";
+      let inventoryMode = false;
+      let activeTemplate = "portrait";
       let toastTimer;
       let badgeFlipped = false;
-      let scrollRevealComplete = false;
+      let badgeScrolledPast = false;
       let badgeSwingAnimation = null;
       const motionPreference = window.matchMedia("(prefers-reduced-motion: reduce)");
       try {
@@ -138,7 +139,7 @@
         const notPopular = bySold.filter(item => !favorites.includes(item)).slice(-3).reverse();
         qs("#homeInventory").innerHTML = inventoryRows(favorites);
         qs("#homeNotPopular").innerHTML = inventoryRows(notPopular);
-        qs("#itemGrid").innerHTML = items.map(item => `<article class="sell-card"><div class="sell-art"><span>${item.mark}</span></div><strong>${item.name}</strong><small>${money(item.price)} · <span class="${item.stock <= 2 ? "stock-count low" : ""}">${item.stock} in stock</span></small><div class="sell-actions"><span style="font-size:10px;color:#92919e">${item.sold} sold today</span><button class="undo-sale" data-undo="${item.id}" aria-label="Remove one mistaken sale of ${item.name}" ${item.sold <= 0 ? "disabled" : ""}>−1 sold</button><button data-sell="${item.id}" ${item.stock <= 0 ? "disabled" : ""}>${item.stock <= 0 ? "Sold out" : "+1 sold"}</button></div></article>`).join("");
+        qs("#itemGrid").innerHTML = items.map(item => `<article class="sell-card"><div class="sell-art"><span>${item.mark}</span></div><strong>${item.name}</strong><small>${money(item.price)} · <span class="${item.stock <= 2 ? "stock-count low" : ""}">${item.stock} in stock</span></small>${inventoryMode ? `<label class="stock-edit">Change stock<input type="number" min="0" step="1" inputmode="numeric" data-stock="${item.id}" value="${item.stock}" aria-label="Stock for ${item.name}"></label>` : ""}<div class="sell-actions"><span style="font-size:10px;color:#92919e">${item.sold} sold today</span>${inventoryMode ? "" : `<button class="undo-sale" data-undo="${item.id}" aria-label="Remove one mistaken sale of ${item.name}" ${item.sold <= 0 ? "disabled" : ""}>−1 sold</button><button data-sell="${item.id}" ${item.stock <= 0 ? "disabled" : ""}>${item.stock <= 0 ? "Sold out" : "+1 sold"}</button>`}</div></article>`).join("");
         qs("#postItem").innerHTML = items.map(item => `<option value="${item.id}">${item.name}</option>`).join("");
         updatePostPreview();
       }
@@ -165,10 +166,12 @@
       }
       qsa("[data-open-app]").forEach(button => button.addEventListener("click", () => openApp()));
       qs("#badgeFlip").addEventListener("click", () => flipBadge());
+      if (window.history && "scrollRestoration" in window.history) window.history.scrollRestoration = "manual";
       window.addEventListener("scroll", () => {
-        if (!scrollRevealComplete && window.scrollY > 115) {
-          scrollRevealComplete = true;
-          flipBadge(true);
+        const scrolledPast = window.scrollY > 115;
+        if (scrolledPast !== badgeScrolledPast) {
+          badgeScrolledPast = scrolledPast;
+          flipBadge(scrolledPast);
         }
       }, { passive: true });
       qsa(".tab-button").forEach(button => button.addEventListener("click", () => setTab(button.dataset.tab)));
@@ -179,6 +182,7 @@
         window.scrollTo(0, 0);
       });
       qs("#itemGrid").addEventListener("click", event => {
+        if (inventoryMode) return;
         const undoButton = event.target.closest("[data-undo]");
         if (undoButton) {
           const item = items.find(entry => entry.id === undoButton.dataset.undo);
@@ -203,13 +207,37 @@
         render();
         showToast(`${item.name} · ${payment.toLowerCase()} sale added`);
       });
-      qsa("[data-payment]").forEach(button => button.addEventListener("click", () => {
-        payment = button.dataset.payment;
+      qs("#itemGrid").addEventListener("change", event => {
+        const input = event.target.closest("[data-stock]");
+        if (!input) return;
+        const item = items.find(entry => entry.id === input.dataset.stock);
+        if (!item) return;
+        const stock = Number(input.value);
+        if (input.value.trim() === "" || !Number.isInteger(stock) || stock < 0) {
+          render();
+          showToast("Stock must be a whole number, 0 or more");
+          return;
+        }
+        item.stock = stock;
+        persist();
+        render();
+        showToast(`${item.name} · stock set to ${stock}`);
+      });
+      function setInventoryMode(on) {
+        inventoryMode = on;
+        qs("#inventoryButton").classList.toggle("active", on);
+        qs("#inventoryButton").setAttribute("aria-pressed", String(on));
         qsa("[data-payment]").forEach(option => {
-          const active = option === button;
+          const active = !on && option.dataset.payment === payment;
           option.classList.toggle("active", active);
           option.setAttribute("aria-pressed", String(active));
         });
+        render();
+      }
+      qs("#inventoryButton").addEventListener("click", () => setInventoryMode(!inventoryMode));
+      qsa("[data-payment]").forEach(button => button.addEventListener("click", () => {
+        payment = button.dataset.payment;
+        setInventoryMode(false);
       }));
       ["materialCost", "workMinutes", "boothFee"].forEach(id => qs(`#${id}`).addEventListener("input", updatePrice));
       qs("#postItem").addEventListener("change", updatePostPreview);
@@ -225,7 +253,9 @@
       qs("#downloadButton").addEventListener("click", () => {
         const item = items.find(entry => entry.id === qs("#postItem").value) || items[0];
         const colors = activeTemplate === "story" ? ["#c1b3ff", "#7bdcff"] : activeTemplate === "flyer" ? ["#ffb36b", "#a899ff"] : ["#ff9bdc", "#a899ff"];
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="${colors[0]}"/><stop offset="1" stop-color="${colors[1]}"/></linearGradient></defs><rect width="1080" height="1080" rx="70" fill="url(#g)"/><text x="540" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="8" fill="#191624">MYBLENX STICKERS</text><text x="540" y="590" text-anchor="middle" font-family="Arial,sans-serif" font-size="100" font-weight="700" letter-spacing="12" fill="#191624">${item.mark}</text><text x="540" y="760" text-anchor="middle" font-family="Arial,sans-serif" font-size="68" font-weight="700" fill="#191624">${item.name.replace(/[&<>"]/g, "")}</text><text x="540" y="840" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" fill="#191624">Find your new favorite!</text></svg>`;
+        const height = { portrait: 1350, story: 1920, flyer: 1080 }[activeTemplate];
+        const middle = height / 2;
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="${height}" viewBox="0 0 1080 ${height}"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="${colors[0]}"/><stop offset="1" stop-color="${colors[1]}"/></linearGradient></defs><rect width="1080" height="${height}" fill="url(#g)"/><text x="540" y="${activeTemplate === "story" ? 300 : 170}" text-anchor="middle" font-family="Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="8" fill="#191624">MYBLENX STICKERS</text><text x="540" y="${middle + 50}" text-anchor="middle" font-family="Arial,sans-serif" font-size="100" font-weight="700" letter-spacing="12" fill="#191624">${item.mark}</text><text x="540" y="${middle + 220}" text-anchor="middle" font-family="Arial,sans-serif" font-size="68" font-weight="700" fill="#191624">${item.name.replace(/[&<>"]/g, "")}</text><text x="540" y="${middle + 300}" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" fill="#191624">Find your new favorite!</text></svg>`;
         const link = document.createElement("a");
         link.href = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
         link.download = "pop-up-pass-post.svg";
