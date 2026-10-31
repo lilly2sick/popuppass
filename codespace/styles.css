@@ -74,6 +74,13 @@
       display: flex; align-items: center; justify-content: space-between;
       position: sticky; top: 0; z-index: 10; background: #000; border-bottom: 1px solid var(--line);
     }
+    .topbar-actions { display: flex; align-items: center; gap: 10px; }
+    .lang-toggle { display: flex; align-items: center; gap: 6px; height: 32px; padding: 0 11px 0 9px; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--text); cursor: pointer; font-size: 11px; font-weight: 700; letter-spacing: .06em; transition: border-color .2s ease; }
+    .lang-toggle:hover { border-color: var(--accent); }
+    .lang-icon { width: 15px; height: 15px; background: var(--accent); -webkit-mask: url("./icons/lang.png") center / contain no-repeat; mask: url("./icons/lang.png") center / contain no-repeat; }
+    :root[data-lang="ja"] { --display-font: "Hiragino Sans", "Yu Gothic", "Meiryo", "Noto Sans JP", sans-serif; --support-font: "Hiragino Sans", "Yu Gothic", "Meiryo", "Noto Sans JP", sans-serif; font-family: var(--support-font); line-break: strict; word-break: auto-phrase; }
+    :root[data-lang="ja"] h1, :root[data-lang="ja"] .section-heading h2 { letter-spacing: 0; }
+    :root[data-lang="ja"] .hero h1 { font-size: clamp(34px, 4.6vw, 56px); line-height: 1.2; }
     .brand { display: flex; align-items: center; }
     .brand-wordmark { display: flex; align-items: baseline; gap: 4px; line-height: .85; }
     .brand-pop {

@@ -16,7 +16,7 @@
       <nav class="nav-links" aria-label="Main navigation">
         <a href="#features">ABOUT</a><a href="#story">OUR STORY</a><a href="#pricing">INFO</a>
       </nav>
-      <button class="button button-accent button-small top-cta" data-open-app>GET YOURS</button>
+      <div class="topbar-actions"><button class="lang-toggle" type="button" data-lang-toggle aria-pressed="false"><span class="lang-icon" aria-hidden="true"></span><span class="lang-label">EN</span></button><button class="button button-accent button-small top-cta" data-open-app>GET YOURS</button></div>
     </header>
 
     <main>
@@ -148,7 +148,7 @@
   <div class="app-shell" id="app">
     <header class="app-top">
       <a class="brand" href="#" aria-label="Pop-Up Pass"><span class="brand-wordmark" aria-hidden="true"><span class="brand-pop">POP<br>UP</span><strong>PASS</strong></span></a>
-      <div class="app-top-right"><span class="live-pill">● DEMO MODE</span><button class="back-to-site" id="backToSite">← Back to site</button></div>
+      <div class="app-top-right"><button class="lang-toggle" type="button" data-lang-toggle aria-pressed="false"><span class="lang-icon" aria-hidden="true"></span><span class="lang-label">EN</span></button><span class="live-pill">● DEMO MODE</span><button class="back-to-site" id="backToSite">← Back to site</button></div>
     </header>
     <div class="app-layout">
       <nav class="sidebar" aria-label="Vendor toolkit">
@@ -212,7 +212,7 @@
         <section class="app-view" id="view-insights">
           <div class="app-heading"><h1>Look what you did.</h1><p>A little recap of your event, with ideas for the next one.</p></div>
           <div class="stat-grid">
-            <article class="stat-card"><div class="stat-label">Event earnings</div><div class="stat-value" id="insightEarnings">$48</div><div class="stat-extra">Anime Fest · today</div></article>
+            <article class="stat-card"><div class="stat-label">Event earnings</div><div class="stat-value" id="insightEarnings">$48</div><div class="stat-extra">Anime Convention · today</div></article>
             <article class="stat-card"><div class="stat-label">Your top seller</div><div class="stat-value" id="topSeller" style="font-size:19px">PUP Sticker</div><div class="stat-extra">Little fan favorite</div></article>
             <article class="stat-card"><div class="stat-label">Room to experiment</div><div class="stat-value" style="font-size:19px">Keychains</div><div class="stat-extra" style="color:var(--blue)">Try a new design</div></article>
           </div>
@@ -222,7 +222,7 @@
             <article class="trend-card"><div class="trend-mark">B</div><strong>Strawberry milk moments</strong><p>Sweet colors and nostalgic treats are a lovely mini collection.</p></article>
             <article class="trend-card"><div class="trend-mark">C</div><strong>Black cat energy</strong><p>Make a companion to your best-seller with a playful twist.</p></article>
           </div>
-          <div class="report"><strong>Your Anime Fest recap</strong><p id="reportText">You made $48 today. PUP Sticker is your table favorite, and you’ve got 2 left. Try a frog-and-mushroom mini set for your next event. You’ve got this!</p></div>
+          <div class="report"><strong>Your Anime Convention recap</strong><p id="reportText">You made $48 today. PUP Sticker is your table favorite, and you’ve got 2 left. Try a frog-and-mushroom mini set for your next event. You’ve got this!</p></div>
           <p style="font-size:10px;line-height:1.5;color:#777682;margin-top:13px">Demo insights use sample sales and a curated trend list; live social trend data isn’t connected.</p>
         </section>
       </main>
@@ -230,6 +230,7 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js" defer></script>
+  <script src="./lang.js" defer></script>
   <script src="./app.js" defer></script>
 </body>
 </html>

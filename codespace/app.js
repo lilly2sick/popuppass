@@ -13,6 +13,8 @@
       let sales = [];
       let payment = "Cash";
       let inventoryMode = false;
+      let activeAudience = "artist";
+      let captionItem = null;
       let activeTemplate = "portrait";
       let toastTimer;
       let badgeFlipped = false;
@@ -36,6 +38,8 @@
         console.warn("Could not load the saved Pop-Up Pass demo.", error);
       }
 
+      const { t, onChange: onLanguageChange } = window.PopUpLang;
+      const itemName = item => t(item.name);
       const qs = (selector, root = document) => root.querySelector(selector);
       const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
       const money = amount => `$${amount.toFixed(2).replace(/\.00$/, "")}`;
@@ -45,7 +49,7 @@
       const topSeller = () => items.reduce((top, item) => item.sold > top.sold ? item : top);
       function persist() {
         try { localStorage.setItem(storageKey, JSON.stringify({ items, sales })); }
-        catch (error) { console.warn("Could not save the Pop-Up Pass demo.", error); showToast("Couldn’t save on this device"); }
+        catch (error) { console.warn("Could not save the Pop-Up Pass demo.", error); showToast(t("Couldn’t save on this device")); }
       }
       function showToast(message) {
         const toast = qs("#toast");
@@ -126,27 +130,28 @@
         qs("#insightEarnings").textContent = money(totalRevenue());
         qs("#totalItems").textContent = totalSold();
         const lowStock = items.filter(item => item.stock <= 2).length;
-        qs("#lowStockTotal").textContent = `${lowStock} ${lowStock === 1 ? "item" : "items"}`;
+        qs("#lowStockTotal").textContent = t(lowStock === 1 ? "{count} item" : "{count} items", { count: lowStock });
         const top = topSeller();
-        qs("#topSeller").textContent = top.name;
-        qs("#reportText").textContent = `You made ${money(totalRevenue())} today. ${top.name} is your table favorite, and ${top.stock > 0 ? `you’ve got ${top.stock} left` : "it’s sold out"}. Try a frog-and-mushroom mini set for your next event. You’ve got this!`;
+        qs("#topSeller").textContent = itemName(top);
+        qs("#reportText").textContent = t(top.stock > 0 ? "You made {money} today. {name} is your table favorite, and you’ve got {stock} left. Try a frog-and-mushroom mini set for your next event. You’ve got this!" : "You made {money} today. {name} is your table favorite, and it’s sold out. Try a frog-and-mushroom mini set for your next event. You’ve got this!", { money: money(totalRevenue()), name: itemName(top), stock: top.stock });
         const lowest = items.filter(item => item.stock <= 2).sort((a, b) => a.stock - b.stock)[0];
-        qs("#alertTitle").textContent = !lowest ? "Nothing’s running low." : lowest.stock > 0 ? `${lowest.name} is almost gone.` : `${lowest.name} is sold out.`;
-        qs("#alertText").textContent = !lowest ? "Your stock looks good. Keep those sales coming." : lowest.stock > 0 ? `You’ve got ${lowest.stock} left. Tap to log a sale or make a note to restock after the rush.` : "Make a note to restock after the rush.";
-        const inventoryRows = list => list.map(item => `<div class="inventory-row"><span class="item-art">${item.mark}</span><span><strong>${item.name}</strong><small>${money(item.price)} · ${item.sold} sold</small></span><span class="stock-count ${item.stock <= 2 ? "low" : ""}">${item.stock} left</span></div>`).join("");
+        qs("#alertTitle").textContent = !lowest ? t("Nothing’s running low.") : t(lowest.stock > 0 ? "{name} is almost gone." : "{name} is sold out.", { name: itemName(lowest) });
+        qs("#alertText").textContent = !lowest ? t("Your stock looks good. Keep those sales coming.") : lowest.stock > 0 ? t("You’ve got {stock} left. Tap to log a sale or make a note to restock after the rush.", { stock: lowest.stock }) : t("Make a note to restock after the rush.");
+        const inventoryRows = list => list.map(item => `<div class="inventory-row"><span class="item-art">${item.mark}</span><span><strong>${itemName(item)}</strong><small>${money(item.price)} · ${t("{count} sold", { count: item.sold })}</small></span><span class="stock-count ${item.stock <= 2 ? "low" : ""}">${t("{count} left", { count: item.stock })}</span></div>`).join("");
         const bySold = [...items].sort((a, b) => b.sold - a.sold);
         const favorites = bySold.filter(item => item.sold > 0).slice(0, 3);
         const notPopular = bySold.filter(item => !favorites.includes(item)).slice(-3).reverse();
         qs("#homeInventory").innerHTML = inventoryRows(favorites);
         qs("#homeNotPopular").innerHTML = inventoryRows(notPopular);
-        qs("#itemGrid").innerHTML = items.map(item => `<article class="sell-card"><div class="sell-art"><span>${item.mark}</span></div><strong>${item.name}</strong><small>${money(item.price)} · <span class="${item.stock <= 2 ? "stock-count low" : ""}">${item.stock} in stock</span></small>${inventoryMode ? `<label class="stock-edit">Change stock<input type="number" min="0" step="1" inputmode="numeric" data-stock="${item.id}" value="${item.stock}" aria-label="Stock for ${item.name}"></label>` : ""}<div class="sell-actions"><span style="font-size:10px;color:#92919e">${item.sold} sold today</span>${inventoryMode ? "" : `<button class="undo-sale" data-undo="${item.id}" aria-label="Remove one mistaken sale of ${item.name}" ${item.sold <= 0 ? "disabled" : ""}>−1 sold</button><button data-sell="${item.id}" ${item.stock <= 0 ? "disabled" : ""}>${item.stock <= 0 ? "Sold out" : "+1 sold"}</button>`}</div></article>`).join("");
-        qs("#postItem").innerHTML = items.map(item => `<option value="${item.id}">${item.name}</option>`).join("");
+        qs("#itemGrid").innerHTML = items.map(item => `<article class="sell-card"><div class="sell-art"><span>${item.mark}</span></div><strong>${itemName(item)}</strong><small>${money(item.price)} · <span class="${item.stock <= 2 ? "stock-count low" : ""}">${t("{count} in stock", { count: item.stock })}</span></small>${inventoryMode ? `<label class="stock-edit">${t("Change stock")}<input type="number" min="0" step="1" inputmode="numeric" data-stock="${item.id}" value="${item.stock}" aria-label="${t("Stock for {name}", { name: itemName(item) })}"></label>` : ""}<div class="sell-actions"><span style="font-size:10px;color:#92919e">${t("{count} sold today", { count: item.sold })}</span>${inventoryMode ? "" : `<button class="undo-sale" data-undo="${item.id}" aria-label="${t("Remove one mistaken sale of {name}", { name: itemName(item) })}" ${item.sold <= 0 ? "disabled" : ""}>${t("−1 sold")}</button><button data-sell="${item.id}" ${item.stock <= 0 ? "disabled" : ""}>${t(item.stock <= 0 ? "Sold out" : "+1 sold")}</button>`}</div></article>`).join("");
+        const chosenItem = qs("#postItem").value;
+        qs("#postItem").innerHTML = items.map(item => `<option value="${item.id}" ${item.id === chosenItem ? "selected" : ""}>${itemName(item)}</option>`).join("");
         updatePostPreview();
       }
       function updatePostPreview() {
         const item = items.find(entry => entry.id === qs("#postItem").value) || items[0];
         qs("#previewMark").textContent = item.mark;
-        qs("#previewName").textContent = item.name;
+        qs("#previewName").textContent = itemName(item);
         qs("#postPreview").classList.toggle("story", activeTemplate === "story");
         qs("#postPreview").classList.toggle("flyer", activeTemplate === "flyer");
       }
@@ -161,8 +166,8 @@
         qs("#suggestedPrice").textContent = `${money(low)}–${money(high)}`;
         const count = midpoint > 0 ? Math.ceil(booth / midpoint) : 0;
         qs("#breakEven").textContent = count > 0
-          ? `Sell ${count} at ${money(midpoint)} to cover your ${money(booth)} table.`
-          : "Add your booth fee to see how many sales cover your table.";
+          ? t("Sell {count} at {price} to cover your {booth} table.", { count, price: money(midpoint), booth: money(booth) })
+          : t("Add your booth fee to see how many sales cover your table.");
       }
       qsa("[data-open-app]").forEach(button => button.addEventListener("click", () => openApp()));
       qs("#badgeFlip").addEventListener("click", () => flipBadge());
@@ -193,7 +198,7 @@
           if (lastSale >= 0) sales.splice(lastSale, 1);
           persist();
           render();
-          showToast(`${item.name} · 1 sale removed`);
+          showToast(t("{name} · 1 sale removed", { name: itemName(item) }));
           return;
         }
         const button = event.target.closest("[data-sell]");
@@ -205,7 +210,7 @@
         sales.push({ id: item.id, price: item.price, payment });
         persist();
         render();
-        showToast(`${item.name} · ${payment.toLowerCase()} sale added`);
+        showToast(t("{name} · {payment} sale added", { name: itemName(item), payment: t(payment.toLowerCase()) }));
       });
       qs("#itemGrid").addEventListener("change", event => {
         const input = event.target.closest("[data-stock]");
@@ -215,13 +220,13 @@
         const stock = Number(input.value);
         if (input.value.trim() === "" || !Number.isInteger(stock) || stock < 0) {
           render();
-          showToast("Stock must be a whole number, 0 or more");
+          showToast(t("Stock must be a whole number, 0 or more"));
           return;
         }
         item.stock = stock;
         persist();
         render();
-        showToast(`${item.name} · stock set to ${stock}`);
+        showToast(t("{name} · stock set to {stock}", { name: itemName(item), stock }));
       });
       function setInventoryMode(on) {
         inventoryMode = on;
@@ -246,37 +251,44 @@
         qsa("[data-template]").forEach(option => option.classList.toggle("active", option === button));
         updatePostPreview();
       }));
+      function renderCaption() {
+        if (captionItem) qs("#captionOutput").textContent = t("Meet your new favorite {name}. Find me at Anime Convention, booth A-14! #artistalley #smallartist #animeconvention", { name: itemName(captionItem).toLowerCase() });
+      }
       qs("#captionButton").addEventListener("click", () => {
-        const item = items.find(entry => entry.id === qs("#postItem").value) || items[0];
-        qs("#captionOutput").textContent = `Meet your new favorite ${item.name.toLowerCase()}. Find me at Anime Fest, booth A-14! #artistalley #smallartist #animefest`;
+        captionItem = items.find(entry => entry.id === qs("#postItem").value) || items[0];
+        renderCaption();
       });
       qs("#downloadButton").addEventListener("click", () => {
         const item = items.find(entry => entry.id === qs("#postItem").value) || items[0];
         const colors = activeTemplate === "story" ? ["#c1b3ff", "#7bdcff"] : activeTemplate === "flyer" ? ["#ffb36b", "#a899ff"] : ["#ff9bdc", "#a899ff"];
         const height = { portrait: 1350, story: 1920, flyer: 1080 }[activeTemplate];
         const middle = height / 2;
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="${height}" viewBox="0 0 1080 ${height}"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="${colors[0]}"/><stop offset="1" stop-color="${colors[1]}"/></linearGradient></defs><rect width="1080" height="${height}" fill="url(#g)"/><text x="540" y="${activeTemplate === "story" ? 300 : 170}" text-anchor="middle" font-family="Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="8" fill="#191624">MYBLENX STICKERS</text><text x="540" y="${middle + 50}" text-anchor="middle" font-family="Arial,sans-serif" font-size="100" font-weight="700" letter-spacing="12" fill="#191624">${item.mark}</text><text x="540" y="${middle + 220}" text-anchor="middle" font-family="Arial,sans-serif" font-size="68" font-weight="700" fill="#191624">${item.name.replace(/[&<>"]/g, "")}</text><text x="540" y="${middle + 300}" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" fill="#191624">Find your new favorite!</text></svg>`;
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="${height}" viewBox="0 0 1080 ${height}"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="${colors[0]}"/><stop offset="1" stop-color="${colors[1]}"/></linearGradient></defs><rect width="1080" height="${height}" fill="url(#g)"/><text x="540" y="${activeTemplate === "story" ? 300 : 170}" text-anchor="middle" font-family="Arial,'Yu Gothic','Hiragino Sans','Noto Sans JP',sans-serif" font-size="38" font-weight="700" letter-spacing="8" fill="#191624">MYBLENX STICKERS</text><text x="540" y="${middle + 50}" text-anchor="middle" font-family="Arial,'Yu Gothic','Hiragino Sans','Noto Sans JP',sans-serif" font-size="100" font-weight="700" letter-spacing="12" fill="#191624">${item.mark}</text><text x="540" y="${middle + 220}" text-anchor="middle" font-family="Arial,'Yu Gothic','Hiragino Sans','Noto Sans JP',sans-serif" font-size="68" font-weight="700" fill="#191624">${itemName(item).replace(/[&<>"]/g, "")}</text><text x="540" y="${middle + 300}" text-anchor="middle" font-family="Arial,'Yu Gothic','Hiragino Sans','Noto Sans JP',sans-serif" font-size="34" fill="#191624">${t("Find your new favorite!")}</text></svg>`;
         const link = document.createElement("a");
         link.href = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
         link.download = "pop-up-pass-post.svg";
         link.click();
         URL.revokeObjectURL(link.href);
-        showToast("Your design is ready to save.");
+        showToast(t("Your design is ready to save."));
       });
+      const trends = {
+        artist: ["A", "New Moment", "Try out a new set or collection. Fit your style and make your new fan favorites."],
+        crafter: ["C", "Creative Detail", "From crochets to keychains, accessories make an easy, giftable collection."],
+        food: ["F", "What’s in Season", "A pretty specialty beverage or unique themed snack could be the next new trend."],
+        student: ["S", "Focus on the Trends", "What’s old is new. Nostalgia is back, but so is pop culture. Find your niche for a fun, low-cost next drop."]
+      };
+      function renderAudience() {
+        const [mark, title, copy] = trends[activeAudience];
+        qs("#audienceTrend").innerHTML = `<div class="trend-mark">${mark}</div><div><strong>${t(title)}</strong><p>${t(copy)}</p></div>`;
+      }
       qsa("[data-audience]").forEach(button => button.addEventListener("click", () => {
-        const trends = {
-          artist: ["A", "New Moment", "Try out a new set or collection. Fit your style and make your new fan favorites."],
-          crafter: ["C", "Creative Detail", "From crochets to keychains, accessories make an easy, giftable collection."],
-          food: ["F", "What’s in Season", "A pretty specialty beverage or unique themed snack could be the next new trend."],
-          student: ["S", "Focus on the Trends", "What’s old is new. Nostalgia is back, but so is pop culture. Find your niche for a fun, low-cost next drop."]
-        };
+        activeAudience = button.dataset.audience;
         qsa("[data-audience]").forEach(option => {
           const active = option === button;
           option.classList.toggle("active", active);
           option.setAttribute("aria-selected", String(active));
         });
-        const [mark, title, copy] = trends[button.dataset.audience];
-        qs("#audienceTrend").innerHTML = `<div class="trend-mark">${mark}</div><div><strong>${title}</strong><p>${copy}</p></div>`;
+        renderAudience();
       }));
       function applyMotionPreference(event) {
         document.documentElement.classList.toggle("motion-off", event.matches);
@@ -332,6 +344,14 @@
       if (motionPreference.addEventListener) motionPreference.addEventListener("change", drawAscii);
       applyMotionPreference(motionPreference);
       if (motionPreference.addEventListener) motionPreference.addEventListener("change", applyMotionPreference);
-      render();
-      updatePrice();
+      function renderLanguage() {
+        const nameField = qs("#itemName");
+        if (nameField.value === "PUP Sticker" || nameField.value === window.PopUpLang.dictionary["PUP Sticker"]) nameField.value = t("PUP Sticker");
+        render();
+        updatePrice();
+        renderAudience();
+        renderCaption();
+      }
+      onLanguageChange(renderLanguage);
+      renderLanguage();
     })();
