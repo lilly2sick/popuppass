@@ -225,7 +225,7 @@
       qs("#downloadButton").addEventListener("click", () => {
         const item = items.find(entry => entry.id === qs("#postItem").value) || items[0];
         const colors = activeTemplate === "story" ? ["#c1b3ff", "#7bdcff"] : activeTemplate === "flyer" ? ["#ffb36b", "#a899ff"] : ["#ff9bdc", "#a899ff"];
-        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="${colors[0]}"/><stop offset="1" stop-color="${colors[1]}"/></linearGradient></defs><rect width="1080" height="1080" rx="70" fill="url(#g)"/><text x="540" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="8" fill="#191624">MOCHI PAWS STICKERS</text><text x="540" y="590" text-anchor="middle" font-family="Arial,sans-serif" font-size="100" font-weight="700" letter-spacing="12" fill="#191624">${item.mark}</text><text x="540" y="760" text-anchor="middle" font-family="Arial,sans-serif" font-size="68" font-weight="700" fill="#191624">${item.name.replace(/[&<>"]/g, "")}</text><text x="540" y="840" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" fill="#191624">Find your new favorite at Anime Fest</text></svg>`;
+        const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080"><defs><linearGradient id="g" x2="1" y2="1"><stop stop-color="${colors[0]}"/><stop offset="1" stop-color="${colors[1]}"/></linearGradient></defs><rect width="1080" height="1080" rx="70" fill="url(#g)"/><text x="540" y="170" text-anchor="middle" font-family="Arial,sans-serif" font-size="38" font-weight="700" letter-spacing="8" fill="#191624">MYBLENX STICKERS</text><text x="540" y="590" text-anchor="middle" font-family="Arial,sans-serif" font-size="100" font-weight="700" letter-spacing="12" fill="#191624">${item.mark}</text><text x="540" y="760" text-anchor="middle" font-family="Arial,sans-serif" font-size="68" font-weight="700" fill="#191624">${item.name.replace(/[&<>"]/g, "")}</text><text x="540" y="840" text-anchor="middle" font-family="Arial,sans-serif" font-size="34" fill="#191624">Find your new favorite!</text></svg>`;
         const link = document.createElement("a");
         link.href = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
         link.download = "pop-up-pass-post.svg";
@@ -235,10 +235,10 @@
       });
       qsa("[data-audience]").forEach(button => button.addEventListener("click", () => {
         const trends = {
-          artist: ["F", "Frogs are having a moment", "Try a tiny frog-and-mushroom sticker set. It fits your art style and gives your table a fresh little favorite."],
-          crafter: ["M", "Cozy cottagecore details", "Mini mushroom charms and nature-inspired accessories make an easy, giftable collection."],
-          food: ["B", "Strawberry matcha season", "A pretty strawberry-and-matcha special could be the new regulars’ favorite."],
-          student: ["Y2K", "Y2K nostalgia is back", "Colorful mini prints and nostalgic charm designs are a fun, low-cost next drop."]
+          artist: ["A", "New Moment", "Try out a new set or collection. Fit your style and make your new fan favorites."],
+          crafter: ["C", "Creative Detail", "From crochets to keychains, accessories make an easy, giftable collection."],
+          food: ["F", "What’s in Season", "A pretty specialty beverage or unique themed snack could be the next new trend."],
+          student: ["S", "Focus on the Trends", "What’s old is new. Nostalgia is back, but so is pop culture. Find your niche for a fun, low-cost next drop."]
         };
         qsa("[data-audience]").forEach(option => {
           const active = option === button;
@@ -258,6 +258,48 @@
           startBadgeMotion();
         }
       }
+      const asciiFont = {
+        C: [".###", "#...", "#...", "#...", ".###"],
+        E: ["####", "#...", "###.", "#...", "####"],
+        K: ["#..#", "#.#.", "##..", "#.#.", "#..#"],
+        O: [".##.", "#..#", "#..#", "#..#", ".##."],
+        P: ["###.", "#..#", "###.", "#...", "#..."],
+        R: ["###.", "#..#", "###.", "#.#.", "#..#"],
+        T: ["####", ".##.", ".##.", ".##.", ".##."],
+        U: ["#..#", "#..#", "#..#", "#..#", ".##."],
+        Y: ["#..#", "#..#", ".##.", ".##.", ".##."],
+        " ": ["..", "..", "..", "..", ".."]
+      };
+      const asciiRamp = "#@%&8$";
+      const asciiRows = text => asciiFont.P.map((_, row) => [...text].map(letter => asciiFont[letter][row]).join("."));
+      const taglineRows = asciiRows("YOUR POCKET PUP");
+      const paintAscii = (rows, frame) => rows.map((row, y) => [...row].map((cell, x) => {
+        if (cell !== "#") return " ";
+        if (motionPreference.matches) return "#";
+        return asciiRamp[Math.round((Math.sin(x * .45 + y * .7 - frame * .5) + 1) / 2 * (asciiRamp.length - 1))];
+      }).join("")).join("\n");
+      const asciiPup = frame => {
+        const still = motionPreference.matches;
+        const eyes = !still && frame % 32 >= 30 ? "- -" : "0 0";
+        const tail = !still && Math.floor(frame / 3) % 2 ? "/" : "~";
+        return ["  /^ ^\\", ` / ${eyes} \\`, " V\\ Y /V", "  / - \\", " /    |", `V__) ||${tail}`].join("\n");
+      };
+      let asciiFrame = 0;
+      let asciiVisible = !("IntersectionObserver" in window);
+      function drawAscii() {
+        qs("#asciiTagline").textContent = paintAscii(taglineRows, asciiFrame);
+        qs("#asciiPup").textContent = asciiPup(asciiFrame);
+      }
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(entries => { asciiVisible = entries[0].isIntersecting; }).observe(qs(".ascii-sign"));
+      }
+      setInterval(() => {
+        if (!asciiVisible || document.hidden || motionPreference.matches) return;
+        asciiFrame += 1;
+        drawAscii();
+      }, 110);
+      drawAscii();
+      if (motionPreference.addEventListener) motionPreference.addEventListener("change", drawAscii);
       applyMotionPreference(motionPreference);
       if (motionPreference.addEventListener) motionPreference.addEventListener("change", applyMotionPreference);
       render();
