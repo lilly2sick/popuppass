@@ -3,7 +3,7 @@ name: CI
 on:
   pull_request:
   push:
-    branches: [main, app-skeleton]
+    branches: [main]
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -34,7 +34,9 @@ jobs:
       - run: flutter test
       - name: Screenshots must match the committed renders
         working-directory: .
-        run: git diff --stat --exit-code -- docs/screenshots || echo "::warning::Screenshots differ from committed PNGs (font or renderer drift)"
+        # Blocking on purpose: renders come from fakes with a bundled monospace font and a
+        # pinned Flutter version, so any diff is a real UI change that must be re-committed.
+        run: git diff --stat --exit-code -- docs/screenshots
 
   supabase:
     name: Supabase database
@@ -44,6 +46,9 @@ jobs:
       - uses: supabase/setup-cli@v1
         with:
           version: 3.0.0
+      # Not run live in the authoring sandbox (no docker). The flags and every excluded
+      # service name were checked against `supabase start --help` for CLI 3.0.0, and the
+      # same pgTAP file passes via scripts/pgtap-local.sh. Confirm on the first PR run.
       - run: supabase start -x studio,imgproxy,mailpit,edge-runtime,vector,logflare,supavisor
       - run: supabase db reset
       - run: supabase test db
