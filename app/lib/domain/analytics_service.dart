@@ -30,7 +30,8 @@ class EventReport {
 
   int get netCents => grossCents - costCents - boothFeeCents;
 
-  List<ProductStats> get ranked => byProduct.values.toList()..sort((a, b) => b.profitCents.compareTo(a.profitCents));
+  List<ProductStats> get ranked =>
+      byProduct.values.toList()..sort((a, b) => b.profitCents.compareTo(a.profitCents));
   ProductStats? get best => ranked.isEmpty ? null : ranked.first;
   ProductStats? get worst => ranked.length < 2 ? null : ranked.last;
 }
@@ -41,7 +42,12 @@ class AnalyticsService {
 
   final SalesRepo sales;
 
-  Future<EventReport> report({ShopEvent? event, DateTime? from, DateTime? to, Map<String, String> names = const {}}) async {
+  Future<EventReport> report({
+    ShopEvent? event,
+    DateTime? from,
+    DateTime? to,
+    Map<String, String> names = const {},
+  }) async {
     final rows = await sales.linesFor(eventId: event?.id, from: from, to: to);
     final r = EventReport(boothFeeCents: event?.boothFeeCents ?? 0);
     for (final (sale, line) in rows) {
@@ -56,7 +62,10 @@ class AnalyticsService {
       final key = line.productId ?? 'unmatched:${line.externalName}';
       final p = r.byProduct.putIfAbsent(
         key,
-        () => ProductStats(line.productId, names[line.productId] ?? line.externalName ?? 'Unmatched item'),
+        () => ProductStats(
+          line.productId,
+          names[line.productId] ?? line.externalName ?? 'Unmatched item',
+        ),
       );
       p
         ..units += line.qty

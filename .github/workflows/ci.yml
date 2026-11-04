@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  app:
+    name: Flutter app
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.47.9"
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      # Format first: drift writes an unformatted, gitignored database.g.dart.
+      - run: dart format --set-exit-if-changed .
+      - run: dart run build_runner build --delete-conflicting-outputs
+      - run: flutter analyze
+      - run: flutter test
+      - name: Screenshots must match the committed renders
+        working-directory: .
+        # Blocking on purpose: renders come from fakes with a bundled monospace font and a
+        # pinned Flutter version, so any diff is a real UI change that must be re-committed.
+        run: git diff --stat --exit-code -- docs/screenshots
+
+  supabase:
+    name: Supabase database
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: supabase/setup-cli@v1
+        with:
+          version: 3.0.0
+      # Not run live in the authoring sandbox (no docker). The flags and every excluded
+      # service name were checked against `supabase start --help` for CLI 3.0.0, and the
+      # same pgTAP file passes via scripts/pgtap-local.sh. Confirm on the first PR run.
+      - run: supabase start -x studio,imgproxy,mailpit,edge-runtime,vector,logflare,supavisor
+      - run: supabase db reset
+      - run: supabase test db
+      - run: supabase db lint --fail-on error
+      - if: always()
+        run: supabase stop --no-backup
+
+  functions:
+    name: Edge Functions
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: supabase/functions
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.9.8"
+      - run: deno task check
+      - run: deno lint
+      - run: deno fmt --check
+      - run: deno task test

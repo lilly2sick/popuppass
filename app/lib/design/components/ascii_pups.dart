@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../tokens.dart';
 
 /// Bottom of Home: the "YOUR POCKET PUP" banner, a pup that wags and blinks,
@@ -58,19 +59,26 @@ class _AsciiPupsState extends State<AsciiPups> with SingleTickerProviderStateMix
   }
 
   String get _tagline => [
-        for (var y = 0; y < _rows.length; y++)
-          [
-            for (var x = 0; x < _rows[y].length; x++)
-              _rows[y][x] != '#'
-                  ? ' '
-                  : _ramp[((sin(x * .45 + y * .7 - _frame * .5) + 1) / 2 * (_ramp.length - 1)).round()],
-          ].join(),
-      ].join('\n');
+    for (var y = 0; y < _rows.length; y++)
+      [
+        for (var x = 0; x < _rows[y].length; x++)
+          _rows[y][x] != '#'
+              ? ' '
+              : _ramp[((sin(x * .45 + y * .7 - _frame * .5) + 1) / 2 * (_ramp.length - 1)).round()],
+      ].join(),
+  ].join('\n');
 
   String get _wagPup {
     final eyes = _frame % 32 >= 30 ? '- -' : '0 0';
     final tail = (_frame ~/ 3).isOdd ? '/' : '~';
-    return ['  /^ ^\\', ' / $eyes \\', ' V\\ Y /V', '  / - \\', ' /    |', 'V__) ||$tail'].join('\n');
+    return [
+      '  /^ ^\\',
+      ' / $eyes \\',
+      ' V\\ Y /V',
+      '  / - \\',
+      ' /    |',
+      'V__) ||$tail',
+    ].join('\n');
   }
 
   String get _walkPup {
@@ -83,8 +91,13 @@ class _AsciiPupsState extends State<AsciiPups> with SingleTickerProviderStateMix
     ].join('\n');
   }
 
-  TextStyle _mono(double size, Color color) =>
-      TextStyle(fontFamily: 'monospace', fontSize: size, height: 1.1, fontWeight: FontWeight.w700, color: color);
+  TextStyle _mono(double size, Color color) => TextStyle(
+    fontFamily: 'monospace',
+    fontSize: size,
+    height: 1.1,
+    fontWeight: FontWeight.w700,
+    color: color,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -102,7 +115,7 @@ class _AsciiPupsState extends State<AsciiPups> with SingleTickerProviderStateMix
               SizedBox(
                 width: 150,
                 child: Text(
-                  'Free mode keeps your data on this phone. We never sell your sales data.',
+                  AppLocalizations.of(context).asciiFreeModeNote,
                   style: PPType.body(size: 12, color: PPColors.muted),
                 ),
               ),
@@ -119,7 +132,10 @@ class _AsciiPupsState extends State<AsciiPups> with SingleTickerProviderStateMix
                     offset: Offset(-110 + _walk.value * (c.maxWidth + 110), 0),
                     child: child,
                   ),
-                  child: Align(alignment: Alignment.bottomLeft, child: Text(_walkPup, style: _mono(12, PPColors.teal))),
+                  child: Align(
+                    alignment: Alignment.bottomLeft,
+                    child: Text(_walkPup, style: _mono(12, PPColors.teal)),
+                  ),
                 ),
               ),
             ),

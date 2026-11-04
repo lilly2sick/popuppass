@@ -12,12 +12,12 @@ class ExportLocked implements Exception {
 /// Picks the exporter, applies plan gates, hands the file to the share sheet.
 class ExportService {
   ExportService({required this.entitlements, required String shopName})
-      : _exporters = {
-          ExportFormat.csv: CsvExporter(),
-          ExportFormat.png: PngExporter(),
-          ExportFormat.xlsx: XlsxExporter(),
-          ExportFormat.pdf: PdfReportExporter(shopName: shopName),
-        };
+    : _exporters = {
+        ExportFormat.csv: CsvExporter(),
+        ExportFormat.png: PngExporter(),
+        ExportFormat.xlsx: XlsxExporter(),
+        ExportFormat.pdf: PdfReportExporter(shopName: shopName),
+      };
 
   final Entitlements Function() entitlements;
   final Map<ExportFormat, Exporter> _exporters;

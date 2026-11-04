@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:path_provider/path_provider.dart';
 
 import '../domain/analytics_service.dart';
+import '../l10n/app_localizations.dart';
 import '../services/entitlements.dart';
 
 enum ExportFormat {
@@ -14,14 +15,24 @@ enum ExportFormat {
 
   const ExportFormat(this.ext, this.label);
   final String ext;
+
+  /// Stable English name for logs and file metadata.
   final String label;
+
+  /// Name shown to the user.
+  String localized(AppLocalizations l10n) => switch (this) {
+    ExportFormat.csv => l10n.exportFormatCsv,
+    ExportFormat.png => l10n.exportFormatPng,
+    ExportFormat.xlsx => l10n.exportFormatXlsx,
+    ExportFormat.pdf => l10n.exportFormatPdf,
+  };
 
   /// Free: CSV and PNG. Pro: branded PDF and XLSX.
   Feature? get gate => switch (this) {
-        ExportFormat.pdf => Feature.exportPdf,
-        ExportFormat.xlsx => Feature.exportXlsx,
-        _ => null,
-      };
+    ExportFormat.pdf => Feature.exportPdf,
+    ExportFormat.xlsx => Feature.exportXlsx,
+    _ => null,
+  };
 }
 
 /// What to export. Exporters read whatever fields they need.

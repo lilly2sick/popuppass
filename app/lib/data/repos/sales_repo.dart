@@ -26,7 +26,13 @@ class ImportedSale {
 }
 
 class ImportedLine {
-  const ImportedLine({required this.name, required this.qty, required this.unitPriceCents, this.productId, this.externalItemId});
+  const ImportedLine({
+    required this.name,
+    required this.qty,
+    required this.unitPriceCents,
+    this.productId,
+    this.externalItemId,
+  });
 
   final String name;
   final int qty;
@@ -45,18 +51,21 @@ class SalesRepo extends Repository<Sale> {
   String get entity => 'sales';
 
   @override
-  Stream<List<Sale>> watchAll() => (db.select(db.sales)
-        ..where((s) => s.deleted.equals(false))
-        ..orderBy([(s) => OrderingTerm.desc(s.soldAt)]))
-      .watch();
+  Stream<List<Sale>> watchAll() =>
+      (db.select(db.sales)
+            ..where((s) => s.deleted.equals(false))
+            ..orderBy([(s) => OrderingTerm.desc(s.soldAt)]))
+          .watch();
 
-  Stream<List<Sale>> watchForEvent(String eventId) => (db.select(db.sales)
-        ..where((s) => s.deleted.equals(false) & s.eventId.equals(eventId))
-        ..orderBy([(s) => OrderingTerm.desc(s.soldAt)]))
-      .watch();
+  Stream<List<Sale>> watchForEvent(String eventId) =>
+      (db.select(db.sales)
+            ..where((s) => s.deleted.equals(false) & s.eventId.equals(eventId))
+            ..orderBy([(s) => OrderingTerm.desc(s.soldAt)]))
+          .watch();
 
   @override
-  Future<Sale?> byId(String id) => (db.select(db.sales)..where((s) => s.id.equals(id))).getSingleOrNull();
+  Future<Sale?> byId(String id) =>
+      (db.select(db.sales)..where((s) => s.id.equals(id))).getSingleOrNull();
 
   /// The +1 sold tap. Sale, line and stock move are written in one transaction.
   Future<String> recordQuickSale({
@@ -69,22 +78,30 @@ class SalesRepo extends Repository<Sale> {
     return db.transaction(() async {
       final saleId = makeId();
       final lineId = makeId();
-      await db.into(db.sales).insert(SalesCompanion.insert(
-            id: Value(saleId),
-            eventId: Value(eventId),
-            paymentMethod: method,
-            totalCents: product.priceCents * qty,
-            deviceId: Value(deviceId),
-          ));
-      await db.into(db.saleLines).insert(SaleLinesCompanion.insert(
-            id: Value(lineId),
-            saleId: saleId,
-            productId: Value(product.id),
-            qty: qty,
-            unitPriceCents: product.priceCents,
-            unitCostCents: cost,
-            deviceId: Value(deviceId),
-          ));
+      await db
+          .into(db.sales)
+          .insert(
+            SalesCompanion.insert(
+              id: Value(saleId),
+              eventId: Value(eventId),
+              paymentMethod: method,
+              totalCents: product.priceCents * qty,
+              deviceId: Value(deviceId),
+            ),
+          );
+      await db
+          .into(db.saleLines)
+          .insert(
+            SaleLinesCompanion.insert(
+              id: Value(lineId),
+              saleId: saleId,
+              productId: Value(product.id),
+              qty: qty,
+              unitPriceCents: product.priceCents,
+              unitCostCents: cost,
+              deviceId: Value(deviceId),
+            ),
+          );
       await inventory.move(
         productId: product.id,
         delta: -qty,
@@ -100,55 +117,65 @@ class SalesRepo extends Repository<Sale> {
 
   /// Undo: soft-delete the sale and return stock with a `voided` move.
   Future<void> voidSale(String saleId) => db.transaction(() async {
-        final lines = await (db.select(db.saleLines)..where((l) => l.saleId.equals(saleId))).get();
-        final sale = await byId(saleId);
-        for (final l in lines) {
-          if (l.productId == null) continue;
-          await inventory.move(
-            productId: l.productId!,
-            delta: l.qty,
-            reason: MoveReason.voided,
-            eventId: sale?.eventId,
-            saleLineId: l.id,
-          );
-        }
-        await softDelete(saleId);
-      });
+    final lines = await (db.select(db.saleLines)..where((l) => l.saleId.equals(saleId))).get();
+    final sale = await byId(saleId);
+    for (final l in lines) {
+      if (l.productId == null) continue;
+      await inventory.move(
+        productId: l.productId!,
+        delta: l.qty,
+        reason: MoveReason.voided,
+        eventId: sale?.eventId,
+        saleLineId: l.id,
+      );
+    }
+    await softDelete(saleId);
+  });
 
   /// Dedupes on (source, externalId). Returns how many were new.
   Future<int> importSales(List<ImportedSale> incoming, {String? eventId}) async {
     var added = 0;
     await db.transaction(() async {
       for (final s in incoming) {
-        final exists = await (db.select(db.sales)
-              ..where((x) => x.source.equalsValue(s.source) & x.externalId.equals(s.externalId)))
-            .getSingleOrNull();
+        final exists =
+            await (db.select(
+                  db.sales,
+                )..where((x) => x.source.equalsValue(s.source) & x.externalId.equals(s.externalId)))
+                .getSingleOrNull();
         if (exists != null) continue;
         added++;
         final saleId = makeId();
-        await db.into(db.sales).insert(SalesCompanion.insert(
-              id: Value(saleId),
-              eventId: Value(eventId),
-              soldAt: Value(s.soldAt),
-              paymentMethod: s.method,
-              source: Value(s.source),
-              externalId: Value(s.externalId),
-              totalCents: s.totalCents,
-              deviceId: Value(deviceId),
-            ));
+        await db
+            .into(db.sales)
+            .insert(
+              SalesCompanion.insert(
+                id: Value(saleId),
+                eventId: Value(eventId),
+                soldAt: Value(s.soldAt),
+                paymentMethod: s.method,
+                source: Value(s.source),
+                externalId: Value(s.externalId),
+                totalCents: s.totalCents,
+                deviceId: Value(deviceId),
+              ),
+            );
         for (final l in s.lines) {
           final lineId = makeId();
           final cost = l.productId == null ? 0 : await products.unitCost(l.productId!);
-          await db.into(db.saleLines).insert(SaleLinesCompanion.insert(
-                id: Value(lineId),
-                saleId: saleId,
-                productId: Value(l.productId),
-                externalName: Value(l.name),
-                qty: l.qty,
-                unitPriceCents: l.unitPriceCents,
-                unitCostCents: cost,
-                deviceId: Value(deviceId),
-              ));
+          await db
+              .into(db.saleLines)
+              .insert(
+                SaleLinesCompanion.insert(
+                  id: Value(lineId),
+                  saleId: saleId,
+                  productId: Value(l.productId),
+                  externalName: Value(l.name),
+                  qty: l.qty,
+                  unitPriceCents: l.unitPriceCents,
+                  unitCostCents: cost,
+                  deviceId: Value(deviceId),
+                ),
+              );
           if (l.productId != null) {
             await inventory.move(
               productId: l.productId!,
@@ -168,8 +195,9 @@ class SalesRepo extends Repository<Sale> {
 
   /// Lines with their sale, for analytics.
   Future<List<(Sale, SaleLine)>> linesFor({String? eventId, DateTime? from, DateTime? to}) async {
-    final q = db.select(db.saleLines).join([innerJoin(db.sales, db.sales.id.equalsExp(db.saleLines.saleId))])
-      ..where(db.sales.deleted.equals(false) & db.saleLines.deleted.equals(false));
+    final q = db.select(db.saleLines).join([
+      innerJoin(db.sales, db.sales.id.equalsExp(db.saleLines.saleId)),
+    ])..where(db.sales.deleted.equals(false) & db.saleLines.deleted.equals(false));
     if (eventId != null) q.where(db.sales.eventId.equals(eventId));
     if (from != null) q.where(db.sales.soldAt.isBiggerOrEqualValue(from));
     if (to != null) q.where(db.sales.soldAt.isSmallerThanValue(to));

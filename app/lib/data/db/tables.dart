@@ -41,7 +41,8 @@ class Events extends Table with Syncable {
   RealColumn get lng => real().nullable()();
   IntColumn get boothFeeCents => integer().withDefault(const Constant(0))();
   TextColumn get boothLabel => text().nullable()();
-  TextColumn get source => textEnum<RecordSource>().withDefault(Constant(RecordSource.manual.name))();
+  TextColumn get source =>
+      textEnum<RecordSource>().withDefault(Constant(RecordSource.manual.name))();
   TextColumn get externalId => text().nullable()();
 }
 
@@ -53,8 +54,10 @@ class Products extends Table with Syncable {
   /// Manual unit cost. When BOM lines exist, the BOM total wins.
   IntColumn get unitCostCents => integer().withDefault(const Constant(0))();
   IntColumn get minutesToMake => integer().nullable()();
-  TextColumn get tags => text().map(const StringListConverter()).withDefault(const Constant('[]'))();
-  TextColumn get photoPaths => text().map(const StringListConverter()).withDefault(const Constant('[]'))();
+  TextColumn get tags =>
+      text().map(const StringListConverter()).withDefault(const Constant('[]'))();
+  TextColumn get photoPaths =>
+      text().map(const StringListConverter()).withDefault(const Constant('[]'))();
   IntColumn get lowStockThreshold => integer().withDefault(const Constant(3))();
   TextColumn get squareItemId => text().nullable()();
   BoolColumn get archived => boolean().withDefault(const Constant(false))();
@@ -73,7 +76,8 @@ class Sales extends Table with Syncable {
   TextColumn get eventId => text().nullable().references(Events, #id)();
   DateTimeColumn get soldAt => dateTime().withDefault(currentDateAndTime)();
   TextColumn get paymentMethod => textEnum<PaymentMethod>()();
-  TextColumn get source => textEnum<RecordSource>().withDefault(Constant(RecordSource.manual.name))();
+  TextColumn get source =>
+      textEnum<RecordSource>().withDefault(Constant(RecordSource.manual.name))();
   TextColumn get externalId => text().nullable()();
   IntColumn get totalCents => integer()();
   TextColumn get note => text().nullable()();
@@ -105,10 +109,12 @@ class InventoryMoves extends Table with Syncable {
 class Brands extends Table with Syncable {
   TextColumn get shopName => text()();
   TextColumn get handle => text().nullable()();
-  TextColumn get colors => text().map(const StringListConverter()).withDefault(const Constant('[]'))();
+  TextColumn get colors =>
+      text().map(const StringListConverter()).withDefault(const Constant('[]'))();
   TextColumn get logoPath => text().nullable()();
   TextColumn get boothLabel => text().nullable()();
-  TextColumn get nicheTags => text().map(const StringListConverter()).withDefault(const Constant('[]'))();
+  TextColumn get nicheTags =>
+      text().map(const StringListConverter()).withDefault(const Constant('[]'))();
 }
 
 @DataClassName('PricePoint')

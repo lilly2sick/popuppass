@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../config.dart';
 import '../design/components/lanyard_loader.dart';
 import '../design/theme.dart';
+import '../l10n/app_localizations.dart';
 import '../providers.dart';
 import 'router.dart';
 
@@ -19,11 +20,15 @@ class PopUpPassApp extends ConsumerWidget {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: PPTheme.dark(),
-        home: LanyardLoader(error: boot.hasError ? 'Something went wrong starting up. Restart the app.' : null),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: LanyardLoader(hasError: boot.hasError),
       );
     }
     return MaterialApp.router(
-      title: 'Pop-Up Pass',
+      onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
       debugShowCheckedModeBanner: false,
       theme: PPTheme.dark(),
       routerConfig: ref.watch(routerProvider),

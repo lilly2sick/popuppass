@@ -35,12 +35,12 @@ class XlsxExporter extends Exporter {
   ExportFormat get format => ExportFormat.xlsx;
 
   CellValue? _cell(Object? v) => switch (v) {
-        null => null,
-        int i => IntCellValue(i),
-        double d => DoubleCellValue(d),
-        DateTime t => DateTimeCellValue.fromDateTime(t),
-        _ => TextCellValue(v.toString()),
-      };
+    null => null,
+    int i => IntCellValue(i),
+    double d => DoubleCellValue(d),
+    DateTime t => DateTimeCellValue.fromDateTime(t),
+    _ => TextCellValue(v.toString()),
+  };
 
   void _sheet(Excel x, String name, List<List<Object?>> rows) {
     if (rows.isEmpty) return;
@@ -66,7 +66,16 @@ class XlsxExporter extends Exporter {
       _sheet(x, 'Per product', [
         ['Item', 'Units', 'Gross', 'Cost', 'Profit', 'Margin', 'First sold', 'Last sold'],
         for (final p in r.ranked)
-          [p.name, p.units, p.grossCents / 100, p.costCents / 100, p.profitCents / 100, p.margin, p.firstSold, p.lastSold],
+          [
+            p.name,
+            p.units,
+            p.grossCents / 100,
+            p.costCents / 100,
+            p.profitCents / 100,
+            p.margin,
+            p.firstSold,
+            p.lastSold,
+          ],
       ]);
     }
     _sheet(x, 'Sales', req.salesRows);
@@ -97,10 +106,16 @@ class PdfReportExporter extends Exporter {
         build: (_) => [
           pw.Text(shopName.toUpperCase(), style: const pw.TextStyle(fontSize: 10, color: ink)),
           pw.SizedBox(height: 4),
-          pw.Text(req.title, style: pw.TextStyle(fontSize: 26, fontWeight: pw.FontWeight.bold, color: ink)),
+          pw.Text(
+            req.title,
+            style: pw.TextStyle(fontSize: 26, fontWeight: pw.FontWeight.bold, color: ink),
+          ),
           pw.SizedBox(height: 16),
           if (r != null) ...[
-            pw.Text(Money.signed(r.netCents), style: pw.TextStyle(fontSize: 40, fontWeight: pw.FontWeight.bold, color: cobalt)),
+            pw.Text(
+              Money.signed(r.netCents),
+              style: pw.TextStyle(fontSize: 40, fontWeight: pw.FontWeight.bold, color: cobalt),
+            ),
             pw.Text(
               '${Money.format(r.grossCents)} gross, ${Money.format(r.costCents)} cost, '
               '${Money.format(r.boothFeeCents)} booth. ${r.units} sold.',
@@ -110,7 +125,13 @@ class PdfReportExporter extends Exporter {
               headers: ['Item', 'Units', 'Gross', 'Profit', 'Margin'],
               data: [
                 for (final p in r.ranked)
-                  [p.name, '${p.units}', Money.format(p.grossCents), Money.signed(p.profitCents), '${(p.margin * 100).round()}%'],
+                  [
+                    p.name,
+                    '${p.units}',
+                    Money.format(p.grossCents),
+                    Money.signed(p.profitCents),
+                    '${(p.margin * 100).round()}%',
+                  ],
               ],
             ),
           ],

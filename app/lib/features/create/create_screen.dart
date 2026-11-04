@@ -14,44 +14,65 @@ import '../../design/components/tiles.dart';
 import '../../design/tokens.dart';
 import '../../domain/enums.dart';
 import '../../domain/money.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../../render/capture.dart';
 import '../../render/post_format.dart';
 import '../../render/post_template.dart';
 import '../../services/entitlements.dart';
 import '../../services/haptics_service.dart';
+import '../../services/social_share_service.dart';
 
 /// The look the vendor picks. Each share destination then exports at its own
 /// platform size for that look.
 enum PostShape {
-  post('Post', 'post', PostFormat.instagramPortrait),
-  story('Story', 'story', PostFormat.story),
-  wide('Wide', 'wide post', PostFormat.facebookLink);
+  post(PostFormat.instagramPortrait),
+  story(PostFormat.story),
+  wide(PostFormat.facebookLink);
 
-  const PostShape(this.label, this.noun, this.preview);
-  final String label;
-  final String noun;
+  const PostShape(this.preview);
   final PostFormat preview;
+
+  String label(AppLocalizations l10n) => switch (this) {
+    PostShape.post => l10n.createShapePost,
+    PostShape.story => l10n.createShapeStory,
+    PostShape.wide => l10n.createShapeWide,
+  };
+
+  String noun(AppLocalizations l10n) => switch (this) {
+    PostShape.post => l10n.createNounPost,
+    PostShape.story => l10n.createNounStory,
+    PostShape.wide => l10n.createNounWide,
+  };
 }
 
 enum ShareTarget {
-  png('Save as PNG', 'PNG'),
-  instagram('Instagram', 'IG'),
-  facebook('Facebook', 'FB'),
-  linkedin('LinkedIn', 'IN'),
-  more('More apps', '...');
+  png('PNG'),
+  instagram('IG'),
+  facebook('FB'),
+  linkedin('IN'),
+  more('...');
 
-  const ShareTarget(this.label, this.mark);
-  final String label;
+  const ShareTarget(this.mark);
+
+  /// Short glyph in the row badge. Brand abbreviations, not translated.
   final String mark;
 
+  String label(AppLocalizations l10n) => switch (this) {
+    ShareTarget.png => l10n.createTargetPng,
+    ShareTarget.instagram => l10n.createTargetInstagram,
+    ShareTarget.facebook => l10n.createTargetFacebook,
+    ShareTarget.linkedin => l10n.createTargetLinkedin,
+    ShareTarget.more => l10n.createTargetMore,
+  };
+
   PostFormat formatFor(PostShape s) => switch ((this, s)) {
-        (_, PostShape.post) => PostFormat.instagramPortrait,
-        (_, PostShape.story) => PostFormat.story,
-        (ShareTarget.instagram, PostShape.wide) => PostFormat.square,
-        (ShareTarget.linkedin, PostShape.wide) => PostFormat.linkedin,
-        (_, PostShape.wide) => PostFormat.facebookLink,
-      };
+    (_, PostShape.post) => PostFormat.instagramPortrait,
+    (_, PostShape.story) => PostFormat.story,
+    (ShareTarget.instagram, PostShape.wide) => PostFormat.square,
+    (ShareTarget.linkedin, PostShape.wide) => PostFormat.linkedin,
+    (_, PostShape.wide) => PostFormat.facebookLink,
+  };
 }
 
 class CreateScreen extends ConsumerStatefulWidget {
@@ -82,7 +103,12 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
 
   Future<void> _pick(Product p) async {
     final brand = ref.read(brandProvider).valueOrNull;
-    final input = {'product': p.name, 'price': Money.format(p.priceCents), 'booth': brand?.boothLabel, 'shop': brand?.shopName};
+    final input = {
+      'product': p.name,
+      'price': Money.format(p.priceCents),
+      'booth': brand?.boothLabel,
+      'shop': brand?.shopName,
+    };
     _caption.text = await const LocalTemplateProvider().run(AiJobKind.caption, input);
     String? jobId;
     if (ref.read(entitlementsProvider).can(Feature.aiCaption)) {
@@ -102,12 +128,16 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
     await WidgetsBinding.instance.endOfFrame;
     final bytes = await capturePng(_boundary, targetWidth: f.width);
     setState(() => _renderFormat = null);
-    final dir = await getTemporaryDirectory();
-    final name = '${(_product?.name ?? 'post').replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-').toLowerCase()}-${f.sizeLabel}.png';
+    // share_plus's FileProvider (also used for direct Stories intents) serves
+    // only <cache>/share_plus/.
+    final dir = await Directory('${(await getTemporaryDirectory()).path}/share_plus').create();
+    final name =
+        '${(_product?.name ?? 'post').replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-').toLowerCase()}-${f.sizeLabel}.png';
     return File('${dir.path}/$name').writeAsBytes(bytes, flush: true);
   }
 
   Future<void> _send(ShareTarget t) async {
+    final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     Navigator.pop(context);
     final f = t.formatFor(_shape);
@@ -115,19 +145,26 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
     if (t == ShareTarget.png) {
       try {
         if (!await Gal.hasAccess()) await Gal.requestAccess();
-        await Gal.putImage(file.path, album: 'Pop-Up Pass');
+        await Gal.putImage(file.path, album: l10n.appTitle);
         await ref.read(hapticsProvider).play(HapticMoment.success);
-        messenger.showSnackBar(SnackBar(content: Text('Saved ${f.width} x ${f.height} PNG to Photos')));
+        messenger.showSnackBar(
+          SnackBar(content: Text(l10n.createSavedToPhotos(f.width, f.height))),
+        );
       } on GalException {
         await ref.read(hapticsProvider).play(HapticMoment.error);
-        messenger.showSnackBar(const SnackBar(content: Text('Could not save. Allow Photos access in Settings.')));
+        messenger.showSnackBar(SnackBar(content: Text(l10n.createSaveFailed)));
       }
       return;
     }
-    // TODO(share): Instagram Stories / Facebook direct share intents need a
-    // Meta app id; until then every social target opens the system share
-    // sheet with the right-size image and caption attached.
-    await Share.shareXFiles([XFile(file.path, mimeType: 'image/png')], text: _caption.text);
+    final social = ref.read(socialShareProvider);
+    switch (t) {
+      case ShareTarget.instagram:
+        await social.share(SocialApp.instagram, file, _caption.text);
+      case ShareTarget.facebook:
+        await social.share(SocialApp.facebook, file, _caption.text);
+      case _:
+        await Share.shareXFiles([XFile(file.path, mimeType: 'image/png')], text: _caption.text);
+    }
   }
 
   void _openShare() {
@@ -140,7 +177,10 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Share ${_shape.noun}', style: PPType.title(size: 24)),
+              Text(
+                AppLocalizations.of(ctx).createShareShape(_shape.noun(AppLocalizations.of(ctx))),
+                style: PPType.title(size: 24),
+              ),
               const SizedBox(height: PPSpace.md),
               for (final t in ShareTarget.values)
                 Padding(
@@ -156,23 +196,42 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final all = ref.watch(productsProvider).valueOrNull ?? const <Product>[];
-    final products = _query.isEmpty ? all : all.where((p) => p.name.toLowerCase().contains(_query.toLowerCase())).toList();
+    final products = _query.isEmpty
+        ? all
+        : all.where((p) => p.name.toLowerCase().contains(_query.toLowerCase())).toList();
     final brand = ref.watch(brandProvider).valueOrNull;
+    final draftId = ref.watch(createDraftProductProvider);
+    final draft = all.where((x) => x.id == draftId).firstOrNull;
+    if (draft != null) {
+      // Home's best seller suggestion: open on that item.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ref.read(createDraftProductProvider.notifier).state = null;
+        _pick(draft);
+      });
+    }
     final p = _product;
+    if (p == null && all.isNotEmpty && draft == null) {
+      // The artboard opens with the first item already chosen.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _product == null) _pick(all.first);
+      });
+    }
     final format = _renderFormat ?? _shape.preview;
 
     final content = PostContent(
-      headline: p == null ? 'Pick an item' : '${p.name} is back.',
-      shopName: brand?.shopName ?? 'My shop',
+      headline: p == null ? l10n.createPickItem : l10n.createBackSoon(p.name),
+      shopName: brand?.shopName ?? l10n.createDefaultShopName,
       priceLabel: p == null ? null : Money.format(p.priceCents),
       handle: brand?.handle,
       boothLabel: brand?.boothLabel,
     );
 
     return PPScaffold(
-      title: 'Make a little noise.',
-      searchHint: 'Search items to post',
+      title: l10n.createTitle,
+      searchHint: l10n.createSearchHint,
       onSearch: (q) => setState(() => _query = q.trim()),
       onSearchSubmit: (_) {},
       scrollable: false,
@@ -185,7 +244,11 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
               scrollDirection: Axis.horizontal,
               itemCount: products.length,
               separatorBuilder: (_, __) => const SizedBox(width: 6),
-              itemBuilder: (_, i) => PPChip(label: products[i].name, selected: products[i].id == p?.id, onTap: () => _pick(products[i])),
+              itemBuilder: (_, i) => PPChip(
+                label: products[i].name,
+                selected: products[i].id == p?.id,
+                onTap: () => _pick(products[i]),
+              ),
             ),
           ),
           const SizedBox(height: PPSpace.md),
@@ -198,14 +261,20 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
                   Expanded(
                     child: Center(
                       child: FittedBox(
-                        child: RepaintBoundary(key: _boundary, child: postTemplates.first.build(content, format)),
+                        child: RepaintBoundary(
+                          key: _boundary,
+                          child: postTemplates.first.build(content, format),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: PPSpace.sm),
                   Container(
                     padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(color: PPColors.bg, borderRadius: BorderRadius.circular(PPRadius.chip)),
+                    decoration: BoxDecoration(
+                      color: PPColors.bg,
+                      borderRadius: BorderRadius.circular(PPRadius.chip),
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -223,7 +292,14 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
                                   color: s == _shape ? PPColors.violet : PPColors.bg,
                                   borderRadius: BorderRadius.circular(PPRadius.chip),
                                 ),
-                                child: Text(s.label, style: PPType.body(size: 13, weight: FontWeight.w800, color: s == _shape ? PPColors.onAccent : PPColors.text)),
+                                child: Text(
+                                  s.label(l10n),
+                                  style: PPType.body(
+                                    size: 13,
+                                    weight: FontWeight.w800,
+                                    color: s == _shape ? PPColors.onAccent : PPColors.text,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -243,11 +319,19 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
               children: [
                 Row(
                   children: [
-                    Expanded(child: Text('CAPTION', style: PPType.label(size: 10, color: PPColors.muted))),
+                    Expanded(
+                      child: Text(
+                        l10n.createCaptionLabel,
+                        style: PPType.label(size: 10, color: PPColors.muted),
+                      ),
+                    ),
                     if (_aiJobId != null)
                       GestureDetector(
                         onTap: () => setState(() => _showAi = !_showAi),
-                        child: Text(_showAi ? 'Use mine' : 'AI version', style: PPType.label(size: 10, color: PPColors.violet)),
+                        child: Text(
+                          _showAi ? l10n.createUseMine : l10n.createAiVersion,
+                          style: PPType.label(size: 10, color: PPColors.violet),
+                        ),
                       ),
                   ],
                 ),
@@ -265,20 +349,26 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
                     controller: _caption,
                     maxLines: 2,
                     style: PPType.body(size: 14),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       isDense: true,
                       filled: false,
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
-                      hintText: 'Pick an item to start a caption',
+                      hintText: l10n.createCaptionHint,
                     ),
                   ),
               ],
             ),
           ),
           const SizedBox(height: PPSpace.md),
-          PPButton(label: 'Share or save', icon: Icons.ios_share_rounded, height: 56, expand: true, onPressed: p == null ? null : _openShare),
+          PPButton(
+            label: l10n.createShareOrSave,
+            icon: Icons.ios_share_rounded,
+            height: 56,
+            expand: true,
+            onPressed: p == null ? null : _openShare,
+          ),
         ],
       ),
     );
@@ -294,12 +384,13 @@ class _ShareRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final primary = target == ShareTarget.png;
     final fg = primary ? PPColors.onAccent : PPColors.text;
     final sub = switch (target) {
-      ShareTarget.png => '${format.width} x ${format.height} to Photos',
-      ShareTarget.more => 'Messages, Shopify, Etsy and others',
-      _ => '${format.width} x ${format.height}',
+      ShareTarget.png => l10n.createTargetPngSubtitle(format.width, format.height),
+      ShareTarget.more => l10n.createTargetMoreSubtitle,
+      _ => l10n.createTargetSizeSubtitle(format.width, format.height),
     };
     return Semantics(
       button: true,
@@ -319,7 +410,10 @@ class _ShareRow extends StatelessWidget {
                 width: 36,
                 height: 36,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(color: primary ? PPColors.text : PPColors.lilac, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(
+                  color: primary ? PPColors.text : PPColors.lilac,
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: Text(target.mark, style: PPType.label(size: 11, color: PPColors.onAccent)),
               ),
               const SizedBox(width: PPSpace.md),
@@ -327,8 +421,17 @@ class _ShareRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(target.label, style: PPType.body(size: 15, weight: FontWeight.w800, color: fg)),
-                    Text(sub, style: PPType.body(size: 12, color: primary ? PPColors.onAccent : PPColors.muted)),
+                    Text(
+                      target.label(l10n),
+                      style: PPType.body(size: 15, weight: FontWeight.w800, color: fg),
+                    ),
+                    Text(
+                      sub,
+                      style: PPType.body(
+                        size: 12,
+                        color: primary ? PPColors.onAccent : PPColors.muted,
+                      ),
+                    ),
                   ],
                 ),
               ),

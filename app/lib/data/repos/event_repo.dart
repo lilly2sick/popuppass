@@ -11,29 +11,33 @@ class EventRepo extends Repository<ShopEvent> {
   String get entity => 'events';
 
   @override
-  Stream<List<ShopEvent>> watchAll() => (db.select(db.events)
-        ..where((e) => e.deleted.equals(false))
-        ..orderBy([(e) => OrderingTerm.asc(e.startsAt)]))
-      .watch();
+  Stream<List<ShopEvent>> watchAll() =>
+      (db.select(db.events)
+            ..where((e) => e.deleted.equals(false))
+            ..orderBy([(e) => OrderingTerm.asc(e.startsAt)]))
+          .watch();
 
   @override
-  Future<ShopEvent?> byId(String id) => (db.select(db.events)..where((e) => e.id.equals(id))).getSingleOrNull();
+  Future<ShopEvent?> byId(String id) =>
+      (db.select(db.events)..where((e) => e.id.equals(id))).getSingleOrNull();
 
   /// The live event, else the next upcoming one, else the most recent.
   Stream<ShopEvent?> watchCurrent({DateTime? now}) => watchAll().map((events) {
-        final t = now ?? DateTime.now();
-        for (final e in events) {
-          if (!t.isBefore(e.startsAt) && !t.isAfter(e.endsAt)) return e;
-        }
-        for (final e in events) {
-          if (e.startsAt.isAfter(t)) return e;
-        }
-        return events.isEmpty ? null : events.last;
-      });
+    final t = now ?? DateTime.now();
+    for (final e in events) {
+      if (!t.isBefore(e.startsAt) && !t.isAfter(e.endsAt)) return e;
+    }
+    for (final e in events) {
+      if (e.startsAt.isAfter(t)) return e;
+    }
+    return events.isEmpty ? null : events.last;
+  });
 
   Future<String> save(EventsCompanion data) async {
     final id = data.id.present ? data.id.value : makeId();
-    await db.into(db.events).insertOnConflictUpdate(
+    await db
+        .into(db.events)
+        .insertOnConflictUpdate(
           data.copyWith(id: Value(id), updatedAt: Value(DateTime.now()), deviceId: Value(deviceId)),
         );
     await touched(id);
@@ -45,9 +49,13 @@ class EventRepo extends Repository<ShopEvent> {
     var added = 0;
     await db.transaction(() async {
       for (final e in incoming) {
-        final existing = await (db.select(db.events)
-              ..where((x) => x.source.equalsValue(e.source.value) & x.externalId.equals(e.externalId.value!)))
-            .getSingleOrNull();
+        final existing =
+            await (db.select(db.events)..where(
+                  (x) =>
+                      x.source.equalsValue(e.source.value) &
+                      x.externalId.equals(e.externalId.value!),
+                ))
+                .getSingleOrNull();
         if (existing == null) added++;
         await save(existing == null ? e : e.copyWith(id: Value(existing.id)));
       }
