@@ -13,6 +13,7 @@ import '../../design/components/stats.dart';
 import '../../design/components/tiles.dart';
 import '../../design/tokens.dart';
 import '../../domain/money.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../../services/haptics_service.dart';
 
@@ -30,29 +31,33 @@ class HomeScreen extends ConsumerWidget {
     final top = favs.take(3).toList();
     final maxSold = top.isEmpty ? 1 : (sold[top.first.id] ?? 0).clamp(1, 1 << 30);
 
+    final l10n = AppLocalizations.of(context);
+    final totalSold = sold.values.fold<int>(0, (a, b) => a + b);
+    final totalStocked = stock.values.fold<int>(0, (a, b) => a + b) + totalSold;
+
     return PPScaffold(
-      eyebrow: 'Made for the makers',
-      title: 'Hey, maker.',
-      searchHint: 'Search items, sales, events',
-      action: PPButton(label: 'Open table', onPressed: () => context.go(AppTab.sell.path)),
+      eyebrow: l10n.homeEyebrow,
+      title: l10n.homeTitle,
+      searchHint: l10n.homeSearchHint,
+      action: PPButton(label: l10n.homeOpenTable, onPressed: () => context.go(AppTab.sell.path)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
               Expanded(
-                child: StatCard(label: 'Gross', value: Money.format(today.grossCents)),
+                child: StatCard(label: l10n.homeStatGross, value: Money.format(today.grossCents)),
               ),
               const SizedBox(width: PPSpace.sm),
               Expanded(
-                child: StatCard(label: 'Sold', value: '${today.units}'),
+                child: StatCard(label: l10n.homeStatSold, value: '${today.units}'),
               ),
               const SizedBox(width: PPSpace.sm),
               Expanded(
                 child: StatCard(
-                  label: 'Low',
+                  label: l10n.homeStatLow,
                   value: '${low.length}',
-                  unit: low.length == 1 ? 'item' : 'items',
+                  unit: low.length == 1 ? l10n.homeItemOne : l10n.homeItemMany,
                   warn: low.isNotEmpty,
                   onTap: () => context.go(AppTab.shop.path),
                 ),
@@ -88,11 +93,11 @@ class HomeScreen extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          '${low.first.name} is almost gone.',
+                          l10n.homeAlmostGone(low.first.name),
                           style: PPType.body(size: 15, weight: FontWeight.w800),
                         ),
                         Text(
-                          '${stock[low.first.id] ?? 0} left.',
+                          l10n.homeLeft(stock[low.first.id] ?? 0),
                           style: PPType.body(size: 13, color: PPColors.muted),
                         ),
                       ],
@@ -110,7 +115,7 @@ class HomeScreen extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text('Fan favorites', style: PPType.title(size: 20)),
+                  Text(l10n.homeFanFavorites, style: PPType.title(size: 20)),
                   const SizedBox(height: PPSpace.sm),
                   for (var i = 0; i < top.length; i++)
                     Padding(
@@ -147,7 +152,7 @@ class HomeScreen extends ConsumerWidget {
                           SizedBox(
                             width: 56,
                             child: Text(
-                              '${sold[top[i].id] ?? 0} sold',
+                              l10n.homeSoldCount(sold[top[i].id] ?? 0),
                               textAlign: TextAlign.right,
                               style: PPType.body(size: 13, weight: FontWeight.w800),
                             ),
@@ -160,7 +165,38 @@ class HomeScreen extends ConsumerWidget {
             ),
           ],
           const SizedBox(height: PPSpace.lg),
-          Text('Room to experiment', style: PPType.title(size: 20)),
+          Text(l10n.homeDayTitle, style: PPType.title(size: 20)),
+          const SizedBox(height: PPSpace.sm),
+          _DaySteps(
+            steps: [
+              _Step(
+                l10n.homeStepBeforeTag,
+                l10n.homeStepBeforeTitle,
+                l10n.homeStepBeforeText(totalStocked),
+                _StepState.done,
+              ),
+              _Step(
+                l10n.homeStepNowTag,
+                l10n.homeStepNowTitle,
+                l10n.homeStepNowText(today.units),
+                _StepState.now,
+              ),
+              _Step(
+                l10n.homeStepPostTag,
+                l10n.homeStepPostTitle,
+                l10n.homeStepPostText(top.isEmpty ? '' : top.first.name),
+                _StepState.next,
+              ),
+              _Step(
+                l10n.homeStepAfterTag,
+                l10n.homeStepAfterTitle,
+                l10n.homeStepAfterText,
+                _StepState.next,
+              ),
+            ],
+          ),
+          const SizedBox(height: PPSpace.lg),
+          Text(l10n.homeExperiment, style: PPType.title(size: 20)),
           const SizedBox(height: PPSpace.sm),
           const _TrendDeck(),
           const SizedBox(height: PPSpace.xl),
@@ -200,6 +236,7 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final trends = ref.watch(trendsProvider).valueOrNull ?? const [];
     final swiped = ref.watch(swipedIdsProvider).valueOrNull ?? const {};
     final brand = ref.watch(brandProvider).valueOrNull;
@@ -208,10 +245,7 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
         .rank(trends: trends, shopTags: {...?brand?.nicheTags}, swipedIds: swiped);
 
     if (ranked.isEmpty) {
-      return const EmptyState(
-        title: 'All caught up',
-        message: 'New ideas land when the trend board refreshes.',
-      );
+      return EmptyState(title: l10n.homeCaughtUpTitle, message: l10n.homeCaughtUpMessage);
     }
 
     return Column(
@@ -230,7 +264,12 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
             },
             cardBuilder: (context, i, _, __) {
               final t = ranked[i];
-              return TrendCard(title: t.title, why: t.why, badge: 'Rising', sources: t.sources);
+              return TrendCard(
+                title: t.title,
+                why: t.why,
+                badge: l10n.homeRising,
+                sources: t.sources,
+              );
             },
           ),
         ),
@@ -239,7 +278,7 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
           children: [
             Expanded(
               child: PPButton.secondary(
-                label: 'Not for me',
+                label: l10n.homeNotForMe,
                 icon: Icons.close_rounded,
                 onPressed: () => _controller.swipe(CardSwiperDirection.left),
               ),
@@ -247,13 +286,81 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
             const SizedBox(width: PPSpace.sm),
             Expanded(
               child: PPButton(
-                label: 'Try it',
+                label: l10n.homeTryIt,
                 icon: Icons.check_rounded,
                 onPressed: () => _controller.swipe(CardSwiperDirection.right),
               ),
             ),
           ],
         ),
+      ],
+    );
+  }
+}
+
+enum _StepState { done, now, next }
+
+class _Step {
+  const _Step(this.tag, this.title, this.text, this.state);
+
+  final String tag;
+  final String title;
+  final String text;
+  final _StepState state;
+}
+
+/// The day as four small steps; the current one is filled teal.
+class _DaySteps extends StatelessWidget {
+  const _DaySteps({required this.steps});
+
+  final List<_Step> steps;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget tile(_Step s) {
+      final now = s.state == _StepState.now;
+      final fg = now ? PPColors.onAccent : PPColors.text;
+      return Container(
+        constraints: const BoxConstraints(minHeight: 92),
+        padding: const EdgeInsets.all(PPSpace.md),
+        decoration: BoxDecoration(
+          color: now
+              ? PPColors.teal
+              : s.state == _StepState.done
+              ? const Color(0xFF2E2B40)
+              : PPColors.card,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: now ? PPColors.teal : const Color(0xFF2E2E38)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(s.tag.toUpperCase(), style: PPType.label(size: 10, color: fg)),
+            const SizedBox(height: 4),
+            Text(s.title, style: PPType.heading(size: 17).copyWith(color: fg)),
+            const SizedBox(height: 4),
+            Text(s.text, style: PPType.body(size: 12, color: fg)),
+          ],
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        for (var i = 0; i < steps.length; i += 2)
+          Padding(
+            padding: EdgeInsets.only(top: i == 0 ? 0 : PPSpace.sm),
+            child: IntrinsicHeight(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Expanded(child: tile(steps[i])),
+                  const SizedBox(width: PPSpace.sm),
+                  Expanded(child: tile(steps[i + 1])),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }

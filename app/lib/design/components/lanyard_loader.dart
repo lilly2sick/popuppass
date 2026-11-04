@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../tokens.dart';
 import 'grid_background.dart';
 import 'pup.dart';
@@ -9,9 +10,9 @@ import 'pup.dart';
 /// Startup screen: PUP's pass swinging on its lanyard while the database
 /// opens and the sample shop loads.
 class LanyardLoader extends StatefulWidget {
-  const LanyardLoader({super.key, this.error});
+  const LanyardLoader({super.key, this.hasError = false});
 
-  final String? error;
+  final bool hasError;
 
   @override
   State<LanyardLoader> createState() => _LanyardLoaderState();
@@ -58,6 +59,7 @@ class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final badge = Column(
       children: [
         Row(
@@ -143,16 +145,16 @@ class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProvider
               bottom: 120,
               child: Column(
                 children: [
-                  Text('Pop-Up Pass', style: PPType.title(size: 30)),
+                  Text(l10n.appTitle, style: PPType.title(size: 30)),
                   const SizedBox(height: PPSpace.sm),
                   Semantics(
                     liveRegion: true,
                     child: Text(
-                      widget.error ?? 'Setting up your table',
+                      widget.hasError ? l10n.loaderError : l10n.loaderSettingUp,
                       textAlign: TextAlign.center,
                       style: PPType.body(
                         size: 14,
-                        color: widget.error == null ? PPColors.muted : PPColors.pink,
+                        color: widget.hasError ? PPColors.pink : PPColors.muted,
                       ),
                     ),
                   ),

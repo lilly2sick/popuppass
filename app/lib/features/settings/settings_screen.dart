@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../design/components/grid_background.dart';
 import '../../design/components/sticker.dart';
 import '../../design/tokens.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../../services/haptics_service.dart';
 
@@ -43,94 +45,100 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final pro = ref.watch(entitlementsProvider).isPro;
     final auth = ref.watch(authProvider);
     final payments = ref.watch(paymentProviderProvider);
+    final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Settings', style: PPType.heading()),
-        backgroundColor: PPColors.bg,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(PPSpace.gutter),
-        children: [
-          StickerCard(
-            fill: pro ? PPColors.violetSoft : PPColors.card,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Text(pro ? 'You are on Pro' : 'Free pass', style: PPType.heading()),
-                const SizedBox(height: PPSpace.xs),
-                Text(
-                  pro
-                      ? 'Cloud backup, AI captions and summaries, PDF and Excel exports.'
-                      : 'Everything stays on this phone. Pro adds cloud backup, AI captions, and PDF and Excel exports.',
-                  style: PPType.body(size: 14, color: PPColors.muted),
-                ),
-                const SizedBox(height: PPSpace.md),
-                if (!pro) PPButton(label: 'Go Pro', onPressed: _goPro, expand: true),
-                const SizedBox(height: PPSpace.sm),
-                PPButton.secondary(label: 'Restore purchases', onPressed: _restore, expand: true),
-              ],
-            ),
-          ),
-          const SizedBox(height: PPSpace.lg),
-          SwitchListTile(
-            title: const Text('Haptics'),
-            value: haptics.enabled,
-            onChanged: (v) => setState(() => haptics.enabled = v),
-          ),
-          ListTile(
-            title: const Text('Haptic strength'),
-            subtitle: Slider(
-              value: haptics.intensity,
-              onChanged: haptics.enabled ? (v) => setState(() => haptics.intensity = v) : null,
-              onChangeEnd: (_) => haptics.play(HapticMoment.sold),
-            ),
-          ),
-          ListTile(
-            title: Text('Card reader: ${payments.displayName}'),
-            trailing: FutureBuilder(
-              future: payments.isConnected,
-              builder: (_, s) => TextButton(
-                onPressed: () async {
-                  s.data == true ? await payments.disconnect() : await payments.connect();
-                  setState(() {});
-                },
-                child: Text(s.data == true ? 'Disconnect' : 'Connect'),
-              ),
-            ),
-          ),
-          if (auth?.user != null) ...[
-            const Divider(),
-            ListTile(title: const Text('Sign out'), onTap: () => auth!.signOut()),
-            ListTile(
-              title: Text(
-                'Delete account',
-                style: PPType.body(color: PPColors.pink, weight: FontWeight.w700),
-              ),
-              subtitle: const Text('Deletes your cloud backup. Data on this phone stays.'),
-              onTap: () async {
-                final ok = await showDialog<bool>(
-                  context: context,
-                  builder: (_) => AlertDialog(
-                    title: const Text('Delete account?'),
-                    content: const Text('Your cloud backup is removed for good.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Cancel'),
-                      ),
-                      TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Delete'),
-                      ),
-                    ],
+    return GridBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text(l10n.settingsTitle, style: PPType.heading()),
+          backgroundColor: Colors.transparent,
+        ),
+        body: ListView(
+          padding: const EdgeInsets.all(PPSpace.gutter),
+          children: [
+            StickerCard(
+              fill: pro ? PPColors.violetSoft : PPColors.card,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(pro ? l10n.settingsPro : l10n.settingsFreePass, style: PPType.heading()),
+                  const SizedBox(height: PPSpace.xs),
+                  Text(
+                    pro ? l10n.settingsProBody : l10n.settingsFreeBody,
+                    style: PPType.body(size: 14, color: PPColors.muted),
                   ),
-                );
-                if (ok == true) await auth!.deleteAccount();
-              },
+                  const SizedBox(height: PPSpace.md),
+                  if (!pro) PPButton(label: l10n.settingsGoPro, onPressed: _goPro, expand: true),
+                  const SizedBox(height: PPSpace.sm),
+                  PPButton.secondary(
+                    label: l10n.settingsRestore,
+                    onPressed: _restore,
+                    expand: true,
+                  ),
+                ],
+              ),
             ),
+            const SizedBox(height: PPSpace.lg),
+            SwitchListTile(
+              title: Text(l10n.settingsHaptics),
+              value: haptics.enabled,
+              onChanged: (v) => setState(() => haptics.enabled = v),
+            ),
+            ListTile(
+              title: Text(l10n.settingsHapticStrength),
+              subtitle: Slider(
+                value: haptics.intensity,
+                onChanged: haptics.enabled ? (v) => setState(() => haptics.intensity = v) : null,
+                onChangeEnd: (_) => haptics.play(HapticMoment.sold),
+              ),
+            ),
+            ListTile(
+              title: Text(l10n.settingsCardReader(payments.displayName)),
+              trailing: FutureBuilder(
+                future: payments.isConnected,
+                builder: (_, s) => TextButton(
+                  onPressed: () async {
+                    s.data == true ? await payments.disconnect() : await payments.connect();
+                    setState(() {});
+                  },
+                  child: Text(s.data == true ? l10n.settingsDisconnect : l10n.settingsConnect),
+                ),
+              ),
+            ),
+            if (auth?.user != null) ...[
+              const Divider(),
+              ListTile(title: Text(l10n.settingsSignOut), onTap: () => auth!.signOut()),
+              ListTile(
+                title: Text(
+                  l10n.settingsDeleteAccount,
+                  style: PPType.body(color: PPColors.pink, weight: FontWeight.w700),
+                ),
+                subtitle: Text(l10n.settingsDeleteSubtitle),
+                onTap: () async {
+                  final ok = await showDialog<bool>(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      title: Text(l10n.settingsDeleteConfirmTitle),
+                      content: Text(l10n.settingsDeleteConfirmBody),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, false),
+                          child: Text(l10n.cancel),
+                        ),
+                        TextButton(
+                          onPressed: () => Navigator.pop(context, true),
+                          child: Text(l10n.delete),
+                        ),
+                      ],
+                    ),
+                  );
+                  if (ok == true) await auth!.deleteAccount();
+                },
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
