@@ -1,50 +1,27 @@
-import 'package:drift/drift.dart';
-
-import '../data/db/database.dart';
-
-class IngestResult {
-  const IngestResult({required this.fetched, required this.added, this.error});
-
-  final int fetched;
-  final int added;
-  final Object? error;
-
-  bool get ok => error == null;
-}
-
-/// Where each connector remembers how far it has read.
-class CursorStore {
-  CursorStore(this.db);
-
-  final AppDatabase db;
-
-  Future<String?> read(String connectorId) async =>
-      (await (db.select(db.connectorCursors)..where((c) => c.connectorId.equals(connectorId))).getSingleOrNull())
-          ?.cursor;
-
-  Future<void> write(String connectorId, String? cursor) => db.into(db.connectorCursors).insertOnConflictUpdate(
-        ConnectorCursorsCompanion.insert(
-          connectorId: connectorId,
-          cursor: Value(cursor),
-          lastRunAt: Value(DateTime.now()),
-        ),
-      );
-}
+import 'ingest_result.dart';
+import 'sync_cursor.dart';
 
 /// Base for every data source the app reads from.
 ///
 ///   fetch (raw, since cursor) -> normalize -> sink (dedupe + store) -> advance cursor
 ///
-/// A new source is one subclass. Each has a Fake* twin for offline dev.
+/// A new source is one subclass. Each kind lives in its own folder with an
+/// abstract base, the real implementation and a Fake* twin for offline dev
+/// (file-based kinds such as CSV and ICS read local files, so they need no Fake).
+/// The cursor only advances after a successful sink, so a failed run retries
+/// the same window.
 abstract class Connector<TRaw, TModel> {
   Connector(this.cursors);
 
-  final CursorStore cursors;
+  final SyncCursor cursors;
 
+  /// Stable key for the cursor row.
   String get id;
 
+  /// Raw records newer than [cursor] (null on the first run).
   Future<List<TRaw>> fetch(String? cursor);
 
+  /// Map one raw record to our model.
   TModel normalize(TRaw raw);
 
   /// Store models, deduping on (source, externalId). Returns rows added.

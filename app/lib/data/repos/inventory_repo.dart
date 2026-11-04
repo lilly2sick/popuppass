@@ -36,7 +36,9 @@ class InventoryRepo extends Repository<InventoryMove> {
     String? saleLineId,
   }) async {
     final id = makeId();
-    await db.into(db.inventoryMoves).insert(
+    await db
+        .into(db.inventoryMoves)
+        .insert(
           InventoryMovesCompanion.insert(
             id: Value(id),
             productId: productId,

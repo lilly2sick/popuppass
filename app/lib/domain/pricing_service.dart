@@ -39,7 +39,11 @@ class PricingService {
       unitCostCents: materialCents,
       lowCents: low,
       highCents: high,
-      breakEvenUnits: breakEven(boothFeeCents: boothFeeCents, priceCents: mid, unitCostCents: materialCents),
+      breakEvenUnits: breakEven(
+        boothFeeCents: boothFeeCents,
+        priceCents: mid,
+        unitCostCents: materialCents,
+      ),
     );
   }
 

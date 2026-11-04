@@ -1,0 +1,17 @@
+{
+  "tasks": {
+    "check": "deno check */index.ts */handler.ts _shared/*.ts _shared/connectors/*.ts",
+    "test": "deno test --allow-env",
+    "fmt": "deno fmt --check"
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@1"
+  },
+  "fmt": {
+    "lineWidth": 100,
+    "exclude": ["**/*.md"]
+  },
+  "lint": {
+    "rules": { "tags": ["recommended"] }
+  }
+}

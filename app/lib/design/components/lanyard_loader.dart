@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../tokens.dart';
 import 'grid_background.dart';
 import 'pup.dart';
@@ -9,52 +10,78 @@ import 'pup.dart';
 /// Startup screen: PUP's pass swinging on its lanyard while the database
 /// opens and the sample shop loads.
 class LanyardLoader extends StatefulWidget {
-  const LanyardLoader({super.key, this.error});
+  const LanyardLoader({super.key, this.hasError = false});
 
-  final String? error;
+  final bool hasError;
 
   @override
   State<LanyardLoader> createState() => _LanyardLoaderState();
 }
 
-class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProviderStateMixin {
-  late final _swing = AnimationController(vsync: this, duration: const Duration(milliseconds: 2200));
+class _LanyardLoaderState extends State<LanyardLoader> with TickerProviderStateMixin {
+  late final _swing = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2200),
+  );
+  late final _dots = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
+  bool _reducedMotion = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (MediaQuery.disableAnimationsOf(context)) {
+    _reducedMotion = MediaQuery.disableAnimationsOf(context);
+    if (_reducedMotion) {
       _swing.stop();
-    } else if (!_swing.isAnimating) {
-      _swing.repeat();
+      _dots.stop();
+    } else {
+      if (!_swing.isAnimating) _swing.repeat();
+      if (!_dots.isAnimating) _dots.repeat();
     }
   }
 
   @override
   void dispose() {
     _swing.dispose();
+    _dots.dispose();
     super.dispose();
   }
 
-  Widget _strap(List<Color> colors, double skew) => Transform(
-        transform: Matrix4.skewX(skew),
+  Widget _dot(Color color, double delay) => AnimatedBuilder(
+    animation: _dots,
+    builder: (_, __) {
+      final t = _reducedMotion ? 1.0 : (_dots.value + delay) % 1.0;
+      final opacity = 0.25 + 0.75 * (0.5 + 0.5 * sin(t * 2 * pi));
+      return Opacity(
+        opacity: opacity,
         child: Container(
-          width: 22,
-          height: 230,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [for (var i = 0; i < 12; i++) colors[i % 2]],
-              stops: [for (var i = 0; i < 12; i++) (i ~/ 2 * 2 + (i.isOdd ? 2 : 0)) / 12],
-              tileMode: TileMode.repeated,
-            ),
-          ),
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
         ),
       );
+    },
+  );
+
+  Widget _strap(List<Color> colors, double skew) => Transform(
+    transform: Matrix4.skewX(skew),
+    child: Container(
+      width: 22,
+      height: 230,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [for (var i = 0; i < 12; i++) colors[i % 2]],
+          stops: [for (var i = 0; i < 12; i++) (i ~/ 2 * 2 + (i.isOdd ? 2 : 0)) / 12],
+          tileMode: TileMode.repeated,
+        ),
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final badge = Column(
       children: [
         Row(
@@ -68,21 +95,35 @@ class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProvider
         Container(
           width: 30,
           height: 24,
-          decoration: BoxDecoration(border: Border.all(color: PPColors.lilac, width: 4), borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(
+            border: Border.all(color: PPColors.lilac, width: 4),
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
-        Container(width: 14, height: 18, decoration: BoxDecoration(color: PPColors.muted, borderRadius: BorderRadius.circular(4))),
+        Container(
+          width: 14,
+          height: 18,
+          decoration: BoxDecoration(color: PPColors.muted, borderRadius: BorderRadius.circular(4)),
+        ),
         Container(
           width: 200,
           height: 252,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFFFAFF), Color(0xFFF0E9FF), Color(0xFFE3F6FF)]),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFFFFAFF), Color(0xFFF0E9FF), Color(0xFFE3F6FF)],
+            ),
             boxShadow: [BoxShadow(color: PPColors.violet.withValues(alpha: 0.25), blurRadius: 60)],
           ),
           child: Column(
             children: [
-              Text('POP UP PASS  /  NO. 1', style: PPType.label(size: 8, color: const Color(0xFF615575))),
+              Text(
+                'POP UP PASS  /  NO. 1',
+                style: PPType.label(size: 8, color: const Color(0xFF615575)),
+              ),
               const SizedBox(height: 6),
               Expanded(
                 child: Container(
@@ -96,6 +137,28 @@ class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProvider
               ),
               const SizedBox(height: 6),
               Text('PUP', style: PPType.title(size: 26, color: const Color(0xFF211A35))),
+              const SizedBox(height: 5),
+              DecoratedBox(
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: Color(0x4D544575))),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.passRole,
+                        style: PPType.label(size: 7, color: const Color(0xFF776D8A)),
+                      ),
+                      Text(
+                        l10n.passAccess,
+                        style: PPType.label(size: 7, color: const Color(0xFF776D8A)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -126,16 +189,36 @@ class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProvider
               bottom: 120,
               child: Column(
                 children: [
-                  Text('Pop-Up Pass', style: PPType.title(size: 30)),
+                  Text(l10n.appTitle, style: PPType.title(size: 30)),
                   const SizedBox(height: PPSpace.sm),
-                  Semantics(
-                    liveRegion: true,
-                    child: Text(
-                      widget.error ?? 'Setting up your table',
-                      textAlign: TextAlign.center,
-                      style: PPType.body(size: 14, color: widget.error == null ? PPColors.muted : PPColors.pink),
+                  if (widget.hasError)
+                    Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        l10n.loaderError,
+                        textAlign: TextAlign.center,
+                        style: PPType.body(size: 14, color: PPColors.pink),
+                      ),
+                    )
+                  else
+                    Semantics(
+                      liveRegion: true,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            l10n.loaderSettingUp,
+                            style: PPType.body(size: 14, color: PPColors.muted),
+                          ),
+                          const SizedBox(width: 6),
+                          _dot(PPColors.violet, 0),
+                          const SizedBox(width: 4),
+                          _dot(PPColors.pink, 0.2),
+                          const SizedBox(width: 4),
+                          _dot(PPColors.teal, 0.4),
+                        ],
+                      ),
                     ),
-                  ),
                 ],
               ),
             ),

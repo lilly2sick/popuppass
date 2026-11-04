@@ -42,5 +42,5 @@ final routerProvider = Provider<GoRouter>((ref) {
 });
 
 StatefulShellBranch _branch(AppTab tab, Widget screen) => StatefulShellBranch(
-      routes: [GoRoute(path: tab.path, builder: (_, __) => screen)],
-    );
+  routes: [GoRoute(path: tab.path, builder: (_, __) => screen)],
+);

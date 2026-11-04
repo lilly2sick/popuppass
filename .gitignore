@@ -11,3 +11,4 @@ app/**/*.g.dart
 # Supabase local
 supabase/.branches/
 supabase/.temp/
+.pgtap-local/

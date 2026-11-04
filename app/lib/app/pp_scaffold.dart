@@ -4,6 +4,7 @@ import '../design/components/event_bar.dart';
 import '../design/components/grid_background.dart';
 import '../design/tokens.dart';
 import '../features/search/search_sheet.dart';
+import '../l10n/app_localizations.dart';
 
 /// The base template every tab uses:
 ///   0. Grid background (dim so content reads first)
@@ -19,7 +20,8 @@ class PPScaffold extends StatelessWidget {
     required this.body,
     this.eyebrow,
     this.action,
-    this.searchHint = 'Search',
+    this.hero,
+    this.searchHint,
     this.onSearch,
     this.onSearchSubmit,
     this.scrollable = true,
@@ -30,8 +32,14 @@ class PPScaffold extends StatelessWidget {
 
   /// The single primary action for this page. Keep it to one.
   final Widget? action;
+
+  /// Replaces the eyebrow/title/action row (Home's greeting and pass). The
+  /// header then scrolls with the page instead of staying pinned.
+  final Widget? hero;
   final Widget body;
-  final String searchHint;
+
+  /// Falls back to the generic "Search" prompt.
+  final String? searchHint;
 
   /// Live filter as the user types (e.g. Shop, Sell).
   final ValueChanged<String>? onSearch;
@@ -47,22 +55,28 @@ class PPScaffold extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (eyebrow != null) Text(eyebrow!.toUpperCase(), style: PPType.label(color: PPColors.muted)),
-                    Text(title, style: PPType.title()),
-                  ],
-                ),
+          hero ??
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (eyebrow != null)
+                          Text(eyebrow!.toUpperCase(), style: PPType.label(color: PPColors.muted)),
+                        Text(title, style: PPType.title()),
+                      ],
+                    ),
+                  ),
+                  if (action != null) ...[const SizedBox(width: PPSpace.md), action!],
+                ],
               ),
-              if (action != null) ...[const SizedBox(width: PPSpace.md), action!],
-            ],
-          ),
           const SizedBox(height: PPSpace.sm),
-          PPSearchField(hint: searchHint, onChanged: onSearch, onSubmitted: onSearchSubmit),
+          PPSearchField(
+            hint: searchHint ?? AppLocalizations.of(context).searchHintDefault,
+            onChanged: onSearch,
+            onSubmitted: onSearchSubmit,
+          ),
         ],
       ),
     );
@@ -71,6 +85,14 @@ class PPScaffold extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(PPSpace.gutter, 0, PPSpace.gutter, 96),
       child: body,
     );
+    final scrolling = hero != null
+        ? SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [header, content],
+            ),
+          )
+        : (scrollable ? SingleChildScrollView(child: content) : content);
 
     return GridBackground(
       child: SafeArea(
@@ -78,8 +100,8 @@ class PPScaffold extends StatelessWidget {
         child: Column(
           children: [
             const EventBar(),
-            header,
-            Expanded(child: scrollable ? SingleChildScrollView(child: content) : content),
+            if (hero == null) header,
+            Expanded(child: scrolling),
           ],
         ),
       ),
@@ -113,9 +135,18 @@ class PPSearchField extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(horizontal: 14),
           prefixIcon: const Icon(Icons.search_rounded, size: 18, color: PPColors.muted),
           prefixIconConstraints: const BoxConstraints(minWidth: 40),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(PPRadius.chip), borderSide: const BorderSide(color: PPColors.line)),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(PPRadius.chip), borderSide: const BorderSide(color: PPColors.line)),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(PPRadius.chip), borderSide: const BorderSide(color: PPColors.violet)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(PPRadius.chip),
+            borderSide: const BorderSide(color: PPColors.line),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(PPRadius.chip),
+            borderSide: const BorderSide(color: PPColors.line),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(PPRadius.chip),
+            borderSide: const BorderSide(color: PPColors.violet),
+          ),
         ),
       ),
     );

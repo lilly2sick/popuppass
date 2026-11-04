@@ -35,7 +35,9 @@ class AuthService {
     );
     // Apple only sends the name the first time; keep it.
     final name = [cred.givenName, cred.familyName].whereType<String>().join(' ');
-    if (name.isNotEmpty) await client.from('profiles').update({'display_name': name}).eq('id', res.user!.id);
+    if (name.isNotEmpty) {
+      await client.from('profiles').update({'display_name': name}).eq('id', res.user!.id);
+    }
     return res.user;
   }
 

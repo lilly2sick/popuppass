@@ -29,17 +29,27 @@ class FakePaymentProvider extends PaymentProvider {
     if (!_connected) return const [];
     _n++;
     return [
-      ExternalPayment(id: 'fake-$_n', createdAt: DateTime.now(), json: {'amount': 700, 'name': 'Cat sticker'}),
+      ExternalPayment(
+        id: 'fake-$_n',
+        createdAt: DateTime.now(),
+        json: {'amount': 700, 'name': 'Cat sticker'},
+      ),
     ];
   }
 
   @override
   ImportedSale normalize(ExternalPayment raw) => ImportedSale(
-        source: RecordSource.square,
-        externalId: raw.id,
-        soldAt: raw.createdAt,
-        method: PaymentMethod.card,
-        totalCents: raw.json['amount'] as int,
-        lines: [ImportedLine(name: raw.json['name'] as String, qty: 1, unitPriceCents: raw.json['amount'] as int)],
-      );
+    source: RecordSource.square,
+    externalId: raw.id,
+    soldAt: raw.createdAt,
+    method: PaymentMethod.card,
+    totalCents: raw.json['amount'] as int,
+    lines: [
+      ImportedLine(
+        name: raw.json['name'] as String,
+        qty: 1,
+        unitPriceCents: raw.json['amount'] as int,
+      ),
+    ],
+  );
 }

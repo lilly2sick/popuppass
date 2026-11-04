@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../tokens.dart';
 
 class PPTabBar extends StatelessWidget {
@@ -8,12 +9,20 @@ class PPTabBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  static const _tabs = [
-    (Icons.home_outlined, 'Home'),
-    (Icons.sell_outlined, 'Shop'),
-    (Icons.add_rounded, 'Sell'),
-    (Icons.photo_outlined, 'Create'),
-    (Icons.bar_chart_rounded, 'Insights'),
+  static const _icons = [
+    Icons.home_outlined,
+    Icons.sell_outlined,
+    Icons.add_rounded,
+    Icons.photo_outlined,
+    Icons.bar_chart_rounded,
+  ];
+
+  static List<String> _labels(AppLocalizations l) => [
+    l.tabHome,
+    l.tabShop,
+    l.tabSell,
+    l.tabCreate,
+    l.tabInsights,
   ];
 
   static const _sellIndex = 2;
@@ -32,7 +41,8 @@ class PPTabBar extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              for (var i = 0; i < _tabs.length; i++) Expanded(child: i == _sellIndex ? _sellBadge(i) : _tab(i)),
+              for (var i = 0; i < _icons.length; i++)
+                Expanded(child: i == _sellIndex ? _sellBadge(context, i) : _tab(context, i)),
             ],
           ),
         ),
@@ -40,13 +50,14 @@ class PPTabBar extends StatelessWidget {
     );
   }
 
-  Widget _tab(int i) {
+  Widget _tab(BuildContext context, int i) {
+    final label = _labels(AppLocalizations.of(context))[i];
     final active = i == currentIndex;
     final color = active ? PPColors.violet : PPColors.muted;
     return Semantics(
       button: true,
       selected: active,
-      label: _tabs[i].$2,
+      label: label,
       excludeSemantics: true,
       child: InkResponse(
         onTap: () => onTap(i),
@@ -55,9 +66,16 @@ class PPTabBar extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(_tabs[i].$1, color: color),
+              Icon(_icons[i], color: color),
               const SizedBox(height: 4),
-              Text(_tabs[i].$2, style: PPType.body(size: 12, color: color, weight: active ? FontWeight.w800 : FontWeight.w500)),
+              Text(
+                label,
+                style: PPType.body(
+                  size: 12,
+                  color: color,
+                  weight: active ? FontWeight.w800 : FontWeight.w500,
+                ),
+              ),
             ],
           ),
         ),
@@ -65,13 +83,14 @@ class PPTabBar extends StatelessWidget {
     );
   }
 
-  Widget _sellBadge(int i) {
+  Widget _sellBadge(BuildContext context, int i) {
+    final label = AppLocalizations.of(context).tabSell;
     final active = i == currentIndex;
     final fill = active ? PPColors.violet : PPColors.pink;
     return Semantics(
       button: true,
       selected: active,
-      label: 'Sell',
+      label: label,
       excludeSemantics: true,
       child: GestureDetector(
         onTap: () => onTap(i),
@@ -90,7 +109,7 @@ class PPTabBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(Icons.add_rounded, color: PPColors.onAccent),
-                  Text('Sell', style: PPType.title(size: 13, color: PPColors.onAccent)),
+                  Text(label, style: PPType.title(size: 13, color: PPColors.onAccent)),
                 ],
               ),
             ),

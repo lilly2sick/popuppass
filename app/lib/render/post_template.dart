@@ -66,7 +66,10 @@ class StickerDropTemplate extends PostTemplate {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(c.headline, style: PPType.title(size: 9 * u, color: PPColors.onAccent)),
+        Text(
+          c.headline,
+          style: PPType.title(size: 9 * u, color: PPColors.onAccent),
+        ),
         SizedBox(height: 2 * u),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -75,26 +78,52 @@ class StickerDropTemplate extends PostTemplate {
               [c.priceLabel, c.boothLabel].whereType<String>().join(' / ').toUpperCase(),
               style: PPType.label(size: 3 * u, color: PPColors.onAccent),
             ),
-            if (c.handle != null) Text(c.handle!.toUpperCase(), style: PPType.label(size: 3 * u, color: PPColors.onAccent)),
+            if (c.handle != null)
+              Text(
+                c.handle!.toUpperCase(),
+                style: PPType.label(size: 3 * u, color: PPColors.onAccent),
+              ),
           ],
         ),
       ],
     );
     return DecoratedBox(
       decoration: BoxDecoration(
-        gradient: LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [c.brandColor, PPColors.pink]),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [c.brandColor, PPColors.pink],
+        ),
       ),
       child: Padding(
         padding: EdgeInsets.all(6 * u),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(c.shopName.toUpperCase(), style: PPType.label(size: 3.2 * u, color: PPColors.onAccent)),
+            Text(
+              c.shopName.toUpperCase(),
+              style: PPType.label(size: 3.2 * u, color: PPColors.onAccent),
+            ),
             SizedBox(height: 4 * u),
             Expanded(
               child: f.isLandscape
-                  ? Row(children: [Expanded(child: photo), SizedBox(width: 5 * u), Expanded(child: Align(alignment: Alignment.bottomLeft, child: text))])
-                  : Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [Expanded(child: photo), SizedBox(height: 5 * u), text]),
+                  ? Row(
+                      children: [
+                        Expanded(child: photo),
+                        SizedBox(width: 5 * u),
+                        Expanded(
+                          child: Align(alignment: Alignment.bottomLeft, child: text),
+                        ),
+                      ],
+                    )
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: photo),
+                        SizedBox(height: 5 * u),
+                        text,
+                      ],
+                    ),
             ),
           ],
         ),
