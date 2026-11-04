@@ -23,6 +23,18 @@ class ProductRepo extends Repository<Product> {
   Future<Product?> byId(String id) =>
       (db.select(db.products)..where((p) => p.id.equals(id))).getSingleOrNull();
 
+  /// Live (not deleted, not archived) products, name order.
+  Future<List<Product>> all() => watchAll().first;
+
+  /// Case-insensitive name match among live products; the CSV import's dedupe key.
+  Future<Product?> findByName(String name) async {
+    final lower = name.trim().toLowerCase();
+    for (final p in await all()) {
+      if (p.name.toLowerCase() == lower) return p;
+    }
+    return null;
+  }
+
   Future<String> save(ProductsCompanion data) async {
     final id = data.id.present ? data.id.value : makeId();
     final row = data.copyWith(
