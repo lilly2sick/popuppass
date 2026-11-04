@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../tokens.dart';
 
 /// Bottom of Home: the "YOUR POCKET PUP" banner, a pup that wags and blinks,
@@ -114,7 +115,7 @@ class _AsciiPupsState extends State<AsciiPups> with SingleTickerProviderStateMix
               SizedBox(
                 width: 150,
                 child: Text(
-                  'Free mode keeps your data on this phone. We never sell your sales data.',
+                  AppLocalizations.of(context).asciiFreeModeNote,
                   style: PPType.body(size: 12, color: PPColors.muted),
                 ),
               ),

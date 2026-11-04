@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../domain/money.dart';
+import '../../l10n/app_localizations.dart';
 import '../tokens.dart';
 import 'sticker.dart';
 
@@ -34,11 +35,12 @@ class ProductTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final pill = soldOut
-        ? const PPPill('Sold out', glyph: 'x')
+        ? PPPill(l10n.sellSoldOut, glyph: 'x')
         : low
-        ? PPPill('$inStock left', tone: PillTone.warn)
-        : PPPill('$inStock in stock', glyph: '#');
+        ? PPPill(l10n.shopLeft(inStock), tone: PillTone.warn)
+        : PPPill(l10n.shopInStock(inStock), glyph: '#');
     return StickerCard(
       padding: const EdgeInsets.all(10),
       radius: 20,
@@ -68,7 +70,7 @@ class ProductTile extends StatelessWidget {
                       style: PPType.body(size: 14, weight: FontWeight.w800),
                     ),
                     Text(
-                      '${Money.format(priceCents)} / sold $soldCount',
+                      l10n.sellPriceSold(Money.format(priceCents), soldCount),
                       style: PPType.body(size: 12, color: PPColors.muted),
                     ),
                   ],
@@ -82,18 +84,22 @@ class ProductTile extends StatelessWidget {
           Row(
             children: [
               Semantics(
-                label: 'Remove one $name sale',
+                label: l10n.sellRemoveOneSale(name),
                 child: SizedBox(
                   width: 52,
-                  child: PPButton.secondary(label: '-1', onPressed: onUnsell, height: PPTap.sell),
+                  child: PPButton.secondary(
+                    label: l10n.sellMinus1,
+                    onPressed: onUnsell,
+                    height: PPTap.sell,
+                  ),
                 ),
               ),
               const SizedBox(width: 6),
               Expanded(
                 child: Semantics(
-                  label: 'Sell one $name',
+                  label: l10n.sellSellOne(name),
                   child: PPButton(
-                    label: soldOut ? 'Sold out' : '+1 sold',
+                    label: soldOut ? l10n.sellSoldOut : l10n.sellOneSold,
                     onPressed: soldOut ? null : onSell,
                     height: PPTap.sell,
                   ),
@@ -107,37 +113,76 @@ class ProductTile extends StatelessWidget {
   }
 }
 
+/// Home deck card: moodboard header, status pills, idea title and the reason
+/// it was picked. Matches the "Room to experiment" artboard.
 class TrendCard extends StatelessWidget {
   const TrendCard({
     super.key,
     required this.title,
     required this.why,
     required this.badge,
-    required this.sources,
+    required this.niche,
   });
 
   final String title;
   final String why;
   final String badge;
-  final List<String> sources;
+  final String niche;
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return StickerCard(
       iridescent: true,
       fill: PPColors.surface,
+      radius: 24,
+      padding: const EdgeInsets.all(14),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          PPPill(badge, tone: PillTone.good),
-          const SizedBox(height: PPSpace.sm),
-          Text(title, style: PPType.title(size: 21)),
-          const SizedBox(height: PPSpace.xs),
-          Text(why, style: PPType.body(size: 13, color: PPColors.muted)),
-          const Spacer(),
-          Text(
-            'Sources: ${sources.join(', ')}'.toUpperCase(),
-            style: PPType.label(size: 9, color: PPColors.muted),
+          Container(
+            height: 82,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: PPColors.badgeGradient,
+              ),
+            ),
+            child: Text(
+              l10n.homeTrendMoodboard,
+              style: PPType.label(size: 12, color: PPColors.onAccent),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Row(
+            children: [
+              PPPill(badge, tone: PillTone.good, glyph: '+'),
+              const SizedBox(width: 6),
+              Container(
+                height: 26,
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: PPColors.raised,
+                  borderRadius: BorderRadius.circular(PPRadius.chip),
+                  border: Border.all(color: PPColors.lineStrong),
+                ),
+                child: Text(niche.toUpperCase(), style: PPType.label(size: 10)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Text(title, maxLines: 2, overflow: TextOverflow.ellipsis, style: PPType.title(size: 21)),
+          const SizedBox(height: 4),
+          Expanded(
+            child: Text(
+              why,
+              overflow: TextOverflow.ellipsis,
+              style: PPType.body(size: 13, color: PPColors.muted),
+            ),
           ),
         ],
       ),
@@ -163,7 +208,7 @@ class PendingAi extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'AI version writing. Keep working.'.toUpperCase(),
+            AppLocalizations.of(context).aiPendingCaption,
             style: PPType.label(color: PPColors.violet),
           ),
           const SizedBox(height: PPSpace.sm),

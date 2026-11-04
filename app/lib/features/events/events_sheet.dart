@@ -13,6 +13,7 @@ import '../../connectors/events/ics_codec.dart';
 import '../../data/db/database.dart';
 import '../../design/components/sticker.dart';
 import '../../design/tokens.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 
 Future<void> showEventsSheet(BuildContext context) => showModalBottomSheet<void>(
@@ -55,10 +56,13 @@ class _EventsSheet extends ConsumerWidget {
     final ok = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        title: const Text('Event name'),
+        title: Text(AppLocalizations.of(context).eventsNameDialogTitle),
         content: TextField(controller: name, autofocus: true),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Save')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: Text(AppLocalizations.of(context).eventsSave),
+          ),
         ],
       ),
     );
@@ -79,15 +83,16 @@ class _EventsSheet extends ConsumerWidget {
     final events = ref.watch(eventsProvider).valueOrNull ?? const [];
     final current = ref.watch(currentEventProvider).valueOrNull;
     final cons = ref.watch(conSourceProvider);
+    final l10n = AppLocalizations.of(context);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(PPSpace.gutter, 0, PPSpace.gutter, PPSpace.xl),
       children: [
         Row(
           children: [
-            Expanded(child: Text('Your events', style: PPType.title())),
+            Expanded(child: Text(l10n.eventsTitle, style: PPType.title())),
             IconButton(
-              tooltip: 'Settings',
+              tooltip: l10n.eventsSettingsTooltip,
               icon: const Icon(Icons.settings_outlined),
               onPressed: () {
                 Navigator.pop(context);
@@ -104,7 +109,7 @@ class _EventsSheet extends ConsumerWidget {
         const SizedBox(height: PPSpace.md),
         Row(
           children: [
-            Expanded(child: Text('Cons near you', style: PPType.heading())),
+            Expanded(child: Text(l10n.eventsConsNearYou, style: PPType.heading())),
             Text(
               cons.attribution.toUpperCase(),
               style: PPType.label(size: 10, color: PPColors.muted),
@@ -146,7 +151,7 @@ class _EventsSheet extends ConsumerWidget {
                           ),
                         ),
                         PPButton.secondary(
-                          label: 'Add',
+                          label: l10n.eventsAdd,
                           onPressed: () => ref.read(eventRepoProvider).importAll([c]),
                         ),
                       ],
@@ -156,23 +161,26 @@ class _EventsSheet extends ConsumerWidget {
             ],
           ),
         ),
-        Text(
-          'Distance is worked out on your phone. Your location is never sent anywhere.',
-          style: PPType.body(size: 12, color: PPColors.muted),
-        ),
+        Text(l10n.eventsPrivacyNote, style: PPType.body(size: 12, color: PPColors.muted)),
         const SizedBox(height: PPSpace.lg),
         Row(
           children: [
             Expanded(
-              child: PPButton(label: 'New event', onPressed: () => _newEvent(context, ref)),
+              child: PPButton(label: l10n.eventsNew, onPressed: () => _newEvent(context, ref)),
             ),
             const SizedBox(width: PPSpace.sm),
             Expanded(
-              child: PPButton.secondary(label: 'Import .ics', onPressed: () => _importIcs(ref)),
+              child: PPButton.secondary(
+                label: l10n.eventsImportIcs,
+                onPressed: () => _importIcs(ref),
+              ),
             ),
             const SizedBox(width: PPSpace.sm),
             Expanded(
-              child: PPButton.secondary(label: 'Export', onPressed: () => _exportIcs(events)),
+              child: PPButton.secondary(
+                label: l10n.eventsExport,
+                onPressed: () => _exportIcs(events),
+              ),
             ),
           ],
         ),
@@ -189,6 +197,7 @@ class _EventRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final fg = PPColors.text;
     final sub = live ? PPColors.muted : PPColors.muted;
     final sameDay =
@@ -235,7 +244,7 @@ class _EventRow extends StatelessWidget {
               ],
             ),
           ),
-          if (live) Text('LIVE', style: PPType.label(color: sub)),
+          if (live) Text(l10n.eventsLive, style: PPType.label(color: sub)),
         ],
       ),
     );

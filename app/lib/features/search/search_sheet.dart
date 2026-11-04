@@ -7,6 +7,7 @@ import '../../app/router.dart';
 import '../../design/components/sticker.dart';
 import '../../design/tokens.dart';
 import '../../domain/money.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../events/events_sheet.dart';
 
@@ -38,15 +39,17 @@ class _Results extends ConsumerWidget {
         .where((e) => e.name.toLowerCase().contains(query))
         .toList();
     final stock = ref.watch(stockProvider).valueOrNull ?? const {};
+    final l10n = AppLocalizations.of(context);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(PPSpace.gutter, 0, PPSpace.gutter, PPSpace.xl),
       children: [
-        Text('Results for "$query"', style: PPType.title(size: 22)),
+        Text(l10n.searchResultsFor(query), style: PPType.title(size: 22)),
         const SizedBox(height: PPSpace.md),
         if (products.isEmpty && events.isEmpty)
-          const EmptyState(title: 'Nothing found', message: 'Try a shorter word.'),
-        if (products.isNotEmpty) Text('ITEMS', style: PPType.label(color: PPColors.muted)),
+          EmptyState(title: l10n.searchNothingFoundTitle, message: l10n.searchNothingFoundMessage),
+        if (products.isNotEmpty)
+          Text(l10n.searchItemsHeader, style: PPType.label(color: PPColors.muted)),
         for (final p in products)
           Padding(
             padding: const EdgeInsets.only(top: PPSpace.sm),
@@ -64,7 +67,7 @@ class _Results extends ConsumerWidget {
                     child: Text(p.name, style: PPType.body(weight: FontWeight.w800)),
                   ),
                   Text(
-                    '${stock[p.id] ?? 0} left  /  ${Money.format(p.priceCents)}',
+                    l10n.searchLeftPrice(stock[p.id] ?? 0, Money.format(p.priceCents)),
                     style: PPType.body(size: 13, color: PPColors.muted),
                   ),
                 ],
@@ -73,7 +76,7 @@ class _Results extends ConsumerWidget {
           ),
         if (events.isNotEmpty) ...[
           const SizedBox(height: PPSpace.lg),
-          Text('EVENTS', style: PPType.label(color: PPColors.muted)),
+          Text(l10n.searchEventsHeader, style: PPType.label(color: PPColors.muted)),
         ],
         for (final e in events)
           Padding(

@@ -10,6 +10,7 @@ import '../../data/db/database.dart';
 import '../../design/components/ascii_pups.dart';
 import '../../design/components/sticker.dart';
 import '../../design/components/stats.dart';
+import '../../design/components/swinging_pass.dart';
 import '../../design/components/tiles.dart';
 import '../../design/tokens.dart';
 import '../../domain/money.dart';
@@ -35,11 +36,20 @@ class HomeScreen extends ConsumerWidget {
     final totalSold = sold.values.fold<int>(0, (a, b) => a + b);
     final totalStocked = stock.values.fold<int>(0, (a, b) => a + b) + totalSold;
 
+    // Bottom of the ranking, valued after the cost of everything stocked.
+    Product? slow;
+    var slowNet = 0;
+    if (products.length > top.length && favs.isNotEmpty) {
+      slow = favs.last;
+      final unitsSold = sold[slow.id] ?? 0;
+      final stocked = (stock[slow.id] ?? 0) + unitsSold;
+      slowNet = unitsSold * slow.priceCents - stocked * slow.unitCostCents;
+    }
+
     return PPScaffold(
-      eyebrow: l10n.homeEyebrow,
       title: l10n.homeTitle,
       searchHint: l10n.homeSearchHint,
-      action: PPButton(label: l10n.homeOpenTable, onPressed: () => context.go(AppTab.sell.path)),
+      hero: _Hero(onOpenTable: () => context.go(AppTab.sell.path)),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -65,58 +75,108 @@ class HomeScreen extends ConsumerWidget {
             ],
           ),
           if (low.isNotEmpty) ...[
-            const SizedBox(height: PPSpace.md),
+            const SizedBox(height: PPSpace.lg),
             StickerCard(
               iridescent: true,
               fill: PPColors.surface,
               radius: 20,
               padding: const EdgeInsets.all(14),
-              child: Row(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Container(
-                    width: 32,
-                    height: 32,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(shape: BoxShape.circle, color: PPColors.pink),
-                    child: Text(
-                      '!',
-                      style: PPType.body(
-                        size: 18,
-                        weight: FontWeight.w900,
-                        color: PPColors.onAccent,
+                  Row(
+                    children: [
+                      Container(
+                        width: 32,
+                        height: 32,
+                        alignment: Alignment.center,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: PPColors.pink,
+                        ),
+                        child: Text(
+                          '!',
+                          style: PPType.body(
+                            size: 18,
+                            weight: FontWeight.w900,
+                            color: PPColors.onAccent,
+                          ),
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              l10n.homeAlmostGone(low.first.name),
+                              style: PPType.body(size: 15, weight: FontWeight.w800),
+                            ),
+                            Text(
+                              l10n.homeLeft(stock[low.first.id] ?? 0),
+                              style: PPType.body(size: 13, color: PPColors.muted),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(l10n.homeJustNow, style: PPType.label(size: 10, color: PPColors.muted)),
+                    ],
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          l10n.homeAlmostGone(low.first.name),
-                          style: PPType.body(size: 15, weight: FontWeight.w800),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _AlertButton(
+                          label: l10n.homeGoToMyTable,
+                          onTap: () => context.go(AppTab.sell.path),
                         ),
-                        Text(
-                          l10n.homeLeft(stock[low.first.id] ?? 0),
-                          style: PPType.body(size: 13, color: PPColors.muted),
+                      ),
+                      const SizedBox(width: PPSpace.sm),
+                      Expanded(
+                        child: _AlertButton(
+                          label: l10n.homeRestockNote,
+                          onTap: () => context.go(AppTab.shop.path),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ],
           if (top.isNotEmpty) ...[
-            const SizedBox(height: PPSpace.md),
+            const SizedBox(height: PPSpace.lg),
             StickerCard(
               radius: 20,
               padding: const EdgeInsets.all(14),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(l10n.homeFanFavorites, style: PPType.title(size: 20)),
-                  const SizedBox(height: PPSpace.sm),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
+                    children: [
+                      Expanded(child: Text(l10n.homeFanFavorites, style: PPType.title(size: 20))),
+                      GestureDetector(
+                        onTap: () => context.go(AppTab.insights.path),
+                        child: ConstrainedBox(
+                          constraints: const BoxConstraints(minHeight: PPTap.min),
+                          child: Align(
+                            widthFactor: 1,
+                            alignment: Alignment.centerRight,
+                            child: Text(
+                              l10n.homeSeeAll,
+                              style: PPType.body(
+                                size: 13,
+                                weight: FontWeight.w700,
+                                color: PPColors.violet,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   for (var i = 0; i < top.length; i++)
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 4),
@@ -160,6 +220,46 @@ class HomeScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
+                  if (slow != null) ...[
+                    const SizedBox(height: PPSpace.sm),
+                    const Divider(height: 1, color: PPColors.line),
+                    const SizedBox(height: PPSpace.sm),
+                    Row(
+                      children: [
+                        Text(
+                          l10n.homeNotSoPopular,
+                          style: PPType.body(
+                            size: 13,
+                            weight: FontWeight.w800,
+                            color: PPColors.muted,
+                          ),
+                        ),
+                        const Spacer(),
+                        Flexible(
+                          child: Text.rich(
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            TextSpan(
+                              style: PPType.body(size: 13),
+                              children: [
+                                TextSpan(
+                                  text: slow.name,
+                                  style: PPType.body(size: 13, weight: FontWeight.w800),
+                                ),
+                                TextSpan(
+                                  text: ' ${l10n.homeAfterCost(Money.signed(slowNet))}',
+                                  style: PPType.body(
+                                    size: 13,
+                                    color: slowNet < 0 ? PPColors.pink : PPColors.teal,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -196,8 +296,6 @@ class HomeScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: PPSpace.lg),
-          Text(l10n.homeExperiment, style: PPType.title(size: 20)),
-          const SizedBox(height: PPSpace.sm),
           const _TrendDeck(),
           const SizedBox(height: PPSpace.xl),
           const AsciiPups(),
@@ -217,6 +315,9 @@ class _TrendDeck extends ConsumerStatefulWidget {
 
 class _TrendDeckState extends ConsumerState<_TrendDeck> {
   final _controller = CardSwiperController();
+
+  /// Cards handled this session, for the "N OF M" count.
+  int _done = 0;
 
   @override
   void dispose() {
@@ -245,13 +346,33 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
         .rank(trends: trends, shopTags: {...?brand?.nicheTags}, swipedIds: swiped);
 
     if (ranked.isEmpty) {
-      return EmptyState(title: l10n.homeCaughtUpTitle, message: l10n.homeCaughtUpMessage);
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.homeExperiment, style: PPType.title(size: 20)),
+          const SizedBox(height: PPSpace.sm),
+          EmptyState(title: l10n.homeCaughtUpTitle, message: l10n.homeCaughtUpMessage),
+        ],
+      );
     }
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Expanded(child: Text(l10n.homeExperiment, style: PPType.title(size: 20))),
+            Text(
+              l10n.homeDeckCount(_done + 1, ranked.length + _done),
+              style: PPType.label(size: 11, color: PPColors.muted),
+            ),
+          ],
+        ),
+        const SizedBox(height: PPSpace.sm),
         SizedBox(
-          height: 220,
+          height: 236,
           child: CardSwiper(
             controller: _controller,
             cardsCount: ranked.length,
@@ -260,16 +381,12 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
             padding: EdgeInsets.zero,
             onSwipe: (i, _, dir) {
               _record(ranked[i], dir == CardSwiperDirection.right);
+              setState(() => _done++);
               return true;
             },
             cardBuilder: (context, i, _, __) {
               final t = ranked[i];
-              return TrendCard(
-                title: t.title,
-                why: t.why,
-                badge: l10n.homeRising,
-                sources: t.sources,
-              );
+              return TrendCard(title: t.title, why: t.why, badge: l10n.homeRising, niche: t.niche);
             },
           ),
         ),
@@ -362,6 +479,73 @@ class _DaySteps extends StatelessWidget {
             ),
           ),
       ],
+    );
+  }
+}
+
+/// Greeting, primary action and the swinging pass (Home artboard hero).
+class _Hero extends StatelessWidget {
+  const _Hero({required this.onOpenTable});
+
+  final VoidCallback onOpenTable;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.homeEyebrow.toUpperCase(), style: PPType.label(color: PPColors.violet)),
+                const SizedBox(height: 8),
+                Text(l10n.homeHeroGreeting, style: PPType.title(size: 34).copyWith(height: 0.98)),
+                const SizedBox(height: 8),
+                Text(l10n.homeHeroSubtitle, style: PPType.body(size: 14, color: PPColors.muted)),
+                const SizedBox(height: 12),
+                PPButton(
+                  label: l10n.homeOpenTable,
+                  icon: Icons.arrow_forward_rounded,
+                  onPressed: onOpenTable,
+                ),
+              ],
+            ),
+          ),
+        ),
+        const SizedBox(width: PPSpace.md),
+        const SwingingPass(),
+      ],
+    );
+  }
+}
+
+class _AlertButton extends StatelessWidget {
+  const _AlertButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 48,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: PPColors.raised,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: PPColors.lineStrong),
+          ),
+          child: Text(label, style: PPType.body(size: 14, weight: FontWeight.w700)),
+        ),
+      ),
     );
   }
 }

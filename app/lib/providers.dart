@@ -7,6 +7,8 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'config.dart';
+import 'l10n/app_localizations.dart';
+import 'l10n/app_localizations_en.dart';
 import 'connectors/ai/ai_provider.dart';
 import 'connectors/connector.dart';
 import 'connectors/csv/csv_import_connector.dart';
@@ -55,6 +57,10 @@ final supabaseProvider = Provider<SupabaseClient?>((ref) {
 });
 
 final hapticsProvider = Provider((_) => HapticsService());
+
+/// Strings for code that runs outside the widget tree (labels derived in
+/// providers). English is the only shipped locale; override when adding more.
+final l10nProvider = Provider<AppLocalizations>((_) => AppLocalizationsEn());
 
 // ---------------- plan ----------------
 
@@ -258,13 +264,14 @@ final todayStatsProvider = StreamProvider<TodayStats>((ref) {
 });
 
 final connectionLabelProvider = StreamProvider<String>((ref) async* {
+  final l10n = ref.watch(l10nProvider);
   final pro = ref.watch(entitlementsProvider).can(Feature.cloudBackup);
   final sync = ref.watch(syncServiceProvider);
   Future<String> label(List<ConnectivityResult> r) async {
-    if (r.contains(ConnectivityResult.none)) return 'Offline, saved on phone';
-    if (!pro || sync == null) return 'Saved on phone';
+    if (r.contains(ConnectivityResult.none)) return l10n.connectionOffline;
+    if (!pro || sync == null) return l10n.connectionSavedOnPhone;
     final n = await sync.pendingCount();
-    return n == 0 ? 'Synced' : 'Syncing $n';
+    return n == 0 ? l10n.connectionSynced : l10n.connectionSyncing(n);
   }
 
   final connectivity = Connectivity();
@@ -295,12 +302,13 @@ class EventBarState {
 final eventBarProvider = Provider<EventBarState>((ref) {
   final event = ref.watch(currentEventProvider).valueOrNull;
   final today = ref.watch(todayStatsProvider).valueOrNull ?? const TodayStats();
-  final conn = ref.watch(connectionLabelProvider).valueOrNull ?? 'Saved on phone';
+  final l10n = ref.watch(l10nProvider);
+  final conn = ref.watch(connectionLabelProvider).valueOrNull ?? l10n.connectionSavedOnPhone;
   final now = DateTime.now();
   if (event == null) {
     return EventBarState(
-      eventName: 'No event yet',
-      statusLabel: 'Add one',
+      eventName: l10n.eventBarNoEvent,
+      statusLabel: l10n.eventBarAddOne,
       isLive: false,
       netTodayCents: today.netCents,
       connectionLabel: conn,
@@ -308,10 +316,17 @@ final eventBarProvider = Provider<EventBarState>((ref) {
   }
   final live = !now.isBefore(event.startsAt) && !now.isAfter(event.endsAt);
   final status = live
-      ? 'Live day ${now.difference(DateTime(event.startsAt.year, event.startsAt.month, event.startsAt.day)).inDays + 1}'
+      ? l10n.eventBarLiveDay(
+          now
+                  .difference(
+                    DateTime(event.startsAt.year, event.startsAt.month, event.startsAt.day),
+                  )
+                  .inDays +
+              1,
+        )
       : event.startsAt.isAfter(now)
-      ? 'In ${event.startsAt.difference(now).inDays + 1} d'
-      : 'Ended';
+      ? l10n.eventBarInDays(event.startsAt.difference(now).inDays + 1)
+      : l10n.eventBarEnded;
   return EventBarState(
     eventName: event.name,
     statusLabel: status,

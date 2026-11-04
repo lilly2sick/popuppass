@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../tokens.dart';
 import 'sticker.dart';
@@ -20,27 +21,12 @@ class PupMark extends StatelessWidget {
   );
 }
 
-const _faqs = [
-  (
-    'Does it work with no signal?',
-    'Yes. Everything saves on your phone first. Pro backs it up when you are back online.',
-  ),
-  (
-    'I tapped +1 twice by accident',
-    'Tap -1 on the same item. It removes the last sale and puts the item back in stock.',
-  ),
-  (
-    'How do I add an event?',
-    'Tap the pass at the top of any screen, then New event, Import .ics, or pick a con near you.',
-  ),
-  (
-    'Where is my data?',
-    'On this phone only, unless you turn on Pro backup. We never sell your sales data.',
-  ),
-  (
-    'What does Pro add?',
-    'Cloud backup, AI captions and recaps, card reader sync, PDF and Excel exports.',
-  ),
+List<(String, String)> _faqs(AppLocalizations l) => [
+  (l.pupFaqOfflineQ, l.pupFaqOfflineA),
+  (l.pupFaqDoubleTapQ, l.pupFaqDoubleTapA),
+  (l.pupFaqAddEventQ, l.pupFaqAddEventA),
+  (l.pupFaqDataQ, l.pupFaqDataA),
+  (l.pupFaqProQ, l.pupFaqProA),
 ];
 
 /// PUP's greeting and FAQs. Shown once on first launch, then from the corner.
@@ -48,7 +34,7 @@ Future<void> showPupSheet(BuildContext context, {bool greeting = false}) =>
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
-      builder: (_) => SafeArea(
+      builder: (sheetContext) => SafeArea(
         child: Padding(
           padding: const EdgeInsets.fromLTRB(PPSpace.gutter, 0, PPSpace.gutter, PPSpace.lg),
           child: Column(
@@ -85,11 +71,13 @@ Future<void> showPupSheet(BuildContext context, {bool greeting = false}) =>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            greeting ? "Hey, maker. I'm PUP." : 'Need a hand?',
+                            greeting
+                                ? AppLocalizations.of(sheetContext).pupGreetingTitle
+                                : AppLocalizations.of(sheetContext).pupNeedHand,
                             style: PPType.title(size: 20, color: PPColors.onAccent),
                           ),
                           Text(
-                            'I live in the corner. Tap me any time you get stuck.',
+                            AppLocalizations.of(sheetContext).pupCornerHint,
                             style: PPType.body(size: 13, color: PPColors.onAccent),
                           ),
                         ],
@@ -99,7 +87,7 @@ Future<void> showPupSheet(BuildContext context, {bool greeting = false}) =>
                 ],
               ),
               const SizedBox(height: PPSpace.md),
-              for (final (q, a) in _faqs)
+              for (final (q, a) in _faqs(AppLocalizations.of(sheetContext)))
                 Padding(
                   padding: const EdgeInsets.only(bottom: 6),
                   child: StickerCard(
@@ -123,7 +111,7 @@ Future<void> showPupSheet(BuildContext context, {bool greeting = false}) =>
               const SizedBox(height: PPSpace.sm),
               Builder(
                 builder: (ctx) => PPButton(
-                  label: "Let's go",
+                  label: AppLocalizations.of(ctx).pupLetsGo,
                   onPressed: () => Navigator.pop(ctx),
                   expand: true,
                   height: 52,
@@ -161,7 +149,7 @@ class _PupCornerButtonState extends ConsumerState<PupCornerButton> {
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
-      label: 'Ask PUP',
+      label: AppLocalizations.of(context).pupAskPup,
       child: GestureDetector(
         onTap: () => showPupSheet(context),
         child: Container(

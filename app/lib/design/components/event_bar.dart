@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../domain/money.dart';
 import '../../features/events/events_sheet.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../tokens.dart';
 
@@ -13,12 +14,13 @@ class EventBar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final s = ref.watch(eventBarProvider);
+    final l10n = AppLocalizations.of(context);
     final up = s.netTodayCents >= 0;
     return Padding(
       padding: const EdgeInsets.fromLTRB(PPSpace.gutter, PPSpace.md, PPSpace.gutter, PPSpace.sm),
       child: Semantics(
         button: true,
-        label: 'Open events. ${s.eventName}',
+        label: l10n.eventBarOpenEvents(s.eventName),
         child: GestureDetector(
           onTap: () => showEventsSheet(context),
           child: Container(
@@ -62,7 +64,7 @@ class EventBar extends ConsumerWidget {
                         RotatedBox(
                           quarterTurns: 3,
                           child: Text(
-                            'PASS',
+                            l10n.eventBarPass,
                             style: PPType.label(size: 8, color: PPColors.onAccent),
                           ),
                         ),
@@ -123,7 +125,10 @@ class EventBar extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('NET TODAY', style: PPType.label(size: 10, color: PPColors.muted)),
+                      Text(
+                        l10n.eventBarNetToday,
+                        style: PPType.label(size: 10, color: PPColors.muted),
+                      ),
                       Text(
                         Money.signedWhole(s.netTodayCents),
                         style: PPType.number(size: 26, color: up ? PPColors.teal : PPColors.pink),

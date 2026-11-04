@@ -14,6 +14,7 @@ import '../../design/components/tiles.dart';
 import '../../design/tokens.dart';
 import '../../domain/enums.dart';
 import '../../domain/money.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../../render/capture.dart';
 import '../../render/post_format.dart';
@@ -24,26 +25,45 @@ import '../../services/haptics_service.dart';
 /// The look the vendor picks. Each share destination then exports at its own
 /// platform size for that look.
 enum PostShape {
-  post('Post', 'post', PostFormat.instagramPortrait),
-  story('Story', 'story', PostFormat.story),
-  wide('Wide', 'wide post', PostFormat.facebookLink);
+  post(PostFormat.instagramPortrait),
+  story(PostFormat.story),
+  wide(PostFormat.facebookLink);
 
-  const PostShape(this.label, this.noun, this.preview);
-  final String label;
-  final String noun;
+  const PostShape(this.preview);
   final PostFormat preview;
+
+  String label(AppLocalizations l10n) => switch (this) {
+    PostShape.post => l10n.createShapePost,
+    PostShape.story => l10n.createShapeStory,
+    PostShape.wide => l10n.createShapeWide,
+  };
+
+  String noun(AppLocalizations l10n) => switch (this) {
+    PostShape.post => l10n.createNounPost,
+    PostShape.story => l10n.createNounStory,
+    PostShape.wide => l10n.createNounWide,
+  };
 }
 
 enum ShareTarget {
-  png('Save as PNG', 'PNG'),
-  instagram('Instagram', 'IG'),
-  facebook('Facebook', 'FB'),
-  linkedin('LinkedIn', 'IN'),
-  more('More apps', '...');
+  png('PNG'),
+  instagram('IG'),
+  facebook('FB'),
+  linkedin('IN'),
+  more('...');
 
-  const ShareTarget(this.label, this.mark);
-  final String label;
+  const ShareTarget(this.mark);
+
+  /// Short glyph in the row badge. Brand abbreviations, not translated.
   final String mark;
+
+  String label(AppLocalizations l10n) => switch (this) {
+    ShareTarget.png => l10n.createTargetPng,
+    ShareTarget.instagram => l10n.createTargetInstagram,
+    ShareTarget.facebook => l10n.createTargetFacebook,
+    ShareTarget.linkedin => l10n.createTargetLinkedin,
+    ShareTarget.more => l10n.createTargetMore,
+  };
 
   PostFormat formatFor(PostShape s) => switch ((this, s)) {
     (_, PostShape.post) => PostFormat.instagramPortrait,
@@ -114,6 +134,7 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
   }
 
   Future<void> _send(ShareTarget t) async {
+    final l10n = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     Navigator.pop(context);
     final f = t.formatFor(_shape);
@@ -121,16 +142,14 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
     if (t == ShareTarget.png) {
       try {
         if (!await Gal.hasAccess()) await Gal.requestAccess();
-        await Gal.putImage(file.path, album: 'Pop-Up Pass');
+        await Gal.putImage(file.path, album: l10n.appTitle);
         await ref.read(hapticsProvider).play(HapticMoment.success);
         messenger.showSnackBar(
-          SnackBar(content: Text('Saved ${f.width} x ${f.height} PNG to Photos')),
+          SnackBar(content: Text(l10n.createSavedToPhotos(f.width, f.height))),
         );
       } on GalException {
         await ref.read(hapticsProvider).play(HapticMoment.error);
-        messenger.showSnackBar(
-          const SnackBar(content: Text('Could not save. Allow Photos access in Settings.')),
-        );
+        messenger.showSnackBar(SnackBar(content: Text(l10n.createSaveFailed)));
       }
       return;
     }
@@ -150,7 +169,10 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Text('Share ${_shape.noun}', style: PPType.title(size: 24)),
+              Text(
+                AppLocalizations.of(ctx).createShareShape(_shape.noun(AppLocalizations.of(ctx))),
+                style: PPType.title(size: 24),
+              ),
               const SizedBox(height: PPSpace.md),
               for (final t in ShareTarget.values)
                 Padding(
@@ -166,6 +188,7 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final all = ref.watch(productsProvider).valueOrNull ?? const <Product>[];
     final products = _query.isEmpty
         ? all
@@ -181,16 +204,16 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
     final format = _renderFormat ?? _shape.preview;
 
     final content = PostContent(
-      headline: p == null ? 'Pick an item' : '${p.name} is back.',
-      shopName: brand?.shopName ?? 'My shop',
+      headline: p == null ? l10n.createPickItem : l10n.createBackSoon(p.name),
+      shopName: brand?.shopName ?? l10n.createDefaultShopName,
       priceLabel: p == null ? null : Money.format(p.priceCents),
       handle: brand?.handle,
       boothLabel: brand?.boothLabel,
     );
 
     return PPScaffold(
-      title: 'Make a little noise.',
-      searchHint: 'Search items to post',
+      title: l10n.createTitle,
+      searchHint: l10n.createSearchHint,
       onSearch: (q) => setState(() => _query = q.trim()),
       onSearchSubmit: (_) {},
       scrollable: false,
@@ -252,7 +275,7 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
                                   borderRadius: BorderRadius.circular(PPRadius.chip),
                                 ),
                                 child: Text(
-                                  s.label,
+                                  s.label(l10n),
                                   style: PPType.body(
                                     size: 13,
                                     weight: FontWeight.w800,
@@ -279,13 +302,16 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
                 Row(
                   children: [
                     Expanded(
-                      child: Text('CAPTION', style: PPType.label(size: 10, color: PPColors.muted)),
+                      child: Text(
+                        l10n.createCaptionLabel,
+                        style: PPType.label(size: 10, color: PPColors.muted),
+                      ),
                     ),
                     if (_aiJobId != null)
                       GestureDetector(
                         onTap: () => setState(() => _showAi = !_showAi),
                         child: Text(
-                          _showAi ? 'Use mine' : 'AI version',
+                          _showAi ? l10n.createUseMine : l10n.createAiVersion,
                           style: PPType.label(size: 10, color: PPColors.violet),
                         ),
                       ),
@@ -305,13 +331,13 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
                     controller: _caption,
                     maxLines: 2,
                     style: PPType.body(size: 14),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       isDense: true,
                       filled: false,
                       border: InputBorder.none,
                       enabledBorder: InputBorder.none,
                       focusedBorder: InputBorder.none,
-                      hintText: 'Pick an item to start a caption',
+                      hintText: l10n.createCaptionHint,
                     ),
                   ),
               ],
@@ -319,7 +345,7 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
           ),
           const SizedBox(height: PPSpace.md),
           PPButton(
-            label: 'Share or save',
+            label: l10n.createShareOrSave,
             icon: Icons.ios_share_rounded,
             height: 56,
             expand: true,
@@ -340,12 +366,13 @@ class _ShareRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final primary = target == ShareTarget.png;
     final fg = primary ? PPColors.onAccent : PPColors.text;
     final sub = switch (target) {
-      ShareTarget.png => '${format.width} x ${format.height} to Photos',
-      ShareTarget.more => 'Messages, Shopify, Etsy and others',
-      _ => '${format.width} x ${format.height}',
+      ShareTarget.png => l10n.createTargetPngSubtitle(format.width, format.height),
+      ShareTarget.more => l10n.createTargetMoreSubtitle,
+      _ => l10n.createTargetSizeSubtitle(format.width, format.height),
     };
     return Semantics(
       button: true,
@@ -377,7 +404,7 @@ class _ShareRow extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      target.label,
+                      target.label(l10n),
                       style: PPType.body(size: 15, weight: FontWeight.w800, color: fg),
                     ),
                     Text(

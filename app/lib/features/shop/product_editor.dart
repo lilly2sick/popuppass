@@ -6,6 +6,7 @@ import '../../data/db/database.dart';
 import '../../design/components/sticker.dart';
 import '../../design/tokens.dart';
 import '../../domain/money.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../../services/haptics_service.dart';
 
@@ -72,6 +73,7 @@ class _ProductEditorState extends ConsumerState<_ProductEditor> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final event = ref.watch(currentEventProvider).valueOrNull;
     final suggestion = ref
         .watch(pricingProvider)
@@ -97,33 +99,41 @@ class _ProductEditorState extends ConsumerState<_ProductEditor> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(widget.product == null ? 'New item' : 'Edit item', style: PPType.title()),
+          Text(
+            widget.product == null ? l10n.editorNewItem : l10n.editorEditItem,
+            style: PPType.title(),
+          ),
           const SizedBox(height: PPSpace.lg),
-          field(_name, 'Name'),
-          field(_cost, 'Materials per item (\$)', type: money),
-          field(_minutes, 'Minutes to make', type: TextInputType.number),
+          field(_name, l10n.editorName),
+          field(_cost, l10n.editorMaterialsPerItem, type: money),
+          field(_minutes, l10n.editorMinutesToMake, type: TextInputType.number),
           StickerCard(
             fill: PPColors.violetSoft,
             shadow: false,
             padding: const EdgeInsets.all(PPSpace.md),
             child: Text(
-              'Try ${Money.format(suggestion.lowCents)} to ${Money.format(suggestion.highCents)}.'
-              '${suggestion.breakEvenUnits > 0 ? ' Sell ${suggestion.breakEvenUnits} to cover your booth.' : ''}',
+              l10n.editorPriceSuggestion(
+                    Money.format(suggestion.lowCents),
+                    Money.format(suggestion.highCents),
+                  ) +
+                  (suggestion.breakEvenUnits > 0
+                      ? l10n.editorPriceSuggestionBreakEven(suggestion.breakEvenUnits)
+                      : ''),
               style: PPType.body(size: 14, weight: FontWeight.w500),
             ),
           ),
           const SizedBox(height: PPSpace.md),
-          field(_price, 'Price (\$)', type: money),
+          field(_price, l10n.editorPrice, type: money),
           field(
             _qty,
-            widget.product == null ? 'Starting stock' : 'Add stock',
+            widget.product == null ? l10n.editorStartingStock : l10n.editorAddStock,
             type: TextInputType.number,
           ),
-          PPButton(label: 'Save', onPressed: _save, expand: true),
+          PPButton(label: l10n.editorSave, onPressed: _save, expand: true),
           if (widget.product != null) ...[
             const SizedBox(height: PPSpace.sm),
             PPButton(
-              label: 'Delete item',
+              label: l10n.editorDeleteItem,
               kind: PPButtonKind.dashed,
               onPressed: _delete,
               expand: true,

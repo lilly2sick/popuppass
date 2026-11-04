@@ -11,6 +11,7 @@ import '../../domain/money.dart';
 import '../../domain/summary_writer.dart';
 import '../../export/export_service.dart';
 import '../../export/exporter.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 
 final _reportProvider = FutureProvider.autoDispose<EventReport>((ref) async {
@@ -25,6 +26,7 @@ class InsightsScreen extends ConsumerWidget {
   const InsightsScreen({super.key});
 
   Future<void> _export(BuildContext context, WidgetRef ref, EventReport r) async {
+    final l10n = AppLocalizations.of(context);
     final svc = ref.read(exportServiceProvider);
     final event = ref.read(currentEventProvider).valueOrNull;
     final format = await showModalBottomSheet<ExportFormat>(
@@ -36,10 +38,10 @@ class InsightsScreen extends ConsumerWidget {
             for (final f in ExportFormat.values)
               ListTile(
                 minTileHeight: PPTap.min,
-                title: Text(f.label, style: PPType.body(weight: FontWeight.w700)),
+                title: Text(f.localized(l10n), style: PPType.body(weight: FontWeight.w700)),
                 trailing: svc.allowed(f)
                     ? null
-                    : Text('PRO', style: PPType.label(color: PPColors.violet)),
+                    : Text(l10n.insightsExportPro, style: PPType.label(color: PPColors.violet)),
                 onTap: () => Navigator.pop(context, f),
               ),
           ],
@@ -52,10 +54,18 @@ class InsightsScreen extends ConsumerWidget {
       await svc.share(
         format,
         ExportRequest(
-          title: '${event?.name ?? 'All sales'} report',
+          title: l10n.insightsReportTitle(event?.name ?? l10n.insightsAllSales),
           report: r,
           salesRows: [
-            ['Sold at', 'Item', 'Qty', 'Unit price', 'Unit cost', 'Paid with', 'Source'],
+            [
+              l10n.exportColSoldAt,
+              l10n.exportColItem,
+              l10n.exportColQty,
+              l10n.exportColUnitPrice,
+              l10n.exportColUnitCost,
+              l10n.exportColPaidWith,
+              l10n.exportColSource,
+            ],
             for (final (s, l) in rows)
               [
                 s.soldAt,
@@ -63,7 +73,7 @@ class InsightsScreen extends ConsumerWidget {
                 l.qty,
                 l.unitPriceCents / 100,
                 l.unitCostCents / 100,
-                s.paymentMethod.label,
+                s.paymentMethod.localized(l10n),
                 s.source.name,
               ],
           ],
@@ -73,20 +83,21 @@ class InsightsScreen extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(
           context,
-        ).showSnackBar(const SnackBar(content: Text('PDF and Excel exports are part of Pro.')));
+        ).showSnackBar(SnackBar(content: Text(l10n.insightsPdfXlsxLocked)));
       }
     }
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context);
     final report = ref.watch(_reportProvider).valueOrNull;
     final event = ref.watch(currentEventProvider).valueOrNull;
 
     return PPScaffold(
-      title: 'Look what you did.',
+      title: l10n.insightsTitle,
       action: PPButton(
-        label: 'Export',
+        label: l10n.insightsExport,
         onPressed: report == null ? null : () => _export(context, ref, report),
       ),
       body: report == null
@@ -96,11 +107,14 @@ class InsightsScreen extends ConsumerWidget {
               children: [
                 MoneyDelta(
                   cents: report.netCents,
-                  eyebrow: 'Net profit',
+                  eyebrow: l10n.insightsNetProfit,
                   large: true,
-                  caption:
-                      '${Money.format(report.grossCents)} gross, ${Money.format(report.costCents)} cost, '
-                      '${Money.format(report.boothFeeCents)} booth. ${report.units} sold.',
+                  caption: l10n.insightsNetCaption(
+                    Money.format(report.grossCents),
+                    Money.format(report.costCents),
+                    Money.format(report.boothFeeCents),
+                    report.units,
+                  ),
                 ),
                 const SizedBox(height: PPSpace.md),
                 _PerItem(report: report),
@@ -117,12 +131,12 @@ class InsightsScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('YOUR RECAP', style: PPType.label(color: PPColors.lilac)),
+                      Text(l10n.insightsYourRecap, style: PPType.label(color: PPColors.lilac)),
                       const SizedBox(height: 6),
                       Text(
                         const RuleSummaryWriter().write(
                           report,
-                          eventName: event?.name ?? 'this event',
+                          eventName: event?.name ?? l10n.insightsThisEvent,
                         ),
                         style: PPType.body(size: 14),
                       ),
@@ -142,6 +156,7 @@ class _PerItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final rows = report.ranked;
     final max = rows.fold<int>(1, (m, p) => p.profitCents.abs() > m ? p.profitCents.abs() : m);
     return StickerCard(
@@ -151,7 +166,7 @@ class _PerItem extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text('Profit by item', style: PPType.body(weight: FontWeight.w700)),
+          Text(l10n.insightsProfitByItem, style: PPType.body(weight: FontWeight.w700)),
           const SizedBox(height: PPSpace.sm),
           for (final p in rows)
             Padding(
@@ -181,7 +196,7 @@ class _PerItem extends StatelessWidget {
                   ),
                   const SizedBox(width: PPSpace.sm),
                   Text(
-                    '${p.units} / ${Money.signed(p.profitCents)}',
+                    l10n.insightsUnitsOverProfit(p.units, Money.signed(p.profitCents)),
                     style: PPType.body(
                       size: 13,
                       weight: FontWeight.w700,
@@ -216,6 +231,7 @@ class _PaidWith extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final entries = report.byMethod.entries.toList()..sort((a, b) => b.value.compareTo(a.value));
     final total = entries.fold<int>(0, (a, e) => a + e.value);
     if (total == 0) return const SizedBox.shrink();
@@ -227,7 +243,7 @@ class _PaidWith extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('How they paid', style: PPType.body(weight: FontWeight.w700)),
+          Text(l10n.insightsHowTheyPaid, style: PPType.body(weight: FontWeight.w700)),
           const SizedBox(height: PPSpace.sm),
           Container(
             height: 16,
@@ -257,7 +273,10 @@ class _PaidWith extends StatelessWidget {
                   children: [
                     Container(width: 10, height: 10, color: color(e.key)),
                     const SizedBox(width: 6),
-                    Text('${e.key.label} ${Money.format(e.value)}', style: PPType.body(size: 12)),
+                    Text(
+                      l10n.insightsMethodAmount(e.key.localized(l10n), Money.format(e.value)),
+                      style: PPType.body(size: 12),
+                    ),
                   ],
                 ),
             ],

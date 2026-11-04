@@ -7,6 +7,7 @@ import '../../design/components/sticker.dart';
 import '../../design/tokens.dart';
 import '../../domain/enums.dart';
 import '../../domain/money.dart';
+import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../../services/haptics_service.dart';
 import '../search/search_sheet.dart';
@@ -91,6 +92,7 @@ class _SellScreenState extends ConsumerState<SellScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final all = ref.watch(productsProvider).valueOrNull ?? const <Product>[];
     final items = _visible(all);
     final stock = ref.watch(stockProvider).valueOrNull ?? const {};
@@ -131,8 +133,8 @@ class _SellScreenState extends ConsumerState<SellScreen> {
         );
 
     return PPScaffold(
-      title: 'Your table, in a tap.',
-      searchHint: 'Search your items',
+      title: l10n.sellTitle,
+      searchHint: l10n.sellSearchHint,
       onSearch: (q) => setState(() {
         _query = q.trim();
         _page = 0;
@@ -144,13 +146,13 @@ class _SellScreenState extends ConsumerState<SellScreen> {
         children: [
           iconButton(
             _grid ? Icons.crop_portrait_rounded : Icons.grid_view_rounded,
-            _grid ? 'Back to single item' : 'Zoom out to grid',
+            _grid ? l10n.sellBackToSingle : l10n.sellZoomToGrid,
             () => _setGrid(!_grid),
           ),
           const SizedBox(width: 6),
           iconButton(
             Icons.add_rounded,
-            'Add item',
+            l10n.sellAddItem,
             () => showProductEditor(context),
             primary: true,
           ),
@@ -168,7 +170,7 @@ class _SellScreenState extends ConsumerState<SellScreen> {
               itemBuilder: (_, i) {
                 final m = PaymentMethod.values[i];
                 return PPChip(
-                  label: m.label,
+                  label: m.localized(l10n),
                   selected: m == method,
                   onTap: () {
                     ref.read(hapticsProvider).play(HapticMoment.selection);
@@ -182,10 +184,10 @@ class _SellScreenState extends ConsumerState<SellScreen> {
           Expanded(
             child: items.isEmpty
                 ? EmptyState(
-                    title: _query.isEmpty ? 'No items yet' : 'No match',
+                    title: _query.isEmpty ? l10n.sellNoItemsTitle : l10n.sellNoMatchTitle,
                     message: _query.isEmpty
-                        ? 'Add your first item with the + button.'
-                        : 'Nothing matches "$_query".',
+                        ? l10n.sellNoItemsMessage
+                        : l10n.sellNoMatchMessage(_query),
                   )
                 : GestureDetector(
                     onScaleUpdate: (d) {
@@ -225,7 +227,7 @@ class _SellScreenState extends ConsumerState<SellScreen> {
                                         product: items[i],
                                         left: stock[items[i].id] ?? 0,
                                         sold: sold[items[i].id] ?? 0,
-                                        position: '${i + 1} / ${items.length}',
+                                        position: l10n.sellPosition(i + 1, items.length),
                                       ),
                                     ),
                                   ),
@@ -243,9 +245,9 @@ class _SellScreenState extends ConsumerState<SellScreen> {
               children: [
                 Expanded(
                   child: Semantics(
-                    label: 'Take back one ${current.name} sale',
+                    label: l10n.sellRemoveOneSale(current.name),
                     child: PPButton.secondary(
-                      label: '-1',
+                      label: l10n.sellMinus1,
                       height: 68,
                       onPressed: (stacks[current.id]?.isNotEmpty ?? false)
                           ? () => _unsell(current)
@@ -257,9 +259,9 @@ class _SellScreenState extends ConsumerState<SellScreen> {
                 Expanded(
                   flex: 2,
                   child: Semantics(
-                    label: 'Sell one ${current.name}',
+                    label: l10n.sellSellOne(current.name),
                     child: PPButton(
-                      label: currentLeft <= 0 ? 'Sold out' : '+1 sold',
+                      label: currentLeft <= 0 ? l10n.sellSoldOut : l10n.sellOneSold,
                       height: 68,
                       onPressed: currentLeft <= 0 ? null : () => _sell(current, currentLeft),
                     ),
@@ -273,11 +275,11 @@ class _SellScreenState extends ConsumerState<SellScreen> {
             children: [
               Expanded(
                 child: Text(
-                  'PAID WITH ${method.label}'.toUpperCase(),
+                  l10n.sellPaidWith(method.localized(l10n)).toUpperCase(),
                   style: PPType.label(size: 10, color: PPColors.muted),
                 ),
               ),
-              Text('${Money.format(today.grossCents)} gross', style: PPType.number(size: 18)),
+              Text(l10n.sellGross(Money.format(today.grossCents)), style: PPType.number(size: 18)),
             ],
           ),
         ],
@@ -301,6 +303,7 @@ class _ItemCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final p = product;
     final out = left <= 0;
     final low = !out && left <= p.lowStockThreshold;
@@ -359,17 +362,17 @@ class _ItemCard extends StatelessWidget {
             runSpacing: 6,
             children: [
               if (out)
-                const PPPill('Sold out', glyph: 'x')
+                PPPill(l10n.sellSoldOut, glyph: 'x')
               else if (low)
-                PPPill('$left left', tone: PillTone.warn)
+                PPPill(l10n.shopLeft(left), tone: PillTone.warn)
               else
-                PPPill('$left in stock', glyph: '#'),
+                PPPill(l10n.shopInStock(left), glyph: '#'),
               PPPill(
-                '$margin% margin',
+                l10n.shopMarginPct(margin),
                 tone: margin >= 60 ? PillTone.good : PillTone.info,
                 glyph: margin >= 60 ? '+' : '-',
               ),
-              PPPill('$sold sold'),
+              PPPill(l10n.sellSoldCount(sold)),
             ],
           ),
         ],
@@ -396,6 +399,7 @@ class _ItemGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return GridView.builder(
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 3,
@@ -410,7 +414,7 @@ class _ItemGrid extends StatelessWidget {
         final low = left <= p.lowStockThreshold;
         return Semantics(
           button: true,
-          label: 'Open ${p.name}, $left left, ${sold[p.id] ?? 0} sold',
+          label: l10n.sellOpenItem(p.name, left, sold[p.id] ?? 0),
           excludeSemantics: true,
           child: GestureDetector(
             onTap: () => onOpen(i),
@@ -462,7 +466,7 @@ class _ItemGrid extends StatelessWidget {
                     style: PPType.body(size: 12, weight: FontWeight.w800),
                   ),
                   Text(
-                    '${Money.format(p.priceCents)} / ${sold[p.id] ?? 0} sold',
+                    l10n.sellPriceSold(Money.format(p.priceCents), sold[p.id] ?? 0),
                     style: PPType.body(size: 11, color: PPColors.muted),
                   ),
                 ],
