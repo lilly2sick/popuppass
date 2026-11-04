@@ -9,7 +9,7 @@ Deno.serve(createHandler({
   db,
   llm: anthropicClient(Deno.env.get("ANTHROPIC_API_KEY")),
   aggregator: new Aggregator(
-    buildConnectors((k) => Deno.env.get(k), db),
+    buildConnectors((k) => Deno.env.get(k)),
     new SupabaseSignalStore(db),
   ),
   cronSecret: Deno.env.get("CRON_SECRET"),

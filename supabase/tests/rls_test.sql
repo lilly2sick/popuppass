@@ -49,7 +49,7 @@ select is_empty(
 -- 1d. Service-only tables expose nothing to clients.
 select is_empty(
   $$ select c.relname from pg_class c join pg_namespace n on n.oid = c.relnamespace
-      where n.nspname = 'public' and c.relname in ('signals_raw', 'ai_usage', 'trend_contributions')
+      where n.nspname = 'public' and c.relname in ('signals_raw', 'ai_usage')
         and (has_table_privilege('authenticated', c.oid, 'select')
           or has_table_privilege('authenticated', c.oid, 'insert')
           or has_table_privilege('anon', c.oid, 'select')) $$,

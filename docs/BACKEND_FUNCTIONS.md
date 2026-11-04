@@ -27,7 +27,6 @@ mocked `fetch` in `handler_test.ts`.
 | Etsy | `ETSY_API_KEY` |
 | Pinterest | `PINTEREST_ACCESS_TOKEN` (optional `PINTEREST_REGION`) |
 | Google Trends | `GOOGLE_TRENDS_API_KEY` (inert placeholder until the API shape is known) |
-| Opt-in sales | `OPT_IN_SALES=true` (optional `OPT_IN_MIN_K`, never below 5) |
 
 ## Scheduling and the free-tier pause
 

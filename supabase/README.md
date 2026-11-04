@@ -53,7 +53,6 @@ Set with `supabase secrets set NAME=value` on the cloud project. `SUPABASE_URL` 
 | `ETSY_API_KEY` | trend connector | optional, needs approval |
 | `PINTEREST_ACCESS_TOKEN`, `PINTEREST_REGION` | trend connector | optional, needs approval |
 | `GOOGLE_TRENDS_API_KEY` | trend connector | optional, placeholder |
-| `OPT_IN_SALES`, `OPT_IN_MIN_K` | trend aggregation | optional, k never below 5 |
 
 ## Cloud deploy
 

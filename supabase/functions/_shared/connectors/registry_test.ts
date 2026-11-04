@@ -1,11 +1,11 @@
 import { assertEquals } from "jsr:@std/assert@1";
-import { mockFetch, testDb } from "../testing.ts";
+import { mockFetch } from "../testing.ts";
 import { buildConnectors, type Env } from "./registry.ts";
 
 const env = (vars: Record<string, string>): Env => (k) => vars[k];
 const ids = (vars: Record<string, string>) => {
   const { fetch } = mockFetch();
-  return buildConnectors(env(vars), testDb(fetch), fetch).map((c) => c.id);
+  return buildConnectors(env(vars), fetch).map((c) => c.id);
 };
 
 Deno.test("only free sources run with no configuration", () => {
@@ -22,9 +22,4 @@ Deno.test("sources needing approval stay off until their env is present", () => 
     "anilist",
     "reddit",
   ]);
-});
-
-Deno.test("opt-in sales needs the explicit flag", () => {
-  assertEquals(ids({ OPT_IN_SALES: "false" }), ["curated", "anilist"]);
-  assertEquals(ids({ OPT_IN_SALES: "true" }), ["curated", "anilist", "opt_in_sales"]);
 });
