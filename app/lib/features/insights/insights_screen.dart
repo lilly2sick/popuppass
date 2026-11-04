@@ -202,15 +202,16 @@ class _PaidWith extends StatelessWidget {
 
   final EventReport report;
 
-  // Told apart by lightness as well as hue.
+  // One token color per payment method slot; cash (the common case) gets
+  // the brightest so the bar reads at a glance.
   static const _colors = [
-    PPColors.text,
+    PPColors.teal,
     PPColors.violet,
     PPColors.pink,
-    PPColors.pink,
+    PPColors.lilac,
+    PPColors.text,
     PPColors.muted,
     PPColors.violetSoft,
-    PPColors.line,
   ];
 
   @override
@@ -236,6 +237,7 @@ class _PaidWith extends StatelessWidget {
               border: Border.all(color: PPColors.text, width: 2),
             ),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 for (final e in entries)
                   Expanded(

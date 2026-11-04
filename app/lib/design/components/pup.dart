@@ -105,14 +105,17 @@ Future<void> showPupSheet(BuildContext context, {bool greeting = false}) =>
                   child: StickerCard(
                     radius: 14,
                     padding: EdgeInsets.zero,
-                    child: Theme(
-                      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-                      child: ExpansionTile(
-                        title: Text(q, style: PPType.body(size: 14, weight: FontWeight.w800)),
-                        iconColor: PPColors.violet,
-                        collapsedIconColor: PPColors.violet,
-                        childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-                        children: [Text(a, style: PPType.body(size: 13, color: PPColors.muted))],
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: Theme(
+                        data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
+                        child: ExpansionTile(
+                          title: Text(q, style: PPType.body(size: 14, weight: FontWeight.w800)),
+                          iconColor: PPColors.violet,
+                          collapsedIconColor: PPColors.violet,
+                          childrenPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                          children: [Text(a, style: PPType.body(size: 13, color: PPColors.muted))],
+                        ),
                       ),
                     ),
                   ),

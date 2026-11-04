@@ -172,6 +172,12 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
         : all.where((p) => p.name.toLowerCase().contains(_query.toLowerCase())).toList();
     final brand = ref.watch(brandProvider).valueOrNull;
     final p = _product;
+    if (p == null && all.isNotEmpty) {
+      // The artboard opens with the first item already chosen.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && _product == null) _pick(all.first);
+      });
+    }
     final format = _renderFormat ?? _shape.preview;
 
     final content = PostContent(
