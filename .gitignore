@@ -1,3 +1,13 @@
 # Saved Figma page: contains account email and session IDs
 Kawaii Convention Lanyard – Figma Make.html
 Kawaii Convention Lanyard – Figma Make_files/
+
+# Flutter / Dart
+app/.dart_tool/
+app/build/
+app/.flutter-plugins
+app/.flutter-plugins-dependencies
+app/**/*.g.dart
+# Supabase local
+supabase/.branches/
+supabase/.temp/
