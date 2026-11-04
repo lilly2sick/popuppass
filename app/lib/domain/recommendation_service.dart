@@ -13,7 +13,8 @@ class RecommendationService {
     final tags = shopTags.map((t) => t.toLowerCase()).toSet();
     final scored = [
       for (final t in trends)
-        if (!swipedIds.contains(t.id)) (t, t.score * (1 + (tags.contains(t.niche.toLowerCase()) ? 1 : 0))),
+        if (!swipedIds.contains(t.id))
+          (t, t.score * (1 + (tags.contains(t.niche.toLowerCase()) ? 1 : 0))),
     ]..sort((a, b) => b.$2.compareTo(a.$2));
     return [for (final s in scored) s.$1];
   }

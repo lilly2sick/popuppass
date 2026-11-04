@@ -37,8 +37,8 @@ class ProductTile extends StatelessWidget {
     final pill = soldOut
         ? const PPPill('Sold out', glyph: 'x')
         : low
-            ? PPPill('$inStock left', tone: PillTone.warn)
-            : PPPill('$inStock in stock', glyph: '#');
+        ? PPPill('$inStock left', tone: PillTone.warn)
+        : PPPill('$inStock in stock', glyph: '#');
     return StickerCard(
       padding: const EdgeInsets.all(10),
       radius: 20,
@@ -61,8 +61,16 @@ class ProductTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(name, maxLines: 1, overflow: TextOverflow.ellipsis, style: PPType.body(size: 14, weight: FontWeight.w800)),
-                    Text('${Money.format(priceCents)} / sold $soldCount', style: PPType.body(size: 12, color: PPColors.muted)),
+                    Text(
+                      name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: PPType.body(size: 14, weight: FontWeight.w800),
+                    ),
+                    Text(
+                      '${Money.format(priceCents)} / sold $soldCount',
+                      style: PPType.body(size: 12, color: PPColors.muted),
+                    ),
                   ],
                 ),
               ),
@@ -84,7 +92,11 @@ class ProductTile extends StatelessWidget {
               Expanded(
                 child: Semantics(
                   label: 'Sell one $name',
-                  child: PPButton(label: soldOut ? 'Sold out' : '+1 sold', onPressed: soldOut ? null : onSell, height: PPTap.sell),
+                  child: PPButton(
+                    label: soldOut ? 'Sold out' : '+1 sold',
+                    onPressed: soldOut ? null : onSell,
+                    height: PPTap.sell,
+                  ),
                 ),
               ),
             ],
@@ -123,7 +135,10 @@ class TrendCard extends StatelessWidget {
           const SizedBox(height: PPSpace.xs),
           Text(why, style: PPType.body(size: 13, color: PPColors.muted)),
           const Spacer(),
-          Text('Sources: ${sources.join(', ')}'.toUpperCase(), style: PPType.label(size: 9, color: PPColors.muted)),
+          Text(
+            'Sources: ${sources.join(', ')}'.toUpperCase(),
+            style: PPType.label(size: 9, color: PPColors.muted),
+          ),
         ],
       ),
     );
@@ -137,14 +152,20 @@ class PendingAi extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget bar(double f) => FractionallySizedBox(
-          widthFactor: f,
-          child: Container(height: 10, decoration: BoxDecoration(color: PPColors.raised, borderRadius: BorderRadius.circular(6))),
-        );
+      widthFactor: f,
+      child: Container(
+        height: 10,
+        decoration: BoxDecoration(color: PPColors.raised, borderRadius: BorderRadius.circular(6)),
+      ),
+    );
     return StickerCard(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('AI version writing. Keep working.'.toUpperCase(), style: PPType.label(color: PPColors.violet)),
+          Text(
+            'AI version writing. Keep working.'.toUpperCase(),
+            style: PPType.label(color: PPColors.violet),
+          ),
           const SizedBox(height: PPSpace.sm),
           bar(1),
           const SizedBox(height: PPSpace.sm),

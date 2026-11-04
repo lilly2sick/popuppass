@@ -18,10 +18,10 @@ enum ExportFormat {
 
   /// Free: CSV and PNG. Pro: branded PDF and XLSX.
   Feature? get gate => switch (this) {
-        ExportFormat.pdf => Feature.exportPdf,
-        ExportFormat.xlsx => Feature.exportXlsx,
-        _ => null,
-      };
+    ExportFormat.pdf => Feature.exportPdf,
+    ExportFormat.xlsx => Feature.exportXlsx,
+    _ => null,
+  };
 }
 
 /// What to export. Exporters read whatever fields they need.

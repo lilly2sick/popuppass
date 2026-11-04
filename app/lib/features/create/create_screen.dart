@@ -46,12 +46,12 @@ enum ShareTarget {
   final String mark;
 
   PostFormat formatFor(PostShape s) => switch ((this, s)) {
-        (_, PostShape.post) => PostFormat.instagramPortrait,
-        (_, PostShape.story) => PostFormat.story,
-        (ShareTarget.instagram, PostShape.wide) => PostFormat.square,
-        (ShareTarget.linkedin, PostShape.wide) => PostFormat.linkedin,
-        (_, PostShape.wide) => PostFormat.facebookLink,
-      };
+    (_, PostShape.post) => PostFormat.instagramPortrait,
+    (_, PostShape.story) => PostFormat.story,
+    (ShareTarget.instagram, PostShape.wide) => PostFormat.square,
+    (ShareTarget.linkedin, PostShape.wide) => PostFormat.linkedin,
+    (_, PostShape.wide) => PostFormat.facebookLink,
+  };
 }
 
 class CreateScreen extends ConsumerStatefulWidget {
@@ -82,7 +82,12 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
 
   Future<void> _pick(Product p) async {
     final brand = ref.read(brandProvider).valueOrNull;
-    final input = {'product': p.name, 'price': Money.format(p.priceCents), 'booth': brand?.boothLabel, 'shop': brand?.shopName};
+    final input = {
+      'product': p.name,
+      'price': Money.format(p.priceCents),
+      'booth': brand?.boothLabel,
+      'shop': brand?.shopName,
+    };
     _caption.text = await const LocalTemplateProvider().run(AiJobKind.caption, input);
     String? jobId;
     if (ref.read(entitlementsProvider).can(Feature.aiCaption)) {
@@ -103,7 +108,8 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
     final bytes = await capturePng(_boundary, targetWidth: f.width);
     setState(() => _renderFormat = null);
     final dir = await getTemporaryDirectory();
-    final name = '${(_product?.name ?? 'post').replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-').toLowerCase()}-${f.sizeLabel}.png';
+    final name =
+        '${(_product?.name ?? 'post').replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-').toLowerCase()}-${f.sizeLabel}.png';
     return File('${dir.path}/$name').writeAsBytes(bytes, flush: true);
   }
 
@@ -117,10 +123,14 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
         if (!await Gal.hasAccess()) await Gal.requestAccess();
         await Gal.putImage(file.path, album: 'Pop-Up Pass');
         await ref.read(hapticsProvider).play(HapticMoment.success);
-        messenger.showSnackBar(SnackBar(content: Text('Saved ${f.width} x ${f.height} PNG to Photos')));
+        messenger.showSnackBar(
+          SnackBar(content: Text('Saved ${f.width} x ${f.height} PNG to Photos')),
+        );
       } on GalException {
         await ref.read(hapticsProvider).play(HapticMoment.error);
-        messenger.showSnackBar(const SnackBar(content: Text('Could not save. Allow Photos access in Settings.')));
+        messenger.showSnackBar(
+          const SnackBar(content: Text('Could not save. Allow Photos access in Settings.')),
+        );
       }
       return;
     }
@@ -157,7 +167,9 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
   @override
   Widget build(BuildContext context) {
     final all = ref.watch(productsProvider).valueOrNull ?? const <Product>[];
-    final products = _query.isEmpty ? all : all.where((p) => p.name.toLowerCase().contains(_query.toLowerCase())).toList();
+    final products = _query.isEmpty
+        ? all
+        : all.where((p) => p.name.toLowerCase().contains(_query.toLowerCase())).toList();
     final brand = ref.watch(brandProvider).valueOrNull;
     final p = _product;
     final format = _renderFormat ?? _shape.preview;
@@ -185,7 +197,11 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
               scrollDirection: Axis.horizontal,
               itemCount: products.length,
               separatorBuilder: (_, __) => const SizedBox(width: 6),
-              itemBuilder: (_, i) => PPChip(label: products[i].name, selected: products[i].id == p?.id, onTap: () => _pick(products[i])),
+              itemBuilder: (_, i) => PPChip(
+                label: products[i].name,
+                selected: products[i].id == p?.id,
+                onTap: () => _pick(products[i]),
+              ),
             ),
           ),
           const SizedBox(height: PPSpace.md),
@@ -198,14 +214,20 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
                   Expanded(
                     child: Center(
                       child: FittedBox(
-                        child: RepaintBoundary(key: _boundary, child: postTemplates.first.build(content, format)),
+                        child: RepaintBoundary(
+                          key: _boundary,
+                          child: postTemplates.first.build(content, format),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: PPSpace.sm),
                   Container(
                     padding: const EdgeInsets.all(3),
-                    decoration: BoxDecoration(color: PPColors.bg, borderRadius: BorderRadius.circular(PPRadius.chip)),
+                    decoration: BoxDecoration(
+                      color: PPColors.bg,
+                      borderRadius: BorderRadius.circular(PPRadius.chip),
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -223,7 +245,14 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
                                   color: s == _shape ? PPColors.violet : PPColors.bg,
                                   borderRadius: BorderRadius.circular(PPRadius.chip),
                                 ),
-                                child: Text(s.label, style: PPType.body(size: 13, weight: FontWeight.w800, color: s == _shape ? PPColors.onAccent : PPColors.text)),
+                                child: Text(
+                                  s.label,
+                                  style: PPType.body(
+                                    size: 13,
+                                    weight: FontWeight.w800,
+                                    color: s == _shape ? PPColors.onAccent : PPColors.text,
+                                  ),
+                                ),
                               ),
                             ),
                           ),
@@ -243,11 +272,16 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
               children: [
                 Row(
                   children: [
-                    Expanded(child: Text('CAPTION', style: PPType.label(size: 10, color: PPColors.muted))),
+                    Expanded(
+                      child: Text('CAPTION', style: PPType.label(size: 10, color: PPColors.muted)),
+                    ),
                     if (_aiJobId != null)
                       GestureDetector(
                         onTap: () => setState(() => _showAi = !_showAi),
-                        child: Text(_showAi ? 'Use mine' : 'AI version', style: PPType.label(size: 10, color: PPColors.violet)),
+                        child: Text(
+                          _showAi ? 'Use mine' : 'AI version',
+                          style: PPType.label(size: 10, color: PPColors.violet),
+                        ),
                       ),
                   ],
                 ),
@@ -278,7 +312,13 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
             ),
           ),
           const SizedBox(height: PPSpace.md),
-          PPButton(label: 'Share or save', icon: Icons.ios_share_rounded, height: 56, expand: true, onPressed: p == null ? null : _openShare),
+          PPButton(
+            label: 'Share or save',
+            icon: Icons.ios_share_rounded,
+            height: 56,
+            expand: true,
+            onPressed: p == null ? null : _openShare,
+          ),
         ],
       ),
     );
@@ -319,7 +359,10 @@ class _ShareRow extends StatelessWidget {
                 width: 36,
                 height: 36,
                 alignment: Alignment.center,
-                decoration: BoxDecoration(color: primary ? PPColors.text : PPColors.lilac, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(
+                  color: primary ? PPColors.text : PPColors.lilac,
+                  borderRadius: BorderRadius.circular(10),
+                ),
                 child: Text(target.mark, style: PPType.label(size: 11, color: PPColors.onAccent)),
               ),
               const SizedBox(width: PPSpace.md),
@@ -327,8 +370,17 @@ class _ShareRow extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(target.label, style: PPType.body(size: 15, weight: FontWeight.w800, color: fg)),
-                    Text(sub, style: PPType.body(size: 12, color: primary ? PPColors.onAccent : PPColors.muted)),
+                    Text(
+                      target.label,
+                      style: PPType.body(size: 15, weight: FontWeight.w800, color: fg),
+                    ),
+                    Text(
+                      sub,
+                      style: PPType.body(
+                        size: 12,
+                        color: primary ? PPColors.onAccent : PPColors.muted,
+                      ),
+                    ),
                   ],
                 ),
               ),

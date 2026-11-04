@@ -1,5 +1,5 @@
-/// Enums stored by name in SQLite (drift textEnum) and in Postgres
-/// (check constraints). Renaming a value is a migration.
+// Enums stored by name in SQLite (drift textEnum) and in Postgres
+// (check constraints). Renaming a value is a migration.
 
 enum PaymentMethod {
   cash('Cash'),

@@ -10,7 +10,8 @@ import '../../providers.dart';
 import '../../services/haptics_service.dart';
 
 /// Create / edit / delete a product, with the Price Helper built in.
-Future<void> showProductEditor(BuildContext context, {Product? product}) => showModalBottomSheet<void>(
+Future<void> showProductEditor(BuildContext context, {Product? product}) =>
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       builder: (_) => Padding(
@@ -49,13 +50,15 @@ class _ProductEditorState extends ConsumerState<_ProductEditor> {
   Future<void> _save() async {
     if (_name.text.trim().isEmpty) return;
     final repo = ref.read(productRepoProvider);
-    final id = await repo.save(ProductsCompanion(
-      id: widget.product == null ? const Value.absent() : Value(widget.product!.id),
-      name: Value(_name.text.trim()),
-      priceCents: Value(_cents(_price.text)),
-      unitCostCents: Value(_cents(_cost.text)),
-      minutesToMake: Value(int.tryParse(_minutes.text)),
-    ));
+    final id = await repo.save(
+      ProductsCompanion(
+        id: widget.product == null ? const Value.absent() : Value(widget.product!.id),
+        name: Value(_name.text.trim()),
+        priceCents: Value(_cents(_price.text)),
+        unitCostCents: Value(_cents(_cost.text)),
+        minutesToMake: Value(int.tryParse(_minutes.text)),
+      ),
+    );
     final qty = int.tryParse(_qty.text) ?? 0;
     if (qty > 0) await ref.read(inventoryRepoProvider).restock(id, qty);
     await ref.read(hapticsProvider).play(HapticMoment.success);
@@ -70,21 +73,23 @@ class _ProductEditorState extends ConsumerState<_ProductEditor> {
   @override
   Widget build(BuildContext context) {
     final event = ref.watch(currentEventProvider).valueOrNull;
-    final suggestion = ref.watch(pricingProvider).suggest(
+    final suggestion = ref
+        .watch(pricingProvider)
+        .suggest(
           materialCents: _cents(_cost.text),
           minutes: int.tryParse(_minutes.text) ?? 0,
           boothFeeCents: event?.boothFeeCents ?? 0,
         );
 
     Widget field(TextEditingController c, String label, {TextInputType? type}) => Padding(
-          padding: const EdgeInsets.only(bottom: PPSpace.md),
-          child: TextField(
-            controller: c,
-            keyboardType: type,
-            onChanged: (_) => setState(() {}),
-            decoration: InputDecoration(labelText: label),
-          ),
-        );
+      padding: const EdgeInsets.only(bottom: PPSpace.md),
+      child: TextField(
+        controller: c,
+        keyboardType: type,
+        onChanged: (_) => setState(() {}),
+        decoration: InputDecoration(labelText: label),
+      ),
+    );
 
     const money = TextInputType.numberWithOptions(decimal: true);
     return SingleChildScrollView(
@@ -109,11 +114,20 @@ class _ProductEditorState extends ConsumerState<_ProductEditor> {
           ),
           const SizedBox(height: PPSpace.md),
           field(_price, 'Price (\$)', type: money),
-          field(_qty, widget.product == null ? 'Starting stock' : 'Add stock', type: TextInputType.number),
+          field(
+            _qty,
+            widget.product == null ? 'Starting stock' : 'Add stock',
+            type: TextInputType.number,
+          ),
           PPButton(label: 'Save', onPressed: _save, expand: true),
           if (widget.product != null) ...[
             const SizedBox(height: PPSpace.sm),
-            PPButton(label: 'Delete item', kind: PPButtonKind.dashed, onPressed: _delete, expand: true),
+            PPButton(
+              label: 'Delete item',
+              kind: PPButtonKind.dashed,
+              onPressed: _delete,
+              expand: true,
+            ),
           ],
         ],
       ),

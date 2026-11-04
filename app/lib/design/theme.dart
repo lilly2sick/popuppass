@@ -49,17 +49,26 @@ abstract final class PPTheme {
         contentTextStyle: PPType.body(size: 14),
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? PPColors.onAccent : PPColors.muted),
-        trackColor: WidgetStateProperty.resolveWith((s) => s.contains(WidgetState.selected) ? PPColors.teal : PPColors.raised),
+        thumbColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? PPColors.onAccent : PPColors.muted,
+        ),
+        trackColor: WidgetStateProperty.resolveWith(
+          (s) => s.contains(WidgetState.selected) ? PPColors.teal : PPColors.raised,
+        ),
       ),
-      sliderTheme: const SliderThemeData(activeTrackColor: PPColors.violet, thumbColor: PPColors.violet),
+      sliderTheme: const SliderThemeData(
+        activeTrackColor: PPColors.violet,
+        thumbColor: PPColors.violet,
+      ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: PPColors.bg,
         labelStyle: PPType.body(size: 14, color: PPColors.muted),
         border: border,
         enabledBorder: border,
-        focusedBorder: border.copyWith(borderSide: const BorderSide(color: PPColors.violet, width: 2)),
+        focusedBorder: border.copyWith(
+          borderSide: const BorderSide(color: PPColors.violet, width: 2),
+        ),
       ),
     );
   }

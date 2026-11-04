@@ -32,7 +32,8 @@ class PPTabBar extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              for (var i = 0; i < _tabs.length; i++) Expanded(child: i == _sellIndex ? _sellBadge(i) : _tab(i)),
+              for (var i = 0; i < _tabs.length; i++)
+                Expanded(child: i == _sellIndex ? _sellBadge(i) : _tab(i)),
             ],
           ),
         ),
@@ -57,7 +58,14 @@ class PPTabBar extends StatelessWidget {
             children: [
               Icon(_tabs[i].$1, color: color),
               const SizedBox(height: 4),
-              Text(_tabs[i].$2, style: PPType.body(size: 12, color: color, weight: active ? FontWeight.w800 : FontWeight.w500)),
+              Text(
+                _tabs[i].$2,
+                style: PPType.body(
+                  size: 12,
+                  color: color,
+                  weight: active ? FontWeight.w800 : FontWeight.w500,
+                ),
+              ),
             ],
           ),
         ),

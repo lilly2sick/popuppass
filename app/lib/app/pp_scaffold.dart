@@ -53,7 +53,8 @@ class PPScaffold extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    if (eyebrow != null) Text(eyebrow!.toUpperCase(), style: PPType.label(color: PPColors.muted)),
+                    if (eyebrow != null)
+                      Text(eyebrow!.toUpperCase(), style: PPType.label(color: PPColors.muted)),
                     Text(title, style: PPType.title()),
                   ],
                 ),
@@ -113,9 +114,18 @@ class PPSearchField extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(horizontal: 14),
           prefixIcon: const Icon(Icons.search_rounded, size: 18, color: PPColors.muted),
           prefixIconConstraints: const BoxConstraints(minWidth: 40),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(PPRadius.chip), borderSide: const BorderSide(color: PPColors.line)),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(PPRadius.chip), borderSide: const BorderSide(color: PPColors.line)),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(PPRadius.chip), borderSide: const BorderSide(color: PPColors.violet)),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(PPRadius.chip),
+            borderSide: const BorderSide(color: PPColors.line),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(PPRadius.chip),
+            borderSide: const BorderSide(color: PPColors.line),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(PPRadius.chip),
+            borderSide: const BorderSide(color: PPColors.violet),
+          ),
         ),
       ),
     );

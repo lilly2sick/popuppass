@@ -25,7 +25,11 @@ class ProductRepo extends Repository<Product> {
 
   Future<String> save(ProductsCompanion data) async {
     final id = data.id.present ? data.id.value : makeId();
-    final row = data.copyWith(id: Value(id), updatedAt: Value(DateTime.now()), deviceId: Value(deviceId));
+    final row = data.copyWith(
+      id: Value(id),
+      updatedAt: Value(DateTime.now()),
+      deviceId: Value(deviceId),
+    );
     await db.into(db.products).insertOnConflictUpdate(row);
     if (data.priceCents.present) await _recordPrice(id, data.priceCents.value);
     await touched(id);
@@ -42,13 +46,15 @@ class ProductRepo extends Repository<Product> {
 
   // ---- bill of materials ----
 
-  Stream<List<BomLine>> watchBom(String productId) => (db.select(db.bomLines)
-        ..where((b) => b.productId.equals(productId) & b.deleted.equals(false)))
-      .watch();
+  Stream<List<BomLine>> watchBom(String productId) => (db.select(
+    db.bomLines,
+  )..where((b) => b.productId.equals(productId) & b.deleted.equals(false))).watch();
 
   Future<void> saveBomLine(BomLinesCompanion line) async {
     final id = line.id.present ? line.id.value : makeId();
-    await db.into(db.bomLines).insertOnConflictUpdate(
+    await db
+        .into(db.bomLines)
+        .insertOnConflictUpdate(
           line.copyWith(id: Value(id), updatedAt: Value(DateTime.now()), deviceId: Value(deviceId)),
         );
     await tracker.record('bom_lines', id, SyncOp.upsert);
@@ -56,9 +62,9 @@ class ProductRepo extends Repository<Product> {
 
   /// BOM total when present, otherwise the manual unit cost.
   Future<int> unitCost(String productId) async {
-    final bom = await (db.select(db.bomLines)
-          ..where((b) => b.productId.equals(productId) & b.deleted.equals(false)))
-        .get();
+    final bom = await (db.select(
+      db.bomLines,
+    )..where((b) => b.productId.equals(productId) & b.deleted.equals(false))).get();
     if (bom.isNotEmpty) {
       return bom.fold<int>(0, (sum, b) => sum + (b.costCents * b.qty).round());
     }
@@ -67,8 +73,15 @@ class ProductRepo extends Repository<Product> {
 
   Future<void> _recordPrice(String productId, int cents) async {
     final id = makeId();
-    await db.into(db.priceHistory).insert(
-          PriceHistoryCompanion.insert(id: Value(id), productId: productId, priceCents: cents, deviceId: Value(deviceId)),
+    await db
+        .into(db.priceHistory)
+        .insert(
+          PriceHistoryCompanion.insert(
+            id: Value(id),
+            productId: productId,
+            priceCents: cents,
+            deviceId: Value(deviceId),
+          ),
         );
     await tracker.record('price_history', id, SyncOp.upsert);
   }

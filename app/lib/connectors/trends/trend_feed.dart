@@ -8,7 +8,7 @@ import '../connector.dart';
 /// caches it. Ranking for this shop happens on device.
 class TrendFeed extends Connector<Map<String, dynamic>, TrendCacheCompanion> {
   TrendFeed(super.cursors, this.db, {required this.supabaseUrl, required this.anonKey, Dio? http})
-      : http = http ?? Dio();
+    : http = http ?? Dio();
 
   final AppDatabase db;
   final String supabaseUrl;
@@ -35,16 +35,16 @@ class TrendFeed extends Connector<Map<String, dynamic>, TrendCacheCompanion> {
 
   @override
   TrendCacheCompanion normalize(Map<String, dynamic> t) => TrendCacheCompanion.insert(
-        id: t['id'] as String,
-        keyword: t['keyword'] as String,
-        niche: t['niche'] as String,
-        score: (t['score'] as num).toDouble(),
-        title: t['title'] as String,
-        why: t['why'] as String,
-        itemIdea: Value(t['item_idea'] as String?),
-        sources: (t['sources'] as List).cast<String>(),
-        snapshotVersion: t['snapshot_version'] as String,
-      );
+    id: t['id'] as String,
+    keyword: t['keyword'] as String,
+    niche: t['niche'] as String,
+    score: (t['score'] as num).toDouble(),
+    title: t['title'] as String,
+    why: t['why'] as String,
+    itemIdea: Value(t['item_idea'] as String?),
+    sources: (t['sources'] as List).cast<String>(),
+    snapshotVersion: t['snapshot_version'] as String,
+  );
 
   @override
   Future<int> sink(List<TrendCacheCompanion> models) async {

@@ -17,7 +17,6 @@ import 'connectors/payment/payment_provider.dart';
 import 'connectors/payment/square_provider.dart';
 import 'connectors/trends/trend_feed.dart';
 import 'data/db/database.dart';
-import 'data/db/tables.dart' show newId;
 import 'data/repos/event_repo.dart';
 import 'data/repos/inventory_repo.dart';
 import 'data/repos/product_repo.dart';
@@ -61,14 +60,21 @@ final hapticsProvider = Provider((_) => HapticsService());
 
 final purchasesProvider = Provider<PurchaseService>((ref) {
   final c = ref.watch(configProvider);
-  return c.useFakes ? FakePurchases() : RevenueCatPurchases(appleKey: c.revenueCatAppleKey, googleKey: c.revenueCatGoogleKey);
+  return c.useFakes
+      ? FakePurchases()
+      : RevenueCatPurchases(appleKey: c.revenueCatAppleKey, googleKey: c.revenueCatGoogleKey);
 });
 
 final entitlementsProvider = StateProvider<Entitlements>((_) => Entitlements.free);
 
 final authProvider = Provider<AuthService?>((ref) {
   final client = ref.watch(supabaseProvider);
-  return client == null ? null : AuthService(client, googleServerClientId: const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID'));
+  return client == null
+      ? null
+      : AuthService(
+          client,
+          googleServerClientId: const String.fromEnvironment('GOOGLE_SERVER_CLIENT_ID'),
+        );
 });
 
 // ---------------- data ----------------
@@ -76,19 +82,37 @@ final authProvider = Provider<AuthService?>((ref) {
 final syncServiceProvider = Provider<SyncService?>((ref) {
   final client = ref.watch(supabaseProvider);
   if (client == null) return null;
-  return SyncService(ref.watch(dbProvider), client, isPro: () => ref.read(entitlementsProvider).can(Feature.cloudBackup));
+  return SyncService(
+    ref.watch(dbProvider),
+    client,
+    isPro: () => ref.read(entitlementsProvider).can(Feature.cloudBackup),
+  );
 });
 
-final changeTrackerProvider = Provider<ChangeTracker>((ref) => ref.watch(syncServiceProvider) ?? const NoopChangeTracker());
+final changeTrackerProvider = Provider<ChangeTracker>(
+  (ref) => ref.watch(syncServiceProvider) ?? const NoopChangeTracker(),
+);
 
 final productRepoProvider = Provider(
-  (ref) => ProductRepo(ref.watch(dbProvider), ref.watch(changeTrackerProvider), ref.watch(deviceIdProvider)),
+  (ref) => ProductRepo(
+    ref.watch(dbProvider),
+    ref.watch(changeTrackerProvider),
+    ref.watch(deviceIdProvider),
+  ),
 );
 final eventRepoProvider = Provider(
-  (ref) => EventRepo(ref.watch(dbProvider), ref.watch(changeTrackerProvider), ref.watch(deviceIdProvider)),
+  (ref) => EventRepo(
+    ref.watch(dbProvider),
+    ref.watch(changeTrackerProvider),
+    ref.watch(deviceIdProvider),
+  ),
 );
 final inventoryRepoProvider = Provider(
-  (ref) => InventoryRepo(ref.watch(dbProvider), ref.watch(changeTrackerProvider), ref.watch(deviceIdProvider)),
+  (ref) => InventoryRepo(
+    ref.watch(dbProvider),
+    ref.watch(changeTrackerProvider),
+    ref.watch(deviceIdProvider),
+  ),
 );
 final salesRepoProvider = Provider(
   (ref) => SalesRepo(
@@ -114,16 +138,21 @@ final paymentProviderProvider = Provider<PaymentProvider>((ref) {
     cursors,
     sales,
     storage: ref.watch(secureStorageProvider),
-    tokenExchange: (body) async => (await client.functions.invoke('square-token', body: body)).data as Map<String, dynamic>,
+    tokenExchange: (body) async =>
+        (await client.functions.invoke('square-token', body: body)).data as Map<String, dynamic>,
   );
 });
 
 final conSourceProvider = Provider<ConSource>((ref) {
   final c = ref.watch(configProvider);
-  return c.hasBackend && !c.useFakes ? AnimeConsFeed(supabaseUrl: c.supabaseUrl, anonKey: c.supabaseAnonKey) : FakeConSource();
+  return c.hasBackend && !c.useFakes
+      ? AnimeConsFeed(supabaseUrl: c.supabaseUrl, anonKey: c.supabaseAnonKey)
+      : FakeConSource();
 });
 
-final icsConnectorProvider = Provider((ref) => IcsConnector(ref.watch(cursorStoreProvider), ref.watch(eventRepoProvider)));
+final icsConnectorProvider = Provider(
+  (ref) => IcsConnector(ref.watch(cursorStoreProvider), ref.watch(eventRepoProvider)),
+);
 
 final csvImportProvider = Provider(
   (ref) => CsvProductImport(
@@ -136,7 +165,12 @@ final csvImportProvider = Provider(
 final trendFeedProvider = Provider<TrendFeed?>((ref) {
   final c = ref.watch(configProvider);
   if (!c.hasBackend || c.useFakes) return null;
-  return TrendFeed(ref.watch(cursorStoreProvider), ref.watch(dbProvider), supabaseUrl: c.supabaseUrl, anonKey: c.supabaseAnonKey);
+  return TrendFeed(
+    ref.watch(cursorStoreProvider),
+    ref.watch(dbProvider),
+    supabaseUrl: c.supabaseUrl,
+    anonKey: c.supabaseAnonKey,
+  );
 });
 
 final aiProvider = Provider<AiProvider>((ref) {
@@ -144,7 +178,10 @@ final aiProvider = Provider<AiProvider>((ref) {
   final auth = ref.watch(authProvider);
   final pro = ref.watch(entitlementsProvider).can(Feature.aiCaption);
   if (!pro || auth == null) return const LocalTemplateProvider();
-  return ClaudeProxyProvider(functionsUrl: '${c.supabaseUrl}/functions/v1', accessToken: auth.accessToken);
+  return ClaudeProxyProvider(
+    functionsUrl: '${c.supabaseUrl}/functions/v1',
+    accessToken: auth.accessToken,
+  );
 });
 
 final jobRunnerProvider = Provider((ref) {
@@ -161,7 +198,10 @@ final recommendationProvider = Provider((_) => const RecommendationService());
 
 final exportServiceProvider = Provider((ref) {
   final brand = ref.watch(brandProvider).valueOrNull;
-  return ExportService(entitlements: () => ref.read(entitlementsProvider), shopName: brand?.shopName ?? 'My shop');
+  return ExportService(
+    entitlements: () => ref.read(entitlementsProvider),
+    shopName: brand?.shopName ?? 'My shop',
+  );
 });
 
 // ---------------- streams the UI reads ----------------
@@ -208,7 +248,13 @@ final todayStatsProvider = StreamProvider<TodayStats>((ref) {
         readsFrom: {db.sales, db.saleLines},
       )
       .watchSingle()
-      .map((r) => TodayStats(grossCents: r.read<int>('gross'), costCents: r.read<int>('cost'), units: r.read<int>('units')));
+      .map(
+        (r) => TodayStats(
+          grossCents: r.read<int>('gross'),
+          costCents: r.read<int>('cost'),
+          units: r.read<int>('units'),
+        ),
+      );
 });
 
 final connectionLabelProvider = StreamProvider<String>((ref) async* {
@@ -252,14 +298,20 @@ final eventBarProvider = Provider<EventBarState>((ref) {
   final conn = ref.watch(connectionLabelProvider).valueOrNull ?? 'Saved on phone';
   final now = DateTime.now();
   if (event == null) {
-    return EventBarState(eventName: 'No event yet', statusLabel: 'Add one', isLive: false, netTodayCents: today.netCents, connectionLabel: conn);
+    return EventBarState(
+      eventName: 'No event yet',
+      statusLabel: 'Add one',
+      isLive: false,
+      netTodayCents: today.netCents,
+      connectionLabel: conn,
+    );
   }
   final live = !now.isBefore(event.startsAt) && !now.isAfter(event.endsAt);
   final status = live
       ? 'Live day ${now.difference(DateTime(event.startsAt.year, event.startsAt.month, event.startsAt.day)).inDays + 1}'
       : event.startsAt.isAfter(now)
-          ? 'In ${event.startsAt.difference(now).inDays + 1} d'
-          : 'Ended';
+      ? 'In ${event.startsAt.difference(now).inDays + 1} d'
+      : 'Ended';
   return EventBarState(
     eventName: event.name,
     statusLabel: status,
@@ -305,7 +357,7 @@ final bootstrapProvider = FutureProvider<void>((ref) async {
   ref.read(deviceIdProvider.notifier).state = deviceId;
 
   if (config.hasBackend) {
-    await Supabase.initialize(url: config.supabaseUrl, anonKey: config.supabaseAnonKey);
+    await Supabase.initialize(url: config.supabaseUrl, publishableKey: config.supabaseAnonKey);
   }
 
   final purchases = ref.read(purchasesProvider);

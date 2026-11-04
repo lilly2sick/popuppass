@@ -23,13 +23,19 @@ class CsvProductImport extends Connector<Map<String, String>, (ProductsCompanion
     final text = pendingText;
     pendingText = null;
     if (text == null) return const [];
-    final rows = const CsvToListConverter(eol: '\n', shouldParseNumbers: false).convert(text.replaceAll('\r\n', '\n'));
+    final rows = const CsvToListConverter(
+      eol: '\n',
+      shouldParseNumbers: false,
+    ).convert(text.replaceAll('\r\n', '\n'));
     if (rows.isEmpty) return const [];
     final header = [for (final h in rows.first) h.toString().trim().toLowerCase()];
     return [
       for (final r in rows.skip(1))
         if (r.isNotEmpty && r.first.toString().trim().isNotEmpty)
-          {for (var i = 0; i < header.length && i < r.length; i++) header[i]: r[i].toString().trim()},
+          {
+            for (var i = 0; i < header.length && i < r.length; i++)
+              header[i]: r[i].toString().trim(),
+          },
     ];
   }
 
@@ -37,15 +43,15 @@ class CsvProductImport extends Connector<Map<String, String>, (ProductsCompanion
 
   @override
   (ProductsCompanion, int) normalize(Map<String, String> r) => (
-        ProductsCompanion.insert(
-          name: r['name']!,
-          priceCents: _cents(r['price']),
-          unitCostCents: Value(_cents(r['cost'])),
-          minutesToMake: Value(int.tryParse(r['minutes'] ?? '')),
-          tags: Value((r['tags'] ?? '').split('|').where((t) => t.isNotEmpty).toList()),
-        ),
-        int.tryParse(r['quantity'] ?? '') ?? 0,
-      );
+    ProductsCompanion.insert(
+      name: r['name']!,
+      priceCents: _cents(r['price']),
+      unitCostCents: Value(_cents(r['cost'])),
+      minutesToMake: Value(int.tryParse(r['minutes'] ?? '')),
+      tags: Value((r['tags'] ?? '').split('|').where((t) => t.isNotEmpty).toList()),
+    ),
+    int.tryParse(r['quantity'] ?? '') ?? 0,
+  );
 
   @override
   Future<int> sink(List<(ProductsCompanion, int)> models) async {

@@ -36,12 +36,18 @@ class StickerCard extends StatelessWidget {
     );
     if (iridescent) {
       box = DecoratedBox(
-        decoration: BoxDecoration(gradient: PPSurface.iridescentGradient, borderRadius: BorderRadius.circular(radius)),
+        decoration: BoxDecoration(
+          gradient: PPSurface.iridescentGradient,
+          borderRadius: BorderRadius.circular(radius),
+        ),
         child: Padding(padding: const EdgeInsets.all(1), child: box),
       );
     }
     if (onTap == null) return box;
-    return Semantics(button: true, child: GestureDetector(onTap: onTap, child: box));
+    return Semantics(
+      button: true,
+      child: GestureDetector(onTap: onTap, child: box),
+    );
   }
 }
 
@@ -78,7 +84,10 @@ class PPButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final enabled = onPressed != null;
     final (fill, fg) = switch (kind) {
-      PPButtonKind.primary => (enabled ? PPColors.violet : PPColors.raised, enabled ? PPColors.onAccent : PPColors.muted),
+      PPButtonKind.primary => (
+        enabled ? PPColors.violet : PPColors.raised,
+        enabled ? PPColors.onAccent : PPColors.muted,
+      ),
       PPButtonKind.secondary => (PPColors.raised, enabled ? PPColors.text : PPColors.muted),
       PPButtonKind.dashed => (PPColors.card, PPColors.text),
     };
@@ -100,8 +109,18 @@ class PPButton extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              if (icon != null) ...[Icon(icon, size: 18, color: fg), const SizedBox(width: PPSpace.sm)],
-              Flexible(child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: PPType.body(color: fg, weight: FontWeight.w800))),
+              if (icon != null) ...[
+                Icon(icon, size: 18, color: fg),
+                const SizedBox(width: PPSpace.sm),
+              ],
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: PPType.body(color: fg, weight: FontWeight.w800),
+                ),
+              ),
             ],
           ),
         ),
@@ -112,7 +131,13 @@ class PPButton extends StatelessWidget {
 
 /// Toggle chip, e.g. payment method or filter. Selected = teal.
 class PPChip extends StatelessWidget {
-  const PPChip({super.key, required this.label, required this.selected, required this.onTap, this.leading});
+  const PPChip({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+    this.leading,
+  });
 
   final String label;
   final bool selected;
@@ -140,7 +165,11 @@ class PPChip extends StatelessWidget {
               if (leading != null) ...[leading!, const SizedBox(width: 6)],
               Text(
                 label,
-                style: PPType.body(size: 14, weight: FontWeight.w800, color: selected ? PPColors.onAccent : PPColors.text),
+                style: PPType.body(
+                  size: 14,
+                  weight: FontWeight.w800,
+                  color: selected ? PPColors.onAccent : PPColors.text,
+                ),
               ),
             ],
           ),
@@ -170,7 +199,13 @@ class PPPill extends StatelessWidget {
       PillTone.info => (PPColors.lilac, PPColors.onAccent),
       PillTone.neutral => (PPColors.raised, PPColors.text),
     };
-    final g = glyph ?? switch (tone) { PillTone.warn => '!', PillTone.good => '+', _ => null };
+    final g =
+        glyph ??
+        switch (tone) {
+          PillTone.warn => '!',
+          PillTone.good => '+',
+          _ => null,
+        };
     return Container(
       height: 26,
       padding: EdgeInsets.fromLTRB(g == null ? 10 : 3, 0, 10, 0),
@@ -187,8 +222,18 @@ class PPPill extends StatelessWidget {
               width: 20,
               height: 20,
               alignment: Alignment.center,
-              decoration: BoxDecoration(shape: BoxShape.circle, color: tone == PillTone.neutral ? PPColors.card : PPColors.onAccent),
-              child: Text(g, style: PPType.body(size: 12, weight: FontWeight.w900, color: tone == PillTone.neutral ? PPColors.text : bg)),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: tone == PillTone.neutral ? PPColors.card : PPColors.onAccent,
+              ),
+              child: Text(
+                g,
+                style: PPType.body(
+                  size: 12,
+                  weight: FontWeight.w900,
+                  color: tone == PillTone.neutral ? PPColors.text : bg,
+                ),
+              ),
             ),
             const SizedBox(width: 6),
           ],

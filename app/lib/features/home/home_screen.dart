@@ -40,9 +40,13 @@ class HomeScreen extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Expanded(child: StatCard(label: 'Gross', value: Money.format(today.grossCents))),
+              Expanded(
+                child: StatCard(label: 'Gross', value: Money.format(today.grossCents)),
+              ),
               const SizedBox(width: PPSpace.sm),
-              Expanded(child: StatCard(label: 'Sold', value: '${today.units}')),
+              Expanded(
+                child: StatCard(label: 'Sold', value: '${today.units}'),
+              ),
               const SizedBox(width: PPSpace.sm),
               Expanded(
                 child: StatCard(
@@ -69,15 +73,28 @@ class HomeScreen extends ConsumerWidget {
                     height: 32,
                     alignment: Alignment.center,
                     decoration: const BoxDecoration(shape: BoxShape.circle, color: PPColors.pink),
-                    child: Text('!', style: PPType.body(size: 18, weight: FontWeight.w900, color: PPColors.onAccent)),
+                    child: Text(
+                      '!',
+                      style: PPType.body(
+                        size: 18,
+                        weight: FontWeight.w900,
+                        color: PPColors.onAccent,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${low.first.name} is almost gone.', style: PPType.body(size: 15, weight: FontWeight.w800)),
-                        Text('${stock[low.first.id] ?? 0} left.', style: PPType.body(size: 13, color: PPColors.muted)),
+                        Text(
+                          '${low.first.name} is almost gone.',
+                          style: PPType.body(size: 15, weight: FontWeight.w800),
+                        ),
+                        Text(
+                          '${stock[low.first.id] ?? 0} left.',
+                          style: PPType.body(size: 13, color: PPColors.muted),
+                        ),
                       ],
                     ),
                   ),
@@ -100,8 +117,22 @@ class HomeScreen extends ConsumerWidget {
                       padding: const EdgeInsets.symmetric(vertical: 4),
                       child: Row(
                         children: [
-                          SizedBox(width: 26, child: Text('0${i + 1}', style: PPType.number(size: 16, color: PPColors.violet))),
-                          SizedBox(width: 110, child: Text(top[i].name, maxLines: 1, overflow: TextOverflow.ellipsis, style: PPType.body(size: 14, weight: FontWeight.w800))),
+                          SizedBox(
+                            width: 26,
+                            child: Text(
+                              '0${i + 1}',
+                              style: PPType.number(size: 16, color: PPColors.violet),
+                            ),
+                          ),
+                          SizedBox(
+                            width: 110,
+                            child: Text(
+                              top[i].name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: PPType.body(size: 14, weight: FontWeight.w800),
+                            ),
+                          ),
                           Expanded(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(6),
@@ -113,7 +144,14 @@ class HomeScreen extends ConsumerWidget {
                               ),
                             ),
                           ),
-                          SizedBox(width: 56, child: Text('${sold[top[i].id] ?? 0} sold', textAlign: TextAlign.right, style: PPType.body(size: 13, weight: FontWeight.w800))),
+                          SizedBox(
+                            width: 56,
+                            child: Text(
+                              '${sold[top[i].id] ?? 0} sold',
+                              textAlign: TextAlign.right,
+                              style: PPType.body(size: 13, weight: FontWeight.w800),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -153,7 +191,9 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
   Future<void> _record(CachedTrend t, bool liked) async {
     ref.read(hapticsProvider).play(HapticMoment.selection);
     final db = ref.read(dbProvider);
-    await db.into(db.swipeFeedback).insertOnConflictUpdate(
+    await db
+        .into(db.swipeFeedback)
+        .insertOnConflictUpdate(
           SwipeFeedbackCompanion.insert(trendId: t.id, liked: liked, at: Value(DateTime.now())),
         );
   }
@@ -163,14 +203,15 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
     final trends = ref.watch(trendsProvider).valueOrNull ?? const [];
     final swiped = ref.watch(swipedIdsProvider).valueOrNull ?? const {};
     final brand = ref.watch(brandProvider).valueOrNull;
-    final ranked = ref.watch(recommendationProvider).rank(
-          trends: trends,
-          shopTags: {...?brand?.nicheTags},
-          swipedIds: swiped,
-        );
+    final ranked = ref
+        .watch(recommendationProvider)
+        .rank(trends: trends, shopTags: {...?brand?.nicheTags}, swipedIds: swiped);
 
     if (ranked.isEmpty) {
-      return const EmptyState(title: 'All caught up', message: 'New ideas land when the trend board refreshes.');
+      return const EmptyState(
+        title: 'All caught up',
+        message: 'New ideas land when the trend board refreshes.',
+      );
     }
 
     return Column(

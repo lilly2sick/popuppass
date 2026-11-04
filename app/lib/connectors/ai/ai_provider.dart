@@ -10,7 +10,8 @@ abstract interface class AiProvider {
 /// Pro only. Calls our `ai` Edge Function, which checks Pro status,
 /// rate-limits, and holds the Claude API key. Prompts forbid emojis.
 class ClaudeProxyProvider implements AiProvider {
-  ClaudeProxyProvider({required this.functionsUrl, required this.accessToken, Dio? http}) : http = http ?? Dio();
+  ClaudeProxyProvider({required this.functionsUrl, required this.accessToken, Dio? http})
+    : http = http ?? Dio();
 
   final String functionsUrl;
   final Future<String?> Function() accessToken;

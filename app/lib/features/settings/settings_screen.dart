@@ -45,7 +45,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final payments = ref.watch(paymentProviderProvider);
 
     return Scaffold(
-      appBar: AppBar(title: Text('Settings', style: PPType.heading()), backgroundColor: PPColors.bg),
+      appBar: AppBar(
+        title: Text('Settings', style: PPType.heading()),
+        backgroundColor: PPColors.bg,
+      ),
       body: ListView(
         padding: const EdgeInsets.all(PPSpace.gutter),
         children: [
@@ -100,7 +103,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             const Divider(),
             ListTile(title: const Text('Sign out'), onTap: () => auth!.signOut()),
             ListTile(
-              title: Text('Delete account', style: PPType.body(color: PPColors.pink, weight: FontWeight.w700)),
+              title: Text(
+                'Delete account',
+                style: PPType.body(color: PPColors.pink, weight: FontWeight.w700),
+              ),
               subtitle: const Text('Deletes your cloud backup. Data on this phone stays.'),
               onTap: () async {
                 final ok = await showDialog<bool>(
@@ -109,8 +115,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     title: const Text('Delete account?'),
                     content: const Text('Your cloud backup is removed for good.'),
                     actions: [
-                      TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-                      TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Delete')),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Cancel'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Delete'),
+                      ),
                     ],
                   ),
                 );

@@ -68,13 +68,21 @@ class SquareProvider extends PaymentProvider {
           'sort_order': 'ASC',
           if (page != null) 'cursor': page,
         },
-        options: Options(headers: {'Authorization': 'Bearer $token', 'Square-Version': '2024-10-17'}),
+        options: Options(
+          headers: {'Authorization': 'Bearer $token', 'Square-Version': '2024-10-17'},
+        ),
       );
       final body = res.data ?? const {};
       for (final p in (body['payments'] as List? ?? const [])) {
         final m = p as Map<String, dynamic>;
         if (m['status'] != 'COMPLETED') continue;
-        out.add(ExternalPayment(id: m['id'] as String, createdAt: DateTime.parse(m['created_at'] as String), json: m));
+        out.add(
+          ExternalPayment(
+            id: m['id'] as String,
+            createdAt: DateTime.parse(m['created_at'] as String),
+            json: m,
+          ),
+        );
       }
       page = body['cursor'] as String?;
     } while (page != null);
@@ -98,8 +106,8 @@ class SquareProvider extends PaymentProvider {
   }
 
   PaymentMethod _method(Map<String, dynamic> j) => switch (j['source_type']) {
-        'CARD' || 'WALLET' => PaymentMethod.card,
-        'CASH' => PaymentMethod.cash,
-        _ => PaymentMethod.other,
-      };
+    'CARD' || 'WALLET' => PaymentMethod.card,
+    'CASH' => PaymentMethod.cash,
+    _ => PaymentMethod.other,
+  };
 }

@@ -13,13 +13,13 @@ class AppConfig {
   });
 
   factory AppConfig.fromEnvironment() => const AppConfig(
-        supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
-        supabaseAnonKey: String.fromEnvironment('SUPABASE_ANON_KEY'),
-        revenueCatAppleKey: String.fromEnvironment('RC_APPLE_KEY'),
-        revenueCatGoogleKey: String.fromEnvironment('RC_GOOGLE_KEY'),
-        squareAppId: String.fromEnvironment('SQUARE_APP_ID'),
-        useFakes: bool.fromEnvironment('USE_FAKES', defaultValue: true),
-      );
+    supabaseUrl: String.fromEnvironment('SUPABASE_URL'),
+    supabaseAnonKey: String.fromEnvironment('SUPABASE_ANON_KEY'),
+    revenueCatAppleKey: String.fromEnvironment('RC_APPLE_KEY'),
+    revenueCatGoogleKey: String.fromEnvironment('RC_GOOGLE_KEY'),
+    squareAppId: String.fromEnvironment('SQUARE_APP_ID'),
+    useFakes: bool.fromEnvironment('USE_FAKES', defaultValue: true),
+  );
 
   final String supabaseUrl;
   final String supabaseAnonKey;

@@ -12,20 +12,40 @@ class PupMark extends StatelessWidget {
   final double size;
 
   @override
-  Widget build(BuildContext context) =>
-      SvgPicture.asset('assets/pup.svg', width: size, height: size * 188 / 220, semanticsLabel: 'PUP');
+  Widget build(BuildContext context) => SvgPicture.asset(
+    'assets/pup.svg',
+    width: size,
+    height: size * 188 / 220,
+    semanticsLabel: 'PUP',
+  );
 }
 
 const _faqs = [
-  ('Does it work with no signal?', 'Yes. Everything saves on your phone first. Pro backs it up when you are back online.'),
-  ('I tapped +1 twice by accident', 'Tap -1 on the same item. It removes the last sale and puts the item back in stock.'),
-  ('How do I add an event?', 'Tap the pass at the top of any screen, then New event, Import .ics, or pick a con near you.'),
-  ('Where is my data?', 'On this phone only, unless you turn on Pro backup. We never sell your sales data.'),
-  ('What does Pro add?', 'Cloud backup, AI captions and recaps, card reader sync, PDF and Excel exports.'),
+  (
+    'Does it work with no signal?',
+    'Yes. Everything saves on your phone first. Pro backs it up when you are back online.',
+  ),
+  (
+    'I tapped +1 twice by accident',
+    'Tap -1 on the same item. It removes the last sale and puts the item back in stock.',
+  ),
+  (
+    'How do I add an event?',
+    'Tap the pass at the top of any screen, then New event, Import .ics, or pick a con near you.',
+  ),
+  (
+    'Where is my data?',
+    'On this phone only, unless you turn on Pro backup. We never sell your sales data.',
+  ),
+  (
+    'What does Pro add?',
+    'Cloud backup, AI captions and recaps, card reader sync, PDF and Excel exports.',
+  ),
 ];
 
 /// PUP's greeting and FAQs. Shown once on first launch, then from the corner.
-Future<void> showPupSheet(BuildContext context, {bool greeting = false}) => showModalBottomSheet<void>(
+Future<void> showPupSheet(BuildContext context, {bool greeting = false}) =>
+    showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       builder: (_) => SafeArea(
@@ -64,8 +84,14 @@ Future<void> showPupSheet(BuildContext context, {bool greeting = false}) => show
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(greeting ? "Hey, maker. I'm PUP." : 'Need a hand?', style: PPType.title(size: 20, color: PPColors.onAccent)),
-                          Text('I live in the corner. Tap me any time you get stuck.', style: PPType.body(size: 13, color: PPColors.onAccent)),
+                          Text(
+                            greeting ? "Hey, maker. I'm PUP." : 'Need a hand?',
+                            style: PPType.title(size: 20, color: PPColors.onAccent),
+                          ),
+                          Text(
+                            'I live in the corner. Tap me any time you get stuck.',
+                            style: PPType.body(size: 13, color: PPColors.onAccent),
+                          ),
                         ],
                       ),
                     ),
@@ -92,7 +118,14 @@ Future<void> showPupSheet(BuildContext context, {bool greeting = false}) => show
                   ),
                 ),
               const SizedBox(height: PPSpace.sm),
-              Builder(builder: (ctx) => PPButton(label: "Let's go", onPressed: () => Navigator.pop(ctx), expand: true, height: 52)),
+              Builder(
+                builder: (ctx) => PPButton(
+                  label: "Let's go",
+                  onPressed: () => Navigator.pop(ctx),
+                  expand: true,
+                  height: 52,
+                ),
+              ),
             ],
           ),
         ),

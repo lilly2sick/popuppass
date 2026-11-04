@@ -19,7 +19,8 @@ Future<void> showSearchResults(BuildContext context, String query) async {
   await showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
-    builder: (_) => FractionallySizedBox(heightFactor: 0.8, child: _Results(query: query.trim().toLowerCase())),
+    builder: (_) =>
+        FractionallySizedBox(heightFactor: 0.8, child: _Results(query: query.trim().toLowerCase())),
   );
 }
 
@@ -30,8 +31,12 @@ class _Results extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final products = (ref.watch(productsProvider).valueOrNull ?? const []).where((p) => p.name.toLowerCase().contains(query)).toList();
-    final events = (ref.watch(eventsProvider).valueOrNull ?? const []).where((e) => e.name.toLowerCase().contains(query)).toList();
+    final products = (ref.watch(productsProvider).valueOrNull ?? const [])
+        .where((p) => p.name.toLowerCase().contains(query))
+        .toList();
+    final events = (ref.watch(eventsProvider).valueOrNull ?? const [])
+        .where((e) => e.name.toLowerCase().contains(query))
+        .toList();
     final stock = ref.watch(stockProvider).valueOrNull ?? const {};
 
     return ListView(
@@ -39,7 +44,8 @@ class _Results extends ConsumerWidget {
       children: [
         Text('Results for "$query"', style: PPType.title(size: 22)),
         const SizedBox(height: PPSpace.md),
-        if (products.isEmpty && events.isEmpty) const EmptyState(title: 'Nothing found', message: 'Try a shorter word.'),
+        if (products.isEmpty && events.isEmpty)
+          const EmptyState(title: 'Nothing found', message: 'Try a shorter word.'),
         if (products.isNotEmpty) Text('ITEMS', style: PPType.label(color: PPColors.muted)),
         for (final p in products)
           Padding(
@@ -54,8 +60,13 @@ class _Results extends ConsumerWidget {
               },
               child: Row(
                 children: [
-                  Expanded(child: Text(p.name, style: PPType.body(weight: FontWeight.w800))),
-                  Text('${stock[p.id] ?? 0} left  /  ${Money.format(p.priceCents)}', style: PPType.body(size: 13, color: PPColors.muted)),
+                  Expanded(
+                    child: Text(p.name, style: PPType.body(weight: FontWeight.w800)),
+                  ),
+                  Text(
+                    '${stock[p.id] ?? 0} left  /  ${Money.format(p.priceCents)}',
+                    style: PPType.body(size: 13, color: PPColors.muted),
+                  ),
                 ],
               ),
             ),
@@ -76,8 +87,13 @@ class _Results extends ConsumerWidget {
               },
               child: Row(
                 children: [
-                  Expanded(child: Text(e.name, style: PPType.body(weight: FontWeight.w800))),
-                  Text(DateFormat('MMM d').format(e.startsAt), style: PPType.body(size: 13, color: PPColors.muted)),
+                  Expanded(
+                    child: Text(e.name, style: PPType.body(weight: FontWeight.w800)),
+                  ),
+                  Text(
+                    DateFormat('MMM d').format(e.startsAt),
+                    style: PPType.body(size: 13, color: PPColors.muted),
+                  ),
                 ],
               ),
             ),

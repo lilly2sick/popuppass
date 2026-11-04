@@ -28,7 +28,8 @@ void main() {
   });
 
   test('IcsCodec parses folded lines and UTC dates', () {
-    const ics = 'BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nUID:abc\r\nSUMMARY:Anime\r\n  Fest\r\n'
+    const ics =
+        'BEGIN:VCALENDAR\r\nBEGIN:VEVENT\r\nUID:abc\r\nSUMMARY:Anime\r\n  Fest\r\n'
         'DTSTART:20261106T170000Z\r\nDTEND:20261108T020000Z\r\nEND:VEVENT\r\nEND:VCALENDAR\r\n';
     final codec = const IcsCodec();
     final events = codec.parse(ics);

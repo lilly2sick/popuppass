@@ -13,6 +13,7 @@ abstract final class PPColors {
   static const raised = Color(0xFF24242E);
   static const line = Color(0x1AFFFFFF);
   static const lineStrong = Color(0x38FFFFFF);
+
   /// Kept very dim so numbers and copy stay easy to read over it.
   static const grid = Color(0x06FFFFFF);
 
@@ -67,7 +68,9 @@ abstract final class PPSurface {
     return BoxDecoration(
       color: dashed ? Colors.transparent : fill,
       borderRadius: BorderRadius.circular(radius),
-      border: border || dashed ? Border.all(color: dashed ? PPColors.lineStrong : PPColors.line, width: borderWidth) : null,
+      border: border || dashed
+          ? Border.all(color: dashed ? PPColors.lineStrong : PPColors.line, width: borderWidth)
+          : null,
     );
   }
 
@@ -84,36 +87,45 @@ abstract final class PPType {
   static const support = 'BDOGrotesk';
 
   static TextStyle number({double size = 56, Color color = PPColors.text}) => TextStyle(
-        fontFamily: display,
-        fontSize: size,
-        fontWeight: FontWeight.w700,
-        height: 1,
-        color: color,
-        fontFeatures: const [FontFeature.tabularFigures()],
-      );
+    fontFamily: display,
+    fontSize: size,
+    fontWeight: FontWeight.w700,
+    height: 1,
+    color: color,
+    fontFeatures: const [FontFeature.tabularFigures()],
+  );
 
-  static TextStyle title({double size = 28, Color color = PPColors.text}) =>
-      TextStyle(fontFamily: display, fontSize: size, fontWeight: FontWeight.w700, height: 1.05, color: color);
+  static TextStyle title({double size = 28, Color color = PPColors.text}) => TextStyle(
+    fontFamily: display,
+    fontSize: size,
+    fontWeight: FontWeight.w700,
+    height: 1.05,
+    color: color,
+  );
 
   static TextStyle heading({double size = 20, Color color = PPColors.text}) =>
       TextStyle(fontFamily: display, fontSize: size, fontWeight: FontWeight.w500, color: color);
 
   /// BDO Grotesk is a variable font: weight goes through the wght axis.
-  static TextStyle body({double size = 16, Color color = PPColors.text, FontWeight weight = FontWeight.w400}) => TextStyle(
-        fontFamily: support,
-        fontSize: size,
-        fontWeight: weight,
-        fontVariations: [FontVariation('wght', weight.value.toDouble())],
-        color: color,
-        height: 1.4,
-      );
+  static TextStyle body({
+    double size = 16,
+    Color color = PPColors.text,
+    FontWeight weight = FontWeight.w400,
+  }) => TextStyle(
+    fontFamily: support,
+    fontSize: size,
+    fontWeight: weight,
+    fontVariations: [FontVariation('wght', weight.value.toDouble())],
+    color: color,
+    height: 1.4,
+  );
 
   static TextStyle label({double size = 11, Color color = PPColors.text}) => TextStyle(
-        fontFamily: support,
-        fontSize: size,
-        fontWeight: FontWeight.w800,
-        fontVariations: const [FontVariation('wght', 850)],
-        letterSpacing: size * 0.14,
-        color: color,
-      );
+    fontFamily: support,
+    fontSize: size,
+    fontWeight: FontWeight.w800,
+    fontVariations: const [FontVariation('wght', 850)],
+    letterSpacing: size * 0.14,
+    color: color,
+  );
 }

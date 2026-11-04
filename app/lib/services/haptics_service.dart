@@ -42,8 +42,9 @@ class HapticsService {
     }
   }
 
-  Future<void> _impact({required bool medium}) =>
-      intensity < 0.4 ? HapticFeedback.lightImpact() : (intensity > 0.8 && !medium ? HapticFeedback.heavyImpact() : HapticFeedback.mediumImpact());
+  Future<void> _impact({required bool medium}) => intensity < 0.4
+      ? HapticFeedback.lightImpact()
+      : (intensity > 0.8 && !medium ? HapticFeedback.heavyImpact() : HapticFeedback.mediumImpact());
 
   Future<void> _gap([int ms = 90]) => Future<void>.delayed(Duration(milliseconds: ms));
 }

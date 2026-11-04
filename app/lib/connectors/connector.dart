@@ -18,11 +18,13 @@ class CursorStore {
 
   final AppDatabase db;
 
-  Future<String?> read(String connectorId) async =>
-      (await (db.select(db.connectorCursors)..where((c) => c.connectorId.equals(connectorId))).getSingleOrNull())
-          ?.cursor;
+  Future<String?> read(String connectorId) async => (await (db.select(
+    db.connectorCursors,
+  )..where((c) => c.connectorId.equals(connectorId))).getSingleOrNull())?.cursor;
 
-  Future<void> write(String connectorId, String? cursor) => db.into(db.connectorCursors).insertOnConflictUpdate(
+  Future<void> write(String connectorId, String? cursor) => db
+      .into(db.connectorCursors)
+      .insertOnConflictUpdate(
         ConnectorCursorsCompanion.insert(
           connectorId: connectorId,
           cursor: Value(cursor),

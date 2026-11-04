@@ -33,24 +33,32 @@ class _SellScreenState extends ConsumerState<SellScreen> {
     super.dispose();
   }
 
-  List<Product> _visible(List<Product> all) =>
-      _query.isEmpty ? all : all.where((p) => p.name.toLowerCase().contains(_query.toLowerCase())).toList();
+  List<Product> _visible(List<Product> all) => _query.isEmpty
+      ? all
+      : all.where((p) => p.name.toLowerCase().contains(_query.toLowerCase())).toList();
 
   Future<void> _sell(Product p, int before) async {
-    final id = await ref.read(salesRepoProvider).recordQuickSale(
+    final id = await ref
+        .read(salesRepoProvider)
+        .recordQuickSale(
           product: p,
           method: ref.read(paymentMethodProvider),
           eventId: ref.read(currentEventProvider).valueOrNull?.id,
         );
     final stacks = ref.read(sessionSalesProvider.notifier);
-    stacks.state = {...stacks.state, p.id: [...?stacks.state[p.id], id]};
+    stacks.state = {
+      ...stacks.state,
+      p.id: [...?stacks.state[p.id], id],
+    };
     final after = before - 1;
-    await ref.read(hapticsProvider).play(
+    await ref
+        .read(hapticsProvider)
+        .play(
           after <= 0
               ? HapticMoment.soldOut
               : after <= p.lowStockThreshold
-                  ? HapticMoment.lowStock
-                  : HapticMoment.sold,
+              ? HapticMoment.lowStock
+              : HapticMoment.sold,
         );
   }
 
@@ -103,7 +111,8 @@ class _SellScreenState extends ConsumerState<SellScreen> {
     final current = items.isEmpty ? null : items[page];
     final currentLeft = current == null ? 0 : stock[current.id] ?? 0;
 
-    Widget iconButton(IconData icon, String label, VoidCallback onTap, {bool primary = false}) => Semantics(
+    Widget iconButton(IconData icon, String label, VoidCallback onTap, {bool primary = false}) =>
+        Semantics(
           button: true,
           label: label,
           child: GestureDetector(
@@ -133,9 +142,18 @@ class _SellScreenState extends ConsumerState<SellScreen> {
       action: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          iconButton(_grid ? Icons.crop_portrait_rounded : Icons.grid_view_rounded, _grid ? 'Back to single item' : 'Zoom out to grid', () => _setGrid(!_grid)),
+          iconButton(
+            _grid ? Icons.crop_portrait_rounded : Icons.grid_view_rounded,
+            _grid ? 'Back to single item' : 'Zoom out to grid',
+            () => _setGrid(!_grid),
+          ),
           const SizedBox(width: 6),
-          iconButton(Icons.add_rounded, 'Add item', () => showProductEditor(context), primary: true),
+          iconButton(
+            Icons.add_rounded,
+            'Add item',
+            () => showProductEditor(context),
+            primary: true,
+          ),
         ],
       ),
       body: Column(
@@ -165,7 +183,9 @@ class _SellScreenState extends ConsumerState<SellScreen> {
             child: items.isEmpty
                 ? EmptyState(
                     title: _query.isEmpty ? 'No items yet' : 'No match',
-                    message: _query.isEmpty ? 'Add your first item with the + button.' : 'Nothing matches "$_query".',
+                    message: _query.isEmpty
+                        ? 'Add your first item with the + button.'
+                        : 'Nothing matches "$_query".',
                   )
                 : GestureDetector(
                     onScaleUpdate: (d) {
@@ -175,7 +195,10 @@ class _SellScreenState extends ConsumerState<SellScreen> {
                     },
                     child: AnimatedSwitcher(
                       duration: const Duration(milliseconds: 220),
-                      transitionBuilder: (child, a) => ScaleTransition(scale: Tween(begin: 0.94, end: 1.0).animate(a), child: FadeTransition(opacity: a, child: child)),
+                      transitionBuilder: (child, a) => ScaleTransition(
+                        scale: Tween(begin: 0.94, end: 1.0).animate(a),
+                        child: FadeTransition(opacity: a, child: child),
+                      ),
                       child: _grid
                           ? _ItemGrid(
                               key: const ValueKey('grid'),
@@ -224,7 +247,9 @@ class _SellScreenState extends ConsumerState<SellScreen> {
                     child: PPButton.secondary(
                       label: '-1',
                       height: 68,
-                      onPressed: (stacks[current.id]?.isNotEmpty ?? false) ? () => _unsell(current) : null,
+                      onPressed: (stacks[current.id]?.isNotEmpty ?? false)
+                          ? () => _unsell(current)
+                          : null,
                     ),
                   ),
                 ),
@@ -246,7 +271,12 @@ class _SellScreenState extends ConsumerState<SellScreen> {
           const SizedBox(height: PPSpace.sm),
           Row(
             children: [
-              Expanded(child: Text('PAID WITH ${method.label}'.toUpperCase(), style: PPType.label(size: 10, color: PPColors.muted))),
+              Expanded(
+                child: Text(
+                  'PAID WITH ${method.label}'.toUpperCase(),
+                  style: PPType.label(size: 10, color: PPColors.muted),
+                ),
+              ),
               Text('${Money.format(today.grossCents)} gross', style: PPType.number(size: 18)),
             ],
           ),
@@ -257,7 +287,12 @@ class _SellScreenState extends ConsumerState<SellScreen> {
 }
 
 class _ItemCard extends StatelessWidget {
-  const _ItemCard({required this.product, required this.left, required this.sold, required this.position});
+  const _ItemCard({
+    required this.product,
+    required this.left,
+    required this.sold,
+    required this.position,
+  });
 
   final Product product;
   final int left;
@@ -269,7 +304,9 @@ class _ItemCard extends StatelessWidget {
     final p = product;
     final out = left <= 0;
     final low = !out && left <= p.lowStockThreshold;
-    final margin = p.priceCents == 0 ? 0 : ((p.priceCents - p.unitCostCents) * 100 / p.priceCents).round();
+    final margin = p.priceCents == 0
+        ? 0
+        : ((p.priceCents - p.unitCostCents) * 100 / p.priceCents).round();
     return StickerCard(
       iridescent: true,
       fill: PPColors.surface,
@@ -282,13 +319,20 @@ class _ItemCard extends StatelessWidget {
             child: Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(18),
-                gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: PPColors.badgeGradient),
+                gradient: const LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: PPColors.badgeGradient,
+                ),
               ),
               alignment: Alignment.topLeft,
               padding: const EdgeInsets.all(10),
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-                decoration: BoxDecoration(color: PPColors.bg, borderRadius: BorderRadius.circular(PPRadius.chip)),
+                decoration: BoxDecoration(
+                  color: PPColors.bg,
+                  borderRadius: BorderRadius.circular(PPRadius.chip),
+                ),
                 child: Text(position, style: PPType.label(size: 11)),
               ),
             ),
@@ -297,7 +341,14 @@ class _ItemCard extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Expanded(child: Text(p.name, maxLines: 2, overflow: TextOverflow.ellipsis, style: PPType.title(size: 26))),
+              Expanded(
+                child: Text(
+                  p.name,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: PPType.title(size: 26),
+                ),
+              ),
               const SizedBox(width: PPSpace.sm),
               Text(Money.format(p.priceCents), style: PPType.number(size: 26)),
             ],
@@ -313,7 +364,11 @@ class _ItemCard extends StatelessWidget {
                 PPPill('$left left', tone: PillTone.warn)
               else
                 PPPill('$left in stock', glyph: '#'),
-              PPPill('$margin% margin', tone: margin >= 60 ? PillTone.good : PillTone.info, glyph: margin >= 60 ? '+' : '-'),
+              PPPill(
+                '$margin% margin',
+                tone: margin >= 60 ? PillTone.good : PillTone.info,
+                glyph: margin >= 60 ? '+' : '-',
+              ),
               PPPill('$sold sold'),
             ],
           ),
@@ -324,7 +379,14 @@ class _ItemCard extends StatelessWidget {
 }
 
 class _ItemGrid extends StatelessWidget {
-  const _ItemGrid({super.key, required this.items, required this.stock, required this.sold, required this.selected, required this.onOpen});
+  const _ItemGrid({
+    super.key,
+    required this.items,
+    required this.stock,
+    required this.sold,
+    required this.selected,
+    required this.onOpen,
+  });
 
   final List<Product> items;
   final Map<String, int> stock;
@@ -357,7 +419,10 @@ class _ItemGrid extends StatelessWidget {
               decoration: BoxDecoration(
                 color: PPColors.card,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: i == selected ? PPColors.violet : PPColors.line, width: i == selected ? 2 : 1),
+                border: Border.all(
+                  color: i == selected ? PPColors.violet : PPColors.line,
+                  width: i == selected ? 2 : 1,
+                ),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -375,14 +440,31 @@ class _ItemGrid extends StatelessWidget {
                         height: 22,
                         padding: const EdgeInsets.symmetric(horizontal: 6),
                         alignment: Alignment.center,
-                        decoration: BoxDecoration(color: low ? PPColors.pink : PPColors.bg, borderRadius: BorderRadius.circular(11)),
-                        child: Text('$left', style: PPType.label(size: 11, color: low ? PPColors.onAccent : PPColors.text)),
+                        decoration: BoxDecoration(
+                          color: low ? PPColors.pink : PPColors.bg,
+                          borderRadius: BorderRadius.circular(11),
+                        ),
+                        child: Text(
+                          '$left',
+                          style: PPType.label(
+                            size: 11,
+                            color: low ? PPColors.onAccent : PPColors.text,
+                          ),
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(height: 5),
-                  Text(p.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: PPType.body(size: 12, weight: FontWeight.w800)),
-                  Text('${Money.format(p.priceCents)} / ${sold[p.id] ?? 0} sold', style: PPType.body(size: 11, color: PPColors.muted)),
+                  Text(
+                    p.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: PPType.body(size: 12, weight: FontWeight.w800),
+                  ),
+                  Text(
+                    '${Money.format(p.priceCents)} / ${sold[p.id] ?? 0} sold',
+                    style: PPType.body(size: 11, color: PPColors.muted),
+                  ),
                 ],
               ),
             ),
@@ -411,7 +493,10 @@ class _Dots extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 3),
               width: i == index ? 18 : 6,
               height: 6,
-              decoration: BoxDecoration(color: i == index ? PPColors.violet : PPColors.raised, borderRadius: BorderRadius.circular(3)),
+              decoration: BoxDecoration(
+                color: i == index ? PPColors.violet : PPColors.raised,
+                borderRadius: BorderRadius.circular(3),
+              ),
             ),
         ],
       ),

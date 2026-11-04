@@ -26,14 +26,19 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
   _Filter _filter = _Filter.all;
 
   Future<void> _importCsv() async {
-    final picked = await FilePicker.platform.pickFiles(type: FileType.custom, allowedExtensions: ['csv'], withData: true);
+    final picked = await FilePicker.platform.pickFiles(
+      type: FileType.custom,
+      allowedExtensions: ['csv'],
+      withData: true,
+    );
     final bytes = picked?.files.single.bytes;
     if (bytes == null) return;
     final importer = ref.read(csvImportProvider)..pendingText = utf8.decode(bytes);
     await importer.ingest();
   }
 
-  static int _margin(Product p) => p.priceCents == 0 ? 0 : ((p.priceCents - p.unitCostCents) * 100 / p.priceCents).round();
+  static int _margin(Product p) =>
+      p.priceCents == 0 ? 0 : ((p.priceCents - p.unitCostCents) * 100 / p.priceCents).round();
 
   @override
   Widget build(BuildContext context) {
@@ -41,17 +46,24 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     final stock = ref.watch(stockProvider).valueOrNull ?? const {};
     final units = stock.values.fold<int>(0, (a, b) => a + b);
 
-    var shown = _query.isEmpty ? [...all] : all.where((p) => p.name.toLowerCase().contains(_query.toLowerCase())).toList();
-    if (_filter == _Filter.low) shown = shown.where((p) => (stock[p.id] ?? 0) <= p.lowStockThreshold).toList();
+    var shown = _query.isEmpty
+        ? [...all]
+        : all.where((p) => p.name.toLowerCase().contains(_query.toLowerCase())).toList();
+    if (_filter == _Filter.low) {
+      shown = shown.where((p) => (stock[p.id] ?? 0) <= p.lowStockThreshold).toList();
+    }
     if (_filter == _Filter.margin) shown.sort((a, b) => _margin(b).compareTo(_margin(a)));
 
     Widget dot(String g, Color c) => Container(
-          width: 18,
-          height: 18,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(shape: BoxShape.circle, color: c),
-          child: Text(g, style: PPType.body(size: 12, weight: FontWeight.w900, color: PPColors.onAccent)),
-        );
+      width: 18,
+      height: 18,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(shape: BoxShape.circle, color: c),
+      child: Text(
+        g,
+        style: PPType.body(size: 12, weight: FontWeight.w900, color: PPColors.onAccent),
+      ),
+    );
 
     Widget segment(_Filter f, String label, [Widget? lead]) {
       final on = f == _filter;
@@ -63,12 +75,22 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
             onTap: () => setState(() => _filter = f),
             child: Container(
               height: 40,
-              decoration: BoxDecoration(color: on ? PPColors.teal : PPColors.card, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                color: on ? PPColors.teal : PPColors.card,
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (lead != null) ...[lead, const SizedBox(width: 6)],
-                  Text(label, style: PPType.body(size: 13, weight: FontWeight.w800, color: on ? PPColors.onAccent : PPColors.text)),
+                  Text(
+                    label,
+                    style: PPType.body(
+                      size: 13,
+                      weight: FontWeight.w800,
+                      color: on ? PPColors.onAccent : PPColors.text,
+                    ),
+                  ),
                 ],
               ),
             ),
@@ -83,7 +105,11 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
       searchHint: 'Search items, tags, SKU',
       onSearch: (q) => setState(() => _query = q.trim()),
       onSearchSubmit: (_) {},
-      action: PPButton(label: 'Add item', icon: Icons.add_rounded, onPressed: () => showProductEditor(context)),
+      action: PPButton(
+        label: 'Add item',
+        icon: Icons.add_rounded,
+        onPressed: () => showProductEditor(context),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -108,7 +134,9 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
           if (shown.isEmpty)
             EmptyState(
               title: all.isEmpty ? 'Start your shop' : 'Nothing here',
-              message: all.isEmpty ? 'Add your first item or import a CSV.' : 'No items match this filter.',
+              message: all.isEmpty
+                  ? 'Add your first item or import a CSV.'
+                  : 'No items match this filter.',
             ),
           const SizedBox(height: PPSpace.sm),
           PPButton(label: 'Import from CSV', kind: PPButtonKind.dashed, onPressed: _importCsv),
@@ -150,7 +178,14 @@ class _ProductRow extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Expanded(child: Text(p.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: PPType.body(size: 15, weight: FontWeight.w800))),
+                    Expanded(
+                      child: Text(
+                        p.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: PPType.body(size: 15, weight: FontWeight.w800),
+                      ),
+                    ),
                     Text(Money.format(p.priceCents), style: PPType.number(size: 17)),
                   ],
                 ),
@@ -158,8 +193,14 @@ class _ProductRow extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    low ? PPPill('$inStock left', tone: PillTone.warn) : PPPill('$inStock in stock', glyph: '#'),
-                    PPPill('$margin% margin', tone: margin >= 60 ? PillTone.good : PillTone.info, glyph: margin >= 60 ? '+' : '-'),
+                    low
+                        ? PPPill('$inStock left', tone: PillTone.warn)
+                        : PPPill('$inStock in stock', glyph: '#'),
+                    PPPill(
+                      '$margin% margin',
+                      tone: margin >= 60 ? PillTone.good : PillTone.info,
+                      glyph: margin >= 60 ? '+' : '-',
+                    ),
                   ],
                 ),
               ],

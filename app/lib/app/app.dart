@@ -19,7 +19,9 @@ class PopUpPassApp extends ConsumerWidget {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         theme: PPTheme.dark(),
-        home: LanyardLoader(error: boot.hasError ? 'Something went wrong starting up. Restart the app.' : null),
+        home: LanyardLoader(
+          error: boot.hasError ? 'Something went wrong starting up. Restart the app.' : null,
+        ),
       );
     }
     return MaterialApp.router(

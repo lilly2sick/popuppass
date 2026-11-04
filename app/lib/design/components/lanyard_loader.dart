@@ -18,7 +18,10 @@ class LanyardLoader extends StatefulWidget {
 }
 
 class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProviderStateMixin {
-  late final _swing = AnimationController(vsync: this, duration: const Duration(milliseconds: 2200));
+  late final _swing = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 2200),
+  );
 
   @override
   void didChangeDependencies() {
@@ -37,21 +40,21 @@ class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProvider
   }
 
   Widget _strap(List<Color> colors, double skew) => Transform(
-        transform: Matrix4.skewX(skew),
-        child: Container(
-          width: 22,
-          height: 230,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [for (var i = 0; i < 12; i++) colors[i % 2]],
-              stops: [for (var i = 0; i < 12; i++) (i ~/ 2 * 2 + (i.isOdd ? 2 : 0)) / 12],
-              tileMode: TileMode.repeated,
-            ),
-          ),
+    transform: Matrix4.skewX(skew),
+    child: Container(
+      width: 22,
+      height: 230,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [for (var i = 0; i < 12; i++) colors[i % 2]],
+          stops: [for (var i = 0; i < 12; i++) (i ~/ 2 * 2 + (i.isOdd ? 2 : 0)) / 12],
+          tileMode: TileMode.repeated,
         ),
-      );
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -68,21 +71,35 @@ class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProvider
         Container(
           width: 30,
           height: 24,
-          decoration: BoxDecoration(border: Border.all(color: PPColors.lilac, width: 4), borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(
+            border: Border.all(color: PPColors.lilac, width: 4),
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
-        Container(width: 14, height: 18, decoration: BoxDecoration(color: PPColors.muted, borderRadius: BorderRadius.circular(4))),
+        Container(
+          width: 14,
+          height: 18,
+          decoration: BoxDecoration(color: PPColors.muted, borderRadius: BorderRadius.circular(4)),
+        ),
         Container(
           width: 200,
           height: 252,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            gradient: const LinearGradient(begin: Alignment.topLeft, end: Alignment.bottomRight, colors: [Color(0xFFFFFAFF), Color(0xFFF0E9FF), Color(0xFFE3F6FF)]),
+            gradient: const LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [Color(0xFFFFFAFF), Color(0xFFF0E9FF), Color(0xFFE3F6FF)],
+            ),
             boxShadow: [BoxShadow(color: PPColors.violet.withValues(alpha: 0.25), blurRadius: 60)],
           ),
           child: Column(
             children: [
-              Text('POP UP PASS  /  NO. 1', style: PPType.label(size: 8, color: const Color(0xFF615575))),
+              Text(
+                'POP UP PASS  /  NO. 1',
+                style: PPType.label(size: 8, color: const Color(0xFF615575)),
+              ),
               const SizedBox(height: 6),
               Expanded(
                 child: Container(
@@ -133,7 +150,10 @@ class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProvider
                     child: Text(
                       widget.error ?? 'Setting up your table',
                       textAlign: TextAlign.center,
-                      style: PPType.body(size: 14, color: widget.error == null ? PPColors.muted : PPColors.pink),
+                      style: PPType.body(
+                        size: 14,
+                        color: widget.error == null ? PPColors.muted : PPColors.pink,
+                      ),
                     ),
                   ),
                 ],

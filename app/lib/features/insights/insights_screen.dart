@@ -16,7 +16,8 @@ import '../../providers.dart';
 final _reportProvider = FutureProvider.autoDispose<EventReport>((ref) async {
   ref.watch(todayStatsProvider); // recompute whenever sales change
   final event = ref.watch(currentEventProvider).valueOrNull;
-  final names = {for (final p in ref.watch(productsProvider).valueOrNull ?? const []) p.id: p.name};
+  final products = ref.watch(productsProvider).valueOrNull;
+  final names = <String, String>{for (final p in products ?? []) p.id: p.name};
   return ref.watch(analyticsProvider).report(event: event, names: names);
 });
 
@@ -36,7 +37,9 @@ class InsightsScreen extends ConsumerWidget {
               ListTile(
                 minTileHeight: PPTap.min,
                 title: Text(f.label, style: PPType.body(weight: FontWeight.w700)),
-                trailing: svc.allowed(f) ? null : Text('PRO', style: PPType.label(color: PPColors.violet)),
+                trailing: svc.allowed(f)
+                    ? null
+                    : Text('PRO', style: PPType.label(color: PPColors.violet)),
                 onTap: () => Navigator.pop(context, f),
               ),
           ],
@@ -54,13 +57,23 @@ class InsightsScreen extends ConsumerWidget {
           salesRows: [
             ['Sold at', 'Item', 'Qty', 'Unit price', 'Unit cost', 'Paid with', 'Source'],
             for (final (s, l) in rows)
-              [s.soldAt, l.externalName ?? l.productId, l.qty, l.unitPriceCents / 100, l.unitCostCents / 100, s.paymentMethod.label, s.source.name],
+              [
+                s.soldAt,
+                l.externalName ?? l.productId,
+                l.qty,
+                l.unitPriceCents / 100,
+                l.unitCostCents / 100,
+                s.paymentMethod.label,
+                s.source.name,
+              ],
           ],
         ),
       );
     } on ExportLocked {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('PDF and Excel exports are part of Pro.')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('PDF and Excel exports are part of Pro.')));
       }
     }
   }
@@ -72,7 +85,10 @@ class InsightsScreen extends ConsumerWidget {
 
     return PPScaffold(
       title: 'Look what you did.',
-      action: PPButton(label: 'Export', onPressed: report == null ? null : () => _export(context, ref, report)),
+      action: PPButton(
+        label: 'Export',
+        onPressed: report == null ? null : () => _export(context, ref, report),
+      ),
       body: report == null
           ? const SizedBox.shrink()
           : Column(
@@ -82,7 +98,8 @@ class InsightsScreen extends ConsumerWidget {
                   cents: report.netCents,
                   eyebrow: 'Net profit',
                   large: true,
-                  caption: '${Money.format(report.grossCents)} gross, ${Money.format(report.costCents)} cost, '
+                  caption:
+                      '${Money.format(report.grossCents)} gross, ${Money.format(report.costCents)} cost, '
                       '${Money.format(report.boothFeeCents)} booth. ${report.units} sold.',
                 ),
                 const SizedBox(height: PPSpace.md),
@@ -92,14 +109,21 @@ class InsightsScreen extends ConsumerWidget {
                 const SizedBox(height: PPSpace.md),
                 Container(
                   padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(color: PPColors.surface, border: Border.all(color: PPColors.violet.withValues(alpha: 0.4)), borderRadius: BorderRadius.circular(PPRadius.tile)),
+                  decoration: BoxDecoration(
+                    color: PPColors.surface,
+                    border: Border.all(color: PPColors.violet.withValues(alpha: 0.4)),
+                    borderRadius: BorderRadius.circular(PPRadius.tile),
+                  ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('YOUR RECAP', style: PPType.label(color: PPColors.lilac)),
                       const SizedBox(height: 6),
                       Text(
-                        const RuleSummaryWriter().write(report, eventName: event?.name ?? 'this event'),
+                        const RuleSummaryWriter().write(
+                          report,
+                          eventName: event?.name ?? 'this event',
+                        ),
                         style: PPType.body(size: 14),
                       ),
                     ],
@@ -134,7 +158,15 @@ class _PerItem extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 5),
               child: Row(
                 children: [
-                  SizedBox(width: 112, child: Text(p.name, maxLines: 1, overflow: TextOverflow.ellipsis, style: PPType.body(size: 13, weight: FontWeight.w700))),
+                  SizedBox(
+                    width: 112,
+                    child: Text(
+                      p.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: PPType.body(size: 13, weight: FontWeight.w700),
+                    ),
+                  ),
                   const SizedBox(width: PPSpace.sm),
                   Expanded(
                     child: ClipRRect(
@@ -150,7 +182,11 @@ class _PerItem extends StatelessWidget {
                   const SizedBox(width: PPSpace.sm),
                   Text(
                     '${p.units} / ${Money.signed(p.profitCents)}',
-                    style: PPType.body(size: 13, weight: FontWeight.w700, color: p.profitCents < 0 ? PPColors.pink : PPColors.text),
+                    style: PPType.body(
+                      size: 13,
+                      weight: FontWeight.w700,
+                      color: p.profitCents < 0 ? PPColors.pink : PPColors.text,
+                    ),
                   ),
                 ],
               ),
@@ -167,7 +203,15 @@ class _PaidWith extends StatelessWidget {
   final EventReport report;
 
   // Told apart by lightness as well as hue.
-  static const _colors = [PPColors.text, PPColors.violet, PPColors.pink, PPColors.pink, PPColors.muted, PPColors.violetSoft, PPColors.line];
+  static const _colors = [
+    PPColors.text,
+    PPColors.violet,
+    PPColors.pink,
+    PPColors.pink,
+    PPColors.muted,
+    PPColors.violetSoft,
+    PPColors.line,
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -187,8 +231,19 @@ class _PaidWith extends StatelessWidget {
           Container(
             height: 16,
             clipBehavior: Clip.antiAlias,
-            decoration: BoxDecoration(borderRadius: BorderRadius.circular(6), border: Border.all(color: PPColors.text, width: 2)),
-            child: Row(children: [for (final e in entries) Expanded(flex: e.value, child: ColoredBox(color: color(e.key)))]),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: PPColors.text, width: 2),
+            ),
+            child: Row(
+              children: [
+                for (final e in entries)
+                  Expanded(
+                    flex: e.value,
+                    child: ColoredBox(color: color(e.key)),
+                  ),
+              ],
+            ),
           ),
           const SizedBox(height: PPSpace.sm),
           Wrap(
