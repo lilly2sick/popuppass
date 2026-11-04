@@ -1,0 +1,248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Home</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:"Ronzino";src:url("/_blob/5819bb62ae426096231fb65a85ba24b6") format("woff2");font-weight:400}
+@font-face{font-family:"Ronzino";src:url("/_blob/efa3cba226188f59e13ae7fe6e45834a") format("woff2");font-weight:500}
+@font-face{font-family:"Ronzino";src:url("/_blob/ec60cd3296323f23985077218873722e") format("woff2");font-weight:700}
+@font-face{font-family:"BDO Grotesk";src:url("/_blob/8a391c23947730abf32d2056c2cefe7d") format("truetype");font-weight:300 900}
+body{margin:0}
+input::placeholder{color:#A9A7B8}
+a{color:#B9A6FF}a:hover{color:#FFFFFF}
+.pp-grid{position:absolute;inset:-48px;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:24px 24px;animation:pp-pan 18s linear infinite}
+.pp-iri{position:absolute;inset:-48px;background:linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9,#9C8CFF,#B9A6FF);background-size:300% 300%;-webkit-mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);-webkit-mask-size:24px 24px;mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);mask-size:24px 24px;opacity:.08;animation:pp-shift 9s ease-in-out infinite,pp-pan 18s linear infinite}
+.pp-glow{position:absolute;border-radius:50%;filter:blur(70px);opacity:.07;animation:pp-float 14s ease-in-out infinite alternate}
+.pp-swing{transform-origin:50% 0;animation:pp-swing 5s ease-in-out infinite}
+.pp-walk{animation:pp-walk 14s linear infinite}
+@keyframes pp-pan{to{transform:translate(24px,24px)}}
+@keyframes pp-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes pp-float{to{transform:translate(60px,120px) scale(1.2)}}
+@keyframes pp-swing{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+@keyframes pp-walk{from{transform:translateX(-110px)}to{transform:translateX(400px)}}
+@media (prefers-reduced-motion: reduce){.pp-grid,.pp-iri,.pp-glow,.pp-swing,.pp-walk{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 1640px; position: relative; overflow: hidden; background: #0B0B0F; color: #F5F4FA; font-family: 'BDO Grotesk', sans-serif; display: flex; flex-direction: column">
+  <div class="pp-grid" aria-hidden="true"></div>
+  <div class="pp-iri" aria-hidden="true"></div>
+  <div class="pp-glow" aria-hidden="true" style="width: 340px; height: 340px; right: -140px; top: 60px; background: #B9A6FF"></div>
+  <div class="pp-glow" aria-hidden="true" style="width: 300px; height: 300px; left: -120px; top: 760px; background: #7FE7D9"></div>
+
+  <div style="position: relative"><dc-import name="EventBar" hint-size="390px,112px"></dc-import></div>
+
+  <main style="position: relative; flex-grow: 1; padding: 6px 16px 16px; display: flex; flex-direction: column; gap: 16px">
+
+    <section aria-labelledby="hi" style="display: flex; gap: 12px; align-items: flex-start">
+      <div style="flex-grow: 1; display: flex; flex-direction: column; gap: 8px; padding-top: 6px">
+        <span style="font-size: 11px; font-weight: 900; letter-spacing: .16em; color: #B9A6FF">MADE FOR THE MAKERS</span>
+        <h1 id="hi" style="margin: 0; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 34px; line-height: .98">Hey, maker.<br>Your table looks good.</h1>
+        <p style="margin: 0; font-size: 14px; line-height: 1.4; color: #A9A7B8">Here's the little picture so far.</p>
+        <a href="Sell.dc.html" style="align-self: flex-start; margin-top: 4px; height: 48px; padding: 0 18px; border-radius: 16px; background: #B9A6FF; color: #0B0B0F; font-weight: 800; font-size: 16px; text-decoration: none; display: flex; align-items: center; gap: 8px">Open table<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg></a>
+      </div>
+      <div class="pp-swing" aria-hidden="true" style="width: 118px; flex-shrink: 0; display: flex; flex-direction: column; align-items: center">
+        <div style="width: 10px; height: 36px; background: repeating-linear-gradient(180deg,#B9A6FF 0 10px,#FF9AD5 10px 20px)"></div>
+        <div style="width: 16px; height: 12px; border: 3px solid #D9CCFF; border-radius: 6px; box-sizing: border-box; margin-top: -2px"></div>
+        <div style="width: 118px; height: 152px; box-sizing: border-box; padding: 4px; border-radius: 14px; border: 1px solid rgba(255,255,255,.7); background: linear-gradient(145deg,rgba(255,255,255,.5),rgba(215,207,255,.3)); box-shadow: 0 18px 40px rgba(0,0,0,.5),0 0 40px rgba(185,166,255,.22)">
+          <div style="height: 100%; box-sizing: border-box; border-radius: 10px; padding: 6px; background: linear-gradient(155deg,#fffaff,#f0e9ff 48%,#e3f6ff); display: flex; flex-direction: column; gap: 4px; color: #211a35">
+            <div style="display: flex; justify-content: space-between; font-size: 5px; font-weight: 900; letter-spacing: .5px; color: #615575"><span>POP UP PASS</span><span>NO. 1</span></div>
+            <div style="flex-grow: 1; border-radius: 8px; background: linear-gradient(145deg,#d9ccff,#f9dff2 58%,#d4f3ff); display: flex; align-items: center; justify-content: center">
+              <svg width="66" height="56" viewBox="0 0 220 188"><path d="M46 77C27 65 23 39 39 25c15-13 37 3 43 26 9-6 19-9 29-9 13 0 25 4 35 11 3-23 24-40 40-29 18 13 14 43-6 56 1 6 2 12 2 19 0 42-30 69-71 69-42 0-73-27-73-69 0-8 3-15 8-22Z" fill="#f8f6ff" stroke="#211a35" stroke-linejoin="round" stroke-width="8"></path><path d="M47 67c-12-10-13-26-6-31 8-6 22 8 27 25L47 67Zm126 0c11-10 13-26 6-31-8-6-22 8-27 25l21 6Z" fill="#ff84d6" stroke="#211a35" stroke-linejoin="round" stroke-width="6"></path><ellipse cx="79" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><ellipse cx="143" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><ellipse cx="60" cy="119" fill="#ff84d6" rx="13" ry="7"></ellipse><ellipse cx="162" cy="119" fill="#ff84d6" rx="13" ry="7"></ellipse><path d="M97 117c3-7 23-7 27 0 3 6-4 12-13 12s-17-6-14-12Z" fill="#211a35"></path><path d="M80 159c15-10 47-10 62 0-8 9-19 14-31 14-12 0-23-5-31-14Z" fill="#7bdcff" stroke="#211a35" stroke-linejoin="round" stroke-width="6"></path></svg>
+            </div>
+            <div style="text-align: center; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 15px; line-height: 1">MAKER</div>
+            <div style="text-align: center; font-size: 5px; font-weight: 900; letter-spacing: .8px; color: #6d5aa2">ALL ACCESS</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <label style="height: 36px; flex-shrink: 0; box-sizing: border-box; border-radius: 999px; border: 1px solid rgba(255,255,255,.16); background: #1C1C24; display: flex; align-items: center; gap: 8px; padding: 0 14px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A9A7B8" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4.5-4.5"></path></svg>
+      <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search</span>
+      <input type="search" placeholder="Search items, sales, events" style="border: 0; outline: 0; flex-grow: 1; min-width: 0; font: 500 14px 'BDO Grotesk', sans-serif; background: #1C1C24; color: #F5F4FA">
+    </label>
+    <section aria-label="Today so far" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <div style="height: 76px; box-sizing: border-box; border-radius: 16px; background: #1C1C24; border: 1px solid rgba(255,255,255,.1); padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between">
+        <span style="font-size: 10px; font-weight: 900; letter-spacing: .14em; color: #A9A7B8">GROSS</span>
+        <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 30px; line-height: .9">$298</span>
+      </div>
+      <div style="height: 76px; box-sizing: border-box; border-radius: 16px; background: #1C1C24; border: 1px solid rgba(255,255,255,.1); padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between">
+        <span style="font-size: 10px; font-weight: 900; letter-spacing: .14em; color: #A9A7B8">SOLD</span>
+        <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 30px; line-height: .9">41</span>
+      </div>
+      <a href="Shop.dc.html" style="height: 76px; box-sizing: border-box; border-radius: 16px; background: #FF9AD5; color: #0B0B0F; padding: 10px 12px; display: flex; flex-direction: column; justify-content: space-between; text-decoration: none">
+        <span style="display: flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 900; letter-spacing: .14em"><span style="width: 16px; height: 16px; border-radius: 50%; background: #0B0B0F; color: #FF9AD5; display: flex; align-items: center; justify-content: center; font-size: 11px">!</span>LOW</span>
+        <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 30px; line-height: .9">2 <span style="font-size: 14px; font-weight: 700; letter-spacing: 0">items</span></span>
+      </a>
+    </section>
+
+    <section aria-labelledby="heads" style="border-radius: 20px; padding: 1px; background: linear-gradient(115deg,#FF9AD5,#B9A6FF)">
+      <div style="border-radius: 19px; background: #15151B; padding: 14px; display: flex; flex-direction: column; gap: 10px">
+        <div style="display: flex; align-items: center; gap: 10px">
+          <span style="width: 32px; height: 32px; flex-shrink: 0; border-radius: 50%; background: #FF9AD5; color: #0B0B0F; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 18px" aria-hidden="true">!</span>
+          <div style="display: flex; flex-direction: column; flex-grow: 1">
+            <h2 id="heads" style="margin: 0; font-size: 15px; font-weight: 800">Cat sticker is almost gone.</h2>
+            <span style="font-size: 13px; color: #A9A7B8">3 left. Sold 12 in the last hour.</span>
+          </div>
+          <span style="font-size: 10px; font-weight: 900; letter-spacing: .12em; color: #A9A7B8">JUST NOW</span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+          <a href="Sell.dc.html" style="height: 44px; border-radius: 14px; background: #24242E; border: 1px solid rgba(255,255,255,.18); color: #F5F4FA; font-weight: 700; font-size: 14px; text-decoration: none; display: flex; align-items: center; justify-content: center">Go to my table</a>
+          <a href="Shop.dc.html" style="height: 44px; border-radius: 14px; background: #24242E; border: 1px solid rgba(255,255,255,.18); color: #F5F4FA; font-weight: 700; font-size: 14px; text-decoration: none; display: flex; align-items: center; justify-content: center">Restock note</a>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="fav" style="border-radius: 20px; background: #1C1C24; border: 1px solid rgba(255,255,255,.1); padding: 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><h2 id="fav" style="margin: 0; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 20px">Fan favorites</h2><a href="Insights.dc.html" style="font-size: 13px; font-weight: 700">See all</a></div>
+      <sc-for list="{{favs}}" as="f" hint-placeholder-count="3">
+        <div style="display: grid; grid-template-columns: 22px 104px minmax(0, 1fr) 42px; gap: 8px; align-items: center">
+          <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 16px; color: #B9A6FF">{{f.rank}}</span>
+          <span style="font-size: 14px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{f.name}}</span>
+          <div style="height: 10px; border-radius: 6px; background: rgba(255,255,255,.08); overflow: hidden"><div style="height: 10px; width: {{f.pct}}; border-radius: 6px; background: linear-gradient(90deg,#B9A6FF,#7FE7D9)"></div></div>
+          <span style="font-size: 13px; font-weight: 800; text-align: right">{{f.sold}}</span>
+        </div>
+      </sc-for>
+      <div style="height: 1px; background: rgba(255,255,255,.08)"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <span style="font-size: 13px; font-weight: 800; letter-spacing: .02em; color: #A9A7B8">Not so popular</span>
+        <span style="font-size: 13px"><strong>Mochi keychain</strong> <span style="color: #FF9AD5">-$18 after cost</span></span>
+      </div>
+    </section>
+
+    <section aria-labelledby="day" style="display: flex; flex-direction: column; gap: 10px">
+      <h2 id="day" style="margin: 0; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 20px">A good day, in four small steps</h2>
+      <ol style="list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <sc-for list="{{steps}}" as="s" hint-placeholder-count="4">
+          <li style="border-radius: 16px; padding: 12px; background: {{s.bg}}; color: {{s.fg}}; border: 1px solid {{s.border}}; display: flex; flex-direction: column; gap: 4px; min-height: 92px; box-sizing: border-box">
+            <span style="font-size: 10px; font-weight: 900; letter-spacing: .14em">{{s.tag}}</span>
+            <strong style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 17px">{{s.title}}</strong>
+            <span style="font-size: 12px; line-height: 1.35; opacity: .85">{{s.text}}</span>
+          </li>
+        </sc-for>
+      </ol>
+    </section>
+
+    <section aria-labelledby="exp" style="display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: baseline; justify-content: space-between">
+        <h2 id="exp" style="margin: 0; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 20px">Room to experiment</h2>
+        <span style="font-size: 11px; font-weight: 800; letter-spacing: .1em; color: #A9A7B8">{{deckCount}}</span>
+      </div>
+      <div style="position: relative; height: 236px">
+        <div aria-hidden="true" style="position: absolute; left: 20px; right: 20px; top: 14px; bottom: 0; border-radius: 24px; background: #24242E; border: 1px solid rgba(255,255,255,.1); transform: rotate(3deg)"></div>
+        <div style="position: absolute; inset: 0 0 8px 0; border-radius: 24px; padding: 1px; background: linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9); transform: rotate(-1.5deg)">
+          <div style="height: 100%; box-sizing: border-box; border-radius: 23px; background: #15151B; padding: 14px; display: flex; flex-direction: column; gap: 8px">
+            <div style="height: 82px; border-radius: 16px; background: linear-gradient(145deg,#D9CCFF,#FFD6EE 55%,#CFF6F0); display: flex; align-items: center; justify-content: center; color: #0B0B0F; font-size: 12px; font-weight: 800; letter-spacing: .1em">[TREND MOODBOARD]</div>
+            <div style="display: flex; gap: 6px">
+              <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 10px; font-weight: 900; letter-spacing: .1em; padding: 4px 8px; border-radius: 999px; background: #7FE7D9; color: #0B0B0F">+ RISING</span>
+              <span style="font-size: 10px; font-weight: 900; letter-spacing: .1em; padding: 4px 8px; border-radius: 999px; background: #24242E; border: 1px solid rgba(255,255,255,.22)">{{deck.niche}}</span>
+            </div>
+            <strong style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 21px; line-height: 1.05">{{deck.title}}</strong>
+            <span style="font-size: 13px; line-height: 1.35; color: #A9A7B8">{{deck.why}}</span>
+          </div>
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <button type="button" onClick="{{skip}}" style="height: 52px; border-radius: 16px; border: 1px solid rgba(255,255,255,.22); background: #24242E; color: #F5F4FA; font: 700 15px 'BDO Grotesk', sans-serif">Not for me</button>
+        <button type="button" onClick="{{keep}}" style="height: 52px; border-radius: 16px; border: 0; background: #B9A6FF; color: #0B0B0F; font: 800 15px 'BDO Grotesk', sans-serif">Try it</button>
+      </div>
+    </section>
+
+    <section aria-label="Your pocket pup" style="margin-top: 8px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+      <pre aria-hidden="true" style="margin: 0; font: 700 6.6px/1.05 ui-monospace, Menlo, monospace; color: #B9A6FF; white-space: pre">{{tagline}}</pre>
+      <div style="display: flex; align-items: flex-end; gap: 16px">
+        <pre aria-hidden="true" style="margin: 0; font: 700 12px/1.15 ui-monospace, Menlo, monospace; color: #FF9AD5; white-space: pre">{{wagPup}}</pre>
+        <span style="font-size: 12px; color: #A9A7B8; max-width: 150px; line-height: 1.4">Free mode keeps your data on this phone. We never sell your sales data.</span>
+      </div>
+      <div aria-hidden="true" style="position: relative; width: 358px; height: 66px; overflow: hidden; border-top: 1px dashed rgba(255,255,255,.14)">
+        <pre class="pp-walk" style="position: absolute; left: 0; bottom: 0; margin: 0; font: 700 12px/1.1 ui-monospace, Menlo, monospace; color: #7FE7D9; white-space: pre">{{walkPup}}</pre>
+      </div>
+    </section>
+  </main>
+
+  <button type="button" aria-label="Ask PUP" style="position: absolute; right: 16px; bottom: 104px; width: 60px; height: 60px; border-radius: 50%; border: 2px solid #D9CCFF; background: #1C1C24; box-shadow: 0 0 22px rgba(185,166,255,.45); display: flex; align-items: center; justify-content: center; padding: 0">
+    <svg width="42" height="36" viewBox="0 0 220 188" aria-hidden="true"><path d="M46 77C27 65 23 39 39 25c15-13 37 3 43 26 9-6 19-9 29-9 13 0 25 4 35 11 3-23 24-40 40-29 18 13 14 43-6 56 1 6 2 12 2 19 0 42-30 69-71 69-42 0-73-27-73-69 0-8 3-15 8-22Z" fill="#f8f6ff" stroke="#211a35" stroke-linejoin="round" stroke-width="8"></path><path d="M47 67c-12-10-13-26-6-31 8-6 22 8 27 25L47 67Zm126 0c11-10 13-26 6-31-8-6-22 8-27 25l21 6Z" fill="#ff84d6" stroke="#211a35" stroke-width="6"></path><ellipse cx="79" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><ellipse cx="143" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><path d="M97 117c3-7 23-7 27 0 3 6-4 12-13 12s-17-6-14-12Z" fill="#211a35"></path></svg>
+  </button>
+
+  <div style="position: relative"><dc-import name="TabBar" active="home" hint-size="390px,88px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1640}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { frame: 0, card: 0 };
+  }
+  componentDidMount() {
+    const still = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!still) this.timer = setInterval(() => this.setState({ frame: this.state.frame + 1 }), 140);
+  }
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+  renderVals() {
+    const f = this.state.frame;
+    const font = {
+      C: ['.###', '#...', '#...', '#...', '.###'], E: ['####', '#...', '###.', '#...', '####'],
+      K: ['#..#', '#.#.', '##..', '#.#.', '#..#'], O: ['.##.', '#..#', '#..#', '#..#', '.##.'],
+      P: ['###.', '#..#', '###.', '#...', '#...'], R: ['###.', '#..#', '###.', '#.#.', '#..#'],
+      T: ['####', '.##.', '.##.', '.##.', '.##.'], U: ['#..#', '#..#', '#..#', '#..#', '.##.'],
+      Y: ['#..#', '#..#', '.##.', '.##.', '.##.'], ' ': ['..', '..', '..', '..', '..']
+    };
+    const ramp = '#@%&8$';
+    const rows = [0, 1, 2, 3, 4].map((r) => [...'YOUR POCKET PUP'].map((c) => font[c][r]).join('.'));
+    const tagline = rows.map((row, y) => [...row].map((cell, x) => cell !== '#' ? ' ' :
+      ramp[Math.round((Math.sin(x * .45 + y * .7 - f * .5) + 1) / 2 * (ramp.length - 1))]).join('')).join('\n');
+
+    const eyes = f % 32 >= 30 ? '- -' : '0 0';
+    const tail = Math.floor(f / 3) % 2 ? '/' : '~';
+    const wagPup = ['  /^ ^\\', ' / ' + eyes + ' \\', ' V\\ Y /V', '  / - \\', ' /    |', 'V__) ||' + tail].join('\n');
+
+    const step = Math.floor(f / 2) % 2;
+    const walkPup = [
+      '        __',
+      (step ? ' ~' : ' /') + '\\___/ o\\_',
+      '   |      __>',
+      step ? '   /\\   /\\' : '   |\\   |\\'
+    ].join('\n');
+
+    const favs = [['Cat sticker', 40], ['Sticker pack', 9], ['Frog pin', 8]].map(([name, n], i) => ({
+      rank: '0' + (i + 1), name, sold: n + ' sold', pct: Math.round((n / 40) * 100) + '%'
+    }));
+
+    const steps = [
+      { tag: 'NIGHT BEFORE', title: 'Price and count', text: 'Prices set, 212 items stocked.', state: 'done' },
+      { tag: 'AT THE TABLE', title: 'Tap to sell', text: '41 sales so far. You are here.', state: 'now' },
+      { tag: 'BETWEEN RUSHES', title: 'Post a best seller', text: 'Cat sticker is ready to share.', state: 'next' },
+      { tag: 'AFTER THE CON', title: 'See what moved', text: 'Recap and restock ideas.', state: 'next' }
+    ].map((s) => Object.assign({}, s, {
+      bg: s.state === 'now' ? '#7FE7D9' : s.state === 'done' ? '#2E2B40' : '#1C1C24',
+      fg: s.state === 'now' ? '#0B0B0F' : '#F5F4FA',
+      border: s.state === 'now' ? '#7FE7D9' : '#2E2E38'
+    }));
+
+    const deckAll = [
+      { title: 'Frog keychain, mushroom hat', niche: 'COTTAGECORE', why: 'Pairs with your best-selling cat sticker. Pinterest searches up 3 weeks running.' },
+      { title: 'Strawberry milk mini set', niche: 'CUTE', why: 'Sweet colors make an easy add-on next to your sticker packs.' },
+      { title: 'Black cat companion print', niche: 'ANIME', why: 'A sibling for your top seller. Trending on AniList this season.' }
+    ];
+    const card = this.state.card % deckAll.length;
+    const next = () => this.setState({ card: this.state.card + 1 });
+    return {
+      tagline, wagPup, walkPup, favs, steps,
+      deck: deckAll[card],
+      deckCount: (card + 1) + ' OF ' + deckAll.length,
+      skip: next,
+      keep: next
+    };
+  }
+}
+</script>
+</body>
+</html>

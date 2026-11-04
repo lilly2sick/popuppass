@@ -1,0 +1,26 @@
+{
+  "v": 3,
+  "attachments": {},
+  "boards": {
+    "Main.dc.html": {"x": 0, "y": 0, "w": 1280, "h": 1720, "title": "UI system"},
+    "EventBar.dc.html": {"x": 1400, "y": 0, "w": 390, "h": 112, "title": "Base: event bar"},
+    "TabBar.dc.html": {"x": 1400, "y": 232, "w": 390, "h": 88, "title": "Base: tab bar"},
+    "Splash.dc.html": {"x": 0, "y": 2080, "w": 390, "h": 844, "title": "Loading: lanyard"},
+    "Pup.dc.html": {"x": 470, "y": 2080, "w": 390, "h": 844, "title": "PUP intro + FAQ", "is_interactive": true},
+    "Home.dc.html": {"x": 940, "y": 2080, "w": 390, "h": 1640, "title": "Home (full scroll)", "is_interactive": true},
+    "Shop.dc.html": {"x": 1410, "y": 2080, "w": 390, "h": 844, "title": "Shop"},
+    "Sell.dc.html": {"x": 1880, "y": 2080, "w": 390, "h": 844, "title": "Sell", "is_interactive": true},
+    "Create.dc.html": {"x": 2350, "y": 2080, "w": 390, "h": 844, "title": "Create", "is_interactive": true},
+    "Insights.dc.html": {"x": 2820, "y": 2080, "w": 390, "h": 844, "title": "Insights"},
+    "Events.dc.html": {"x": 3290, "y": 2080, "w": 390, "h": 844, "title": "Events sheet"}
+  },
+  "createdOnFiles": {"at": "2026-11-03T21:10:00Z", "v": 1},
+  "designSystems": [],
+  "launch": {"view": "canvas"},
+  "notes": {
+    "screens": {"kind": "title1", "maxW": 3680, "text": "App screens", "w": 240, "x": 0, "y": 1820}
+  },
+  "order": ["Main.dc.html", "EventBar.dc.html", "TabBar.dc.html", "Splash.dc.html", "Pup.dc.html", "Home.dc.html", "Shop.dc.html", "Sell.dc.html", "Create.dc.html", "Insights.dc.html", "Events.dc.html"],
+  "pages": [],
+  "title": "Pop-Up Pass App UI"
+}

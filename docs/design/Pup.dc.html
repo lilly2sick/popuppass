@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PUP intro and FAQ</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:"Ronzino";src:url("/_blob/ec60cd3296323f23985077218873722e") format("woff2");font-weight:700}
+@font-face{font-family:"BDO Grotesk";src:url("/_blob/8a391c23947730abf32d2056c2cefe7d") format("truetype");font-weight:300 900}
+body{margin:0}
+.pp-grid{position:absolute;inset:-48px;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:24px 24px;animation:pp-pan 18s linear infinite}
+.pp-iri{position:absolute;inset:-48px;background:linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9,#9C8CFF,#B9A6FF);background-size:300% 300%;-webkit-mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);-webkit-mask-size:24px 24px;mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);mask-size:24px 24px;opacity:.08;animation:pp-shift 9s ease-in-out infinite,pp-pan 18s linear infinite}
+.pp-pop{animation:pp-pop .5s cubic-bezier(.2,1.4,.4,1) both}
+@keyframes pp-pan{to{transform:translate(24px,24px)}}
+@keyframes pp-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes pp-pop{from{transform:translateY(40px) scale(.6);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){.pp-grid,.pp-iri,.pp-pop{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0B0B0F; color: #F5F4FA; font-family: 'BDO Grotesk', sans-serif">
+  <div class="pp-grid" aria-hidden="true"></div>
+  <div class="pp-iri" aria-hidden="true"></div>
+
+  <sc-if value="{{open}}" hint-placeholder-val="{{ true }}">
+    <div style="position: absolute; inset: 0; background: rgba(11,11,15,.72)"></div>
+    <section role="dialog" aria-modal="true" aria-labelledby="pupTitle" class="pp-pop" style="position: absolute; left: 16px; right: 16px; bottom: 112px; border-radius: 26px; padding: 1px; background: linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9)">
+      <div style="border-radius: 25px; background: #15151B; padding: 18px; display: flex; flex-direction: column; gap: 14px">
+        <div style="display: flex; gap: 12px; align-items: flex-end">
+          <div style="width: 92px; height: 92px; flex-shrink: 0; border-radius: 22px; background: linear-gradient(145deg,#d9ccff,#f9dff2 58%,#d4f3ff); display: flex; align-items: center; justify-content: center">
+            <svg width="78" height="66" viewBox="0 0 220 188" role="img" aria-label="PUP"><path d="M46 77C27 65 23 39 39 25c15-13 37 3 43 26 9-6 19-9 29-9 13 0 25 4 35 11 3-23 24-40 40-29 18 13 14 43-6 56 1 6 2 12 2 19 0 42-30 69-71 69-42 0-73-27-73-69 0-8 3-15 8-22Z" fill="#f8f6ff" stroke="#211a35" stroke-linejoin="round" stroke-width="8"></path><path d="M47 67c-12-10-13-26-6-31 8-6 22 8 27 25L47 67Zm126 0c11-10 13-26 6-31-8-6-22 8-27 25l21 6Z" fill="#ff84d6" stroke="#211a35" stroke-linejoin="round" stroke-width="6"></path><path d="M57 87c11-9 21-4 25 5m83-5c-11-9-21-4-25 5" fill="none" stroke="#211a35" stroke-linecap="round" stroke-width="7"></path><ellipse cx="79" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><ellipse cx="143" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><ellipse cx="60" cy="119" fill="#ff84d6" rx="13" ry="7"></ellipse><ellipse cx="162" cy="119" fill="#ff84d6" rx="13" ry="7"></ellipse><path d="M97 117c3-7 23-7 27 0 3 6-4 12-13 12s-17-6-14-12Z" fill="#211a35"></path><path d="M80 159c15-10 47-10 62 0-8 9-19 14-31 14-12 0-23-5-31-14Z" fill="#7bdcff" stroke="#211a35" stroke-linejoin="round" stroke-width="6"></path></svg>
+          </div>
+          <div style="position: relative; background: #F5F4FA; color: #0B0B0F; border-radius: 16px 16px 16px 4px; padding: 10px 12px; flex-grow: 1">
+            <h1 id="pupTitle" style="margin: 0 0 2px; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 20px">Hey, maker. I'm PUP.</h1>
+            <p style="margin: 0; font-size: 13px; line-height: 1.35">I live in the corner. Tap me any time you get stuck.</p>
+          </div>
+        </div>
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px">
+          <sc-for list="{{faqs}}" as="f" hint-placeholder-count="5">
+            <li style="border-radius: 14px; background: #1C1C24; border: 1px solid rgba(255,255,255,.08)">
+              <button type="button" aria-expanded="{{f.expanded}}" onClick="{{f.toggle}}" style="width: 100%; min-height: 48px; border: 0; background: #1C1C24; color: #F5F4FA; display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 14px; font: 700 14px 'BDO Grotesk', sans-serif; text-align: left">{{f.q}}<span aria-hidden="true" style="color: #B9A6FF; font-size: 18px">{{f.sign}}</span></button>
+              <sc-if value="{{f.isOpen}}" hint-placeholder-val="{{ false }}">
+                <p style="margin: 0; padding: 0 14px 12px; font-size: 13px; line-height: 1.45; color: #A9A7B8">{{f.a}}</p>
+              </sc-if>
+            </li>
+          </sc-for>
+        </ul>
+        <button type="button" onClick="{{close}}" style="height: 52px; border-radius: 16px; border: 0; background: #B9A6FF; color: #0B0B0F; font: 800 16px 'BDO Grotesk', sans-serif">Let's go</button>
+      </div>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{closed}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; left: 24px; right: 24px; top: 320px; text-align: center; display: flex; flex-direction: column; gap: 8px">
+      <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 24px">PUP moved to the corner</span>
+      <span style="font-size: 14px; color: #A9A7B8">Tap him bottom-right to reopen the FAQs.</span>
+    </div>
+  </sc-if>
+
+  <button type="button" onClick="{{reopen}}" aria-label="Ask PUP" style="position: absolute; right: 16px; bottom: 104px; width: 60px; height: 60px; border-radius: 50%; border: 2px solid #D9CCFF; background: #1C1C24; box-shadow: 0 0 22px rgba(185,166,255,.45); display: flex; align-items: center; justify-content: center; padding: 0">
+    <svg width="42" height="36" viewBox="0 0 220 188" aria-hidden="true"><path d="M46 77C27 65 23 39 39 25c15-13 37 3 43 26 9-6 19-9 29-9 13 0 25 4 35 11 3-23 24-40 40-29 18 13 14 43-6 56 1 6 2 12 2 19 0 42-30 69-71 69-42 0-73-27-73-69 0-8 3-15 8-22Z" fill="#f8f6ff" stroke="#211a35" stroke-linejoin="round" stroke-width="8"></path><path d="M47 67c-12-10-13-26-6-31 8-6 22 8 27 25L47 67Zm126 0c11-10 13-26 6-31-8-6-22 8-27 25l21 6Z" fill="#ff84d6" stroke="#211a35" stroke-width="6"></path><ellipse cx="79" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><ellipse cx="143" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><path d="M97 117c3-7 23-7 27 0 3 6-4 12-13 12s-17-6-14-12Z" fill="#211a35"></path></svg>
+  </button>
+
+  <div style="position: absolute; left: 0; bottom: 0">
+    <dc-import name="TabBar" active="home" hint-size="390px,88px"></dc-import>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { open: true, faq: 0 };
+  }
+  renderVals() {
+    const list = [
+      ['Does it work with no signal?', 'Yes. Everything saves on your phone first. Pro backs it up when you are back online.'],
+      ['I tapped +1 twice by accident', 'Tap -1 on the same item. It removes the last sale and puts the item back in stock.'],
+      ['How do I add an event?', 'Tap the pass at the top of any screen, then New event, Import .ics, or pick a con near you.'],
+      ['Where is my data?', 'On this phone only, unless you turn on Pro backup. We never sell your sales data.'],
+      ['What does Pro add?', 'Cloud backup, AI captions and recaps, card reader sync, PDF and Excel exports.']
+    ];
+    const faqs = list.map(([q, a], i) => ({
+      q, a,
+      isOpen: this.state.faq === i,
+      expanded: this.state.faq === i ? 'true' : 'false',
+      sign: this.state.faq === i ? '-' : '+',
+      toggle: () => this.setState({ faq: this.state.faq === i ? -1 : i })
+    }));
+    return {
+      faqs,
+      open: this.state.open,
+      closed: !this.state.open,
+      close: () => this.setState({ open: false }),
+      reopen: () => this.setState({ open: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

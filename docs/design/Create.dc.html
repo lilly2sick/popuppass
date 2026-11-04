@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Create</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:"Ronzino";src:url("/_blob/ec60cd3296323f23985077218873722e") format("woff2");font-weight:700}
+@font-face{font-family:"BDO Grotesk";src:url("/_blob/8a391c23947730abf32d2056c2cefe7d") format("truetype");font-weight:300 900}
+body{margin:0}
+input::placeholder{color:#A9A7B8}
+.pp-grid{position:absolute;inset:-48px;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:24px 24px;animation:pp-pan 18s linear infinite}
+.pp-iri{position:absolute;inset:-48px;background:linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9,#9C8CFF,#B9A6FF);background-size:300% 300%;-webkit-mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);-webkit-mask-size:24px 24px;mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);mask-size:24px 24px;opacity:.08;animation:pp-shift 9s ease-in-out infinite,pp-pan 18s linear infinite}
+@keyframes pp-pan{to{transform:translate(24px,24px)}}
+@keyframes pp-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@media (prefers-reduced-motion: reduce){.pp-grid,.pp-iri{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0B0B0F; color: #F5F4FA; font-family: 'BDO Grotesk', sans-serif; display: flex; flex-direction: column">
+  <div class="pp-grid" aria-hidden="true"></div>
+  <div class="pp-iri" aria-hidden="true"></div>
+  <div style="position: relative"><dc-import name="EventBar" hint-size="390px,112px"></dc-import></div>
+  <main style="position: relative; flex-grow: 1; padding: 4px 16px 10px; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
+    <h1 style="margin: 0; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 28px; line-height: 1.05">Make a little noise.</h1>
+    <label style="height: 36px; flex-shrink: 0; box-sizing: border-box; border-radius: 999px; border: 1px solid rgba(255,255,255,.16); background: #1C1C24; display: flex; align-items: center; gap: 8px; padding: 0 14px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A9A7B8" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4.5-4.5"></path></svg>
+      <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search items to post</span>
+      <input type="search" placeholder="Search items to post" style="border: 0; outline: 0; flex-grow: 1; min-width: 0; font: 500 14px 'BDO Grotesk', sans-serif; background: #1C1C24; color: #F5F4FA">
+    </label>
+
+    <div role="group" aria-label="Item" style="display: flex; gap: 6px; flex-shrink: 0">
+      <sc-for list="{{items}}" as="it" hint-placeholder-count="4">
+        <button type="button" aria-pressed="{{it.pressed}}" onClick="{{it.pick}}" style="height: 36px; padding: 0 12px; flex-shrink: 0; border-radius: 999px; border: {{it.border}}; background: {{it.bg}}; color: {{it.fg}}; font: 800 12px 'BDO Grotesk', sans-serif">{{it.name}}</button>
+      </sc-for>
+    </div>
+
+    <div style="flex-grow: 1; min-height: 0; border-radius: 20px; background: #15151B; border: 1px solid rgba(255,255,255,.1); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 12px">
+      <div role="img" aria-label="{{previewLabel}}" style="width: {{pw}}; height: {{ph}}; box-sizing: border-box; border-radius: 8px; padding: 10px; background: linear-gradient(160deg,#B9A6FF,#FF9AD5); color: #0B0B0F; display: flex; flex-direction: column; gap: 6px; overflow: hidden; box-shadow: 0 0 28px rgba(185,166,255,.35)">
+        <span style="font-size: 7px; font-weight: 900; letter-spacing: .14em">MOCHI PAWS STICKERS</span>
+        <div style="flex-grow: 1; border-radius: 8px; background: #F5F4FA; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 800; letter-spacing: .1em">[ITEM PHOTO]</div>
+        <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 16px; line-height: 1">{{headline}}</span>
+        <div style="display: flex; justify-content: space-between; font-size: 7px; font-weight: 900; letter-spacing: .08em"><span>{{priceLine}}</span><span>@MOCHIPAWS</span></div>
+      </div>
+      <div role="radiogroup" aria-label="Shape" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; padding: 3px; border-radius: 999px; background: #0B0B0F; width: 240px">
+        <sc-for list="{{shapes}}" as="sh" hint-placeholder-count="3">
+          <button type="button" role="radio" aria-checked="{{sh.checked}}" onClick="{{sh.pick}}" style="height: 32px; border-radius: 999px; border: 0; background: {{sh.bg}}; color: {{sh.fg}}; font: 800 12px 'BDO Grotesk', sans-serif">{{sh.label}}</button>
+        </sc-for>
+      </div>
+    </div>
+
+    <label style="flex-shrink: 0; border-radius: 16px; background: #1C1C24; border: 1px solid rgba(255,255,255,.1); padding: 10px 12px; display: flex; flex-direction: column; gap: 4px">
+      <span style="font-size: 10px; font-weight: 900; letter-spacing: .14em; color: #A9A7B8">CAPTION</span>
+      <textarea rows="2" style="resize: none; border: 0; outline: 0; padding: 0; background: #1C1C24; font: 400 14px/1.4 'BDO Grotesk', sans-serif; color: #F5F4FA">{{caption}}</textarea>
+    </label>
+
+    <button type="button" onClick="{{openShare}}" style="flex-shrink: 0; height: 56px; border-radius: 18px; border: 0; background: #B9A6FF; color: #0B0B0F; font: 800 17px 'BDO Grotesk', sans-serif; display: flex; align-items: center; justify-content: center; gap: 10px">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V3M7 8l5-5 5 5"></path><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"></path></svg>Share or save
+    </button>
+  </main>
+
+  <sc-if value="{{sheetOpen}}" hint-placeholder-val="{{ false }}">
+    <div style="position: absolute; inset: 0; background: rgba(11,11,15,.72)"></div>
+    <section role="dialog" aria-modal="true" aria-labelledby="shareTitle" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; border-radius: 28px 28px 0 0; background: #15151B; border-top: 1px solid rgba(255,255,255,.16); padding: 10px 16px 28px; display: flex; flex-direction: column; gap: 8px">
+      <div style="width: 44px; height: 5px; border-radius: 3px; background: rgba(255,255,255,.3); align-self: center" aria-hidden="true"></div>
+      <div style="display: flex; justify-content: space-between; align-items: center">
+        <h2 id="shareTitle" style="margin: 0; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 24px">Share {{shapeName}}</h2>
+        <button type="button" onClick="{{closeShare}}" aria-label="Close" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgba(255,255,255,.2); background: #1C1C24; color: #F5F4FA; font-size: 16px">x</button>
+      </div>
+      <sc-for list="{{targets}}" as="t" hint-placeholder-count="5">
+        <button type="button" onClick="{{t.go}}" style="min-height: 56px; border-radius: 16px; border: {{t.border}}; background: {{t.bg}}; color: {{t.fg}}; display: flex; align-items: center; gap: 12px; padding: 0 14px; text-align: left; font-family: 'BDO Grotesk', sans-serif">
+          <span style="width: 36px; height: 36px; flex-shrink: 0; border-radius: 10px; background: {{t.iconBg}}; color: #0B0B0F; display: flex; align-items: center; justify-content: center; font: 900 13px 'BDO Grotesk', sans-serif">{{t.mark}}</span>
+          <span style="flex-grow: 1; display: flex; flex-direction: column"><strong style="font-size: 15px">{{t.label}}</strong><span style="font-size: 12px; opacity: .75">{{t.sub}}</span></span>
+        </button>
+      </sc-for>
+    </section>
+  </sc-if>
+
+  <sc-if value="{{toast}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position: absolute; left: 24px; right: 24px; bottom: 104px; border-radius: 14px; background: #7FE7D9; color: #0B0B0F; padding: 12px 14px; font-size: 14px; font-weight: 800; text-align: center">{{toastText}}</div>
+  </sc-if>
+
+  <div style="position: relative"><dc-import name="TabBar" active="create" hint-size="390px,88px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { item: 0, shape: 0, sheetOpen: false, toast: '' };
+  }
+  renderVals() {
+    const s = this.state;
+    const set = (patch) => this.setState(Object.assign({}, s, patch));
+    const products = [['Cat sticker', 7], ['Frog pin', 12], ['Sticker pack', 20], ['Art print', 15]];
+    const items = products.map(([name], i) => ({
+      name,
+      pressed: s.item === i ? 'true' : 'false',
+      bg: s.item === i ? '#7FE7D9' : '#1C1C24',
+      fg: s.item === i ? '#0B0B0F' : '#F5F4FA',
+      border: s.item === i ? '0' : '1px solid rgba(255,255,255,.16)',
+      pick: () => set({ item: i })
+    }));
+    // Shape picks the layout; each destination exports at its own pixel size for that shape.
+    const shapeDefs = [
+      { label: 'Post', name: 'post', ratio: [4, 5], sizes: { png: [1080, 1350], ig: [1080, 1350], fb: [1080, 1350], li: [1080, 1350], shop: [2048, 2048] } },
+      { label: 'Story', name: 'story', ratio: [9, 16], sizes: { png: [1080, 1920], ig: [1080, 1920], fb: [1080, 1920], li: [1080, 1920], shop: [2048, 2048] } },
+      { label: 'Wide', name: 'wide post', ratio: [1200, 630], sizes: { png: [1200, 630], ig: [1080, 1080], fb: [1200, 630], li: [1200, 627], shop: [2048, 2048] } }
+    ];
+    const shape = shapeDefs[s.shape];
+    const shapes = shapeDefs.map((d, i) => ({
+      label: d.label,
+      checked: s.shape === i ? 'true' : 'false',
+      bg: s.shape === i ? '#B9A6FF' : '#0B0B0F',
+      fg: s.shape === i ? '#0B0B0F' : '#F5F4FA',
+      pick: () => set({ shape: i })
+    }));
+    const [rw, rh] = shape.ratio;
+    const scale = Math.min(300 / rw, 250 / rh);
+    const [name, price] = products[s.item];
+    const px = (k) => shape.sizes[k][0] + ' x ' + shape.sizes[k][1];
+    const done = (msg) => set({ sheetOpen: false, toast: msg });
+    const targets = [
+      { mark: 'PNG', label: 'Save as PNG', sub: px('png') + ' to Photos', primary: true, msg: 'Saved ' + px('png') + ' PNG to Photos' },
+      { mark: 'IG', label: 'Instagram', sub: px('ig') + (s.shape === 1 ? ', opens Stories' : ', opens a new post'), msg: 'Opening Instagram' },
+      { mark: 'FB', label: 'Facebook', sub: px('fb'), msg: 'Opening Facebook' },
+      { mark: 'IN', label: 'LinkedIn', sub: px('li'), msg: 'Opening LinkedIn' },
+      { mark: '...', label: 'More apps', sub: 'Messages, Shopify, Etsy and others', msg: 'Opening the share sheet' }
+    ].map((t) => Object.assign({}, t, {
+      bg: t.primary ? '#B9A6FF' : '#1C1C24',
+      fg: t.primary ? '#0B0B0F' : '#F5F4FA',
+      border: t.primary ? '0' : '1px solid rgba(255,255,255,.1)',
+      iconBg: t.primary ? '#F5F4FA' : '#D9CCFF',
+      go: () => done(t.msg)
+    }));
+    return {
+      items, shapes, targets,
+      pw: Math.round(rw * scale) + 'px',
+      ph: Math.round(rh * scale) + 'px',
+      headline: name + ' is back.',
+      priceLine: '$' + price + ' / BOOTH A-14',
+      caption: name + ' is back. $' + price + ' at Booth A-14 all weekend. Come say hi. #artistalley #animefest',
+      previewLabel: name + ' ' + shape.label + ' preview',
+      shapeName: shape.name,
+      sheetOpen: s.sheetOpen,
+      openShare: () => set({ sheetOpen: true, toast: '' }),
+      closeShare: () => set({ sheetOpen: false }),
+      toast: !!s.toast,
+      toastText: s.toast
+    };
+  }
+}
+</script>
+</body>
+</html>

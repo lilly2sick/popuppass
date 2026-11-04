@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Loading</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:"Ronzino";src:url("/_blob/ec60cd3296323f23985077218873722e") format("woff2");font-weight:700}
+@font-face{font-family:"BDO Grotesk";src:url("/_blob/8a391c23947730abf32d2056c2cefe7d") format("truetype");font-weight:300 900}
+body{margin:0}
+.pp-grid{position:absolute;inset:-48px;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:24px 24px;animation:pp-pan 18s linear infinite}
+.pp-iri{position:absolute;inset:-48px;background:linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9,#9C8CFF,#B9A6FF);background-size:300% 300%;-webkit-mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);-webkit-mask-size:24px 24px;mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);mask-size:24px 24px;opacity:.08;animation:pp-shift 9s ease-in-out infinite,pp-pan 18s linear infinite}
+.pp-glow{position:absolute;border-radius:50%;filter:blur(70px);opacity:.07;animation:pp-float 14s ease-in-out infinite alternate}
+.pp-swing{transform-origin:50% 0;animation:pp-swing 2.2s ease-in-out infinite}
+.pp-dot{animation:pp-blink 1.2s ease-in-out infinite}
+@keyframes pp-pan{to{transform:translate(24px,24px)}}
+@keyframes pp-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes pp-float{to{transform:translate(60px,120px) scale(1.2)}}
+@keyframes pp-swing{0%,100%{transform:rotate(-9deg)}50%{transform:rotate(9deg)}}
+@keyframes pp-blink{0%,100%{opacity:.25}50%{opacity:1}}
+@media (prefers-reduced-motion: reduce){.pp-grid,.pp-iri,.pp-glow,.pp-swing,.pp-dot{animation:none}}
+</style>
+</helmet>
+<div role="status" aria-label="Loading Pop-Up Pass" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0B0B0F; color: #F5F4FA; font-family: 'BDO Grotesk', sans-serif">
+  <div class="pp-grid" aria-hidden="true"></div>
+  <div class="pp-iri" aria-hidden="true"></div>
+  <div class="pp-glow" aria-hidden="true" style="width: 340px; height: 340px; left: -90px; top: 120px; background: #B9A6FF"></div>
+  <div class="pp-glow" aria-hidden="true" style="width: 280px; height: 280px; right: -60px; top: 480px; background: #FF9AD5"></div>
+
+  <div class="pp-swing" aria-hidden="true" style="position: absolute; left: 95px; top: 0; width: 200px; display: flex; flex-direction: column; align-items: center">
+    <div style="display: flex; gap: 46px">
+      <div style="width: 22px; height: 230px; background: repeating-linear-gradient(180deg,#B9A6FF 0 18px,#FF9AD5 18px 36px); transform: skewX(8deg); border-radius: 0 0 6px 6px"></div>
+      <div style="width: 22px; height: 230px; background: repeating-linear-gradient(180deg,#FF9AD5 0 18px,#B9A6FF 18px 36px); transform: skewX(-8deg); border-radius: 0 0 6px 6px"></div>
+    </div>
+    <div style="width: 30px; height: 26px; margin-top: -6px; border-radius: 8px 8px 12px 12px; border: 4px solid #D9CCFF; box-sizing: border-box"></div>
+    <div style="width: 14px; height: 18px; background: #A9A7B8; border-radius: 4px"></div>
+    <div style="width: 200px; height: 252px; box-sizing: border-box; margin-top: -2px; padding: 6px; border-radius: 20px; border: 1px solid rgba(255,255,255,.7); background: linear-gradient(145deg,rgba(255,255,255,.55),rgba(215,207,255,.3)); box-shadow: 0 30px 70px rgba(0,0,0,.55),0 0 60px rgba(185,166,255,.25)">
+      <div style="height: 100%; box-sizing: border-box; border-radius: 14px; padding: 10px; background: linear-gradient(155deg,#fffaff,#f0e9ff 48%,#e3f6ff); display: flex; flex-direction: column; gap: 6px; color: #211a35">
+        <div style="width: 40px; height: 8px; border-radius: 4px; background: #0B0B0F; align-self: center; opacity: .8"></div>
+        <div style="display: flex; justify-content: space-between; font-size: 7px; font-weight: 800; letter-spacing: 1px; color: #615575"><span>POP UP PASS</span><span>NO. 1</span></div>
+        <div style="flex-grow: 1; border-radius: 12px; background: linear-gradient(145deg,#d9ccff,#f9dff2 58%,#d4f3ff); display: flex; align-items: center; justify-content: center">
+          <svg width="112" height="96" viewBox="0 0 220 188" role="img" aria-label="PUP"><path d="M46 77C27 65 23 39 39 25c15-13 37 3 43 26 9-6 19-9 29-9 13 0 25 4 35 11 3-23 24-40 40-29 18 13 14 43-6 56 1 6 2 12 2 19 0 42-30 69-71 69-42 0-73-27-73-69 0-8 3-15 8-22Z" fill="#f8f6ff" stroke="#211a35" stroke-linejoin="round" stroke-width="8"></path><path d="M47 67c-12-10-13-26-6-31 8-6 22 8 27 25L47 67Zm126 0c11-10 13-26 6-31-8-6-22 8-27 25l21 6Z" fill="#ff84d6" stroke="#211a35" stroke-linejoin="round" stroke-width="6"></path><path d="M57 87c11-9 21-4 25 5m83-5c-11-9-21-4-25 5" fill="none" stroke="#211a35" stroke-linecap="round" stroke-width="7"></path><ellipse cx="79" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><ellipse cx="143" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><ellipse cx="60" cy="119" fill="#ff84d6" rx="13" ry="7"></ellipse><ellipse cx="162" cy="119" fill="#ff84d6" rx="13" ry="7"></ellipse><path d="M97 117c3-7 23-7 27 0 3 6-4 12-13 12s-17-6-14-12Z" fill="#211a35"></path><path d="M111 129v5m0 0c-8 9-18 4-18-2m18 2c8 9 18 4 18-2" fill="none" stroke="#211a35" stroke-linecap="round" stroke-width="5"></path><path d="M80 159c15-10 47-10 62 0-8 9-19 14-31 14-12 0-23-5-31-14Z" fill="#7bdcff" stroke="#211a35" stroke-linejoin="round" stroke-width="6"></path><circle cx="111" cy="161" r="8" fill="#c1b3ff" stroke="#211a35" stroke-width="4"></circle></svg>
+        </div>
+        <div style="text-align: center; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 26px; line-height: 1">PUP</div>
+        <div style="display: flex; justify-content: space-between; font-size: 7px; font-weight: 800; letter-spacing: 1px; color: #776d8a; border-top: 1px dashed rgba(84,69,117,.3); padding-top: 5px"><span>MAKER</span><span>ALL ACCESS</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: absolute; left: 0; right: 0; bottom: 120px; display: flex; flex-direction: column; align-items: center; gap: 10px">
+    <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 30px">Pop-Up Pass</span>
+    <span style="display: flex; align-items: center; gap: 6px; font-size: 14px; color: #A9A7B8">Setting up your table
+      <span class="pp-dot" style="width: 6px; height: 6px; border-radius: 50%; background: #B9A6FF"></span>
+      <span class="pp-dot" style="width: 6px; height: 6px; border-radius: 50%; background: #FF9AD5; animation-delay: .2s"></span>
+      <span class="pp-dot" style="width: 6px; height: 6px; border-radius: 50%; background: #7FE7D9; animation-delay: .4s"></span>
+    </span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

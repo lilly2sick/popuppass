@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Event bar</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:"Ronzino";src:url("/_blob/ec60cd3296323f23985077218873722e") format("woff2");font-weight:700}
+@font-face{font-family:"BDO Grotesk";src:url("/_blob/8a391c23947730abf32d2056c2cefe7d") format("truetype");font-weight:300 900}
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 390px; height: 112px; box-sizing: border-box; padding: 14px 16px 10px; font-family: 'BDO Grotesk', sans-serif; color: #F5F4FA; display: flex; gap: 8px">
+  <a href="Events.dc.html" aria-label="Open events: {{event}}" style="flex-grow: 1; min-width: 0; display: block; height: 88px; box-sizing: border-box; border-radius: 20px; padding: 1px; background: linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9); text-decoration: none; color: #F5F4FA">
+    <span style="height: 86px; box-sizing: border-box; border-radius: 19px; background: #15151B; padding: 10px 12px 10px 10px; display: flex; align-items: center; gap: 10px">
+      <span style="width: 30px; height: 66px; flex-shrink: 0; border-radius: 10px; background: linear-gradient(160deg,#D9CCFF,#FFD6EE 55%,#CFF6F0); display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 6px 0; box-sizing: border-box" aria-hidden="true">
+        <span style="width: 12px; height: 5px; border-radius: 3px; background: #0B0B0F"></span>
+        <span style="font-size: 8px; font-weight: 900; letter-spacing: .06em; color: #0B0B0F; writing-mode: vertical-rl; transform: rotate(180deg)">PASS</span>
+      </span>
+      <span style="display: flex; flex-direction: column; gap: 3px; min-width: 0; flex-grow: 1">
+        <span style="display: flex; align-items: center; gap: 6px; min-width: 0">
+          <span style="flex-shrink: 0; font-size: 10px; font-weight: 900; letter-spacing: .1em; padding: 3px 7px; border-radius: 999px; background: {{statusBg}}; color: #0B0B0F">{{status}}</span>
+          <span style="font-size: 10px; font-weight: 800; letter-spacing: .1em; color: #A9A7B8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{booth}}</span>
+        </span>
+        <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 19px; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{event}}</span>
+        <span style="display: flex; align-items: center; gap: 5px; font-size: 12px; color: #A9A7B8; white-space: nowrap">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7FE7D9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17.5 19a4.5 4.5 0 1 0-1.4-8.8A6 6 0 0 0 4.3 12.6 3.5 3.5 0 0 0 6.5 19z"></path></svg>{{sync}}
+        </span>
+      </span>
+      <span style="display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0">
+        <span style="font-size: 9px; font-weight: 800; letter-spacing: .12em; color: #A9A7B8">NET TODAY</span>
+        <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 24px; line-height: 1; color: {{netColor}}">{{net}}</span>
+      </span>
+    </span>
+  </a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"event":{"editor":"text","default":"Anime Fest 2026"},"status":{"editor":"text","default":"LIVE DAY 2"},"booth":{"editor":"text","default":"BOOTH A-14"},"net":{"editor":"text","default":"+$212"},"sync":{"editor":"enum","options":["Synced","Offline, saved on phone","Syncing 3"],"default":"Synced"},"down":{"editor":"boolean","default":false},"$preview":{"width":390,"height":112}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const down = this.props.down ?? false;
+    const status = this.props.status ?? 'LIVE DAY 2';
+    return {
+      event: this.props.event ?? 'Anime Fest 2026',
+      status,
+      booth: this.props.booth ?? 'BOOTH A-14',
+      net: this.props.net ?? '+$212',
+      sync: this.props.sync ?? 'Synced',
+      netColor: down ? '#FF9AD5' : '#7FE7D9',
+      statusBg: status.indexOf('LIVE') === 0 ? '#7FE7D9' : '#D9CCFF'
+    };
+  }
+}
+</script>
+</body>
+</html>

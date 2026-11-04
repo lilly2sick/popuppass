@@ -202,8 +202,12 @@ CSV re-imports through `CsvImportConnector`.
 
 ## 12. UI system
 
-Design canvas (source of truth for look and behavior):
-https://claude.ai/artifact/YYJdMPdVQHFCAeMmgM9vRF
+Design (source of truth for look and behavior): the artboards in
+[docs/design/](design/), one `.dc.html` file per screen (HTML + inline styles + a small
+logic class; read the markup for layout and colors, the script for behavior). `Main.dc.html`
+is the token sheet. Live canvas for humans: https://claude.ai/artifact/YYJdMPdVQHFCAeMmgM9vRF
+(private). If this section and an artboard disagree, the artboard wins for visuals and
+this spec wins for behavior.
 
 - **Look:** black ground (#0B0B0F) with a very dim light grid and a faint
   iridescent shimmer that drifts along the grid lines. Every box is opaque
@@ -281,10 +285,57 @@ Free mode: data stays on the phone, nothing sent to us. Pro: cloud backup in the
 RLS-isolated rows; sales data is never sold or shared. Location never leaves the device.
 Opt-in aggregate trend contribution only above a k-anonymity threshold.
 
-## 15. Build order
+## 15. Current state and build order
 
-1. Claude Design pass: tokens, components, PPScaffold, five tabs, Events sheet.
-2. Flutter skeleton with Drift schema, repositories, fake connectors, PPScaffold, haptics.
-3. Supabase migrations + RLS + pgTAP tests.
-4. Real connectors: ICS -> AnimeCons feed -> exports -> RevenueCat + auth -> sync -> AI proxy
-   -> Square -> trend pipeline sources.
+Done (branch `app-skeleton`): design, this spec, Flutter skeleton, Supabase schema + RLS +
+pgTAP tests, Edge Functions. **None of it has been compiled or run yet** (no Flutter or
+Supabase CLI on the authoring machine). Expect analyzer errors, wrong package versions and
+API drift; fixing those is step 1.
+
+1. Make it build: `flutter create` platform folders, `pub get`, upgrade pins, Drift codegen,
+   `flutter analyze` clean, `flutter test` green.
+2. Make every screen match its artboard in `docs/design/`, running fully on fakes.
+3. Supabase: `supabase start`, migrations apply, `supabase test db` green, Edge Functions
+   type-check and have unit tests with mocked HTTP.
+4. Real connectors behind config, in order: ICS -> AnimeCons feed -> exports -> RevenueCat +
+   auth -> sync -> AI proxy -> Square -> trend sources.
+5. Recommendation schedule and notifications (section 16).
+6. CI (section 18).
+
+## 16. Recommendation schedule
+
+The vendor chooses how often they get fresh post and restock ideas: **off, daily, weekly
+(default), every two weeks**, plus a time of day. Setting lives in Settings and on Home's
+"Room to experiment" header.
+
+- On schedule, the app builds a small batch on device: top trend cards from the cached feed
+  ranked for this shop, plus one "post your best seller" suggestion with a pre-filled Create
+  draft (item + shape + template caption). Pro adds the AI caption and restock ideas through
+  the job queue.
+- Delivered as a local notification (`flutter_local_notifications`); tapping opens Home with
+  the new cards on top. No server push needed; works offline from the cached feed.
+- The inspiration board is the swipe deck plus a "Saved ideas" list of right-swiped cards,
+  each showing its sources.
+
+## 17. Decisions and out of scope
+
+- Language: English only for v1, but all user-facing strings go through Flutter `intl`
+  ARB files so Japanese (already on the landing page) can be added without code changes.
+- "Embed" post format: out of scope for v1.
+- Collective / shared stock: dropped. Landing page (`codespace/`) still mentions it; do not
+  edit `codespace/` from this project.
+- Windows, Flutter web, social feed, multi-user booths: out of scope.
+- No emojis anywhere, including test fixtures, sample data and AI prompts.
+
+## 18. Definition of done (for an automated run)
+
+- `flutter analyze` with zero errors and zero warnings; `dart format` clean.
+- `flutter test` green, covering: pricing and break-even, analytics totals and per-product
+  rows, sale + undo (-1) keeps stock correct, CSV round trip, ICS round trip, each exporter
+  produces a non-empty file, post capture produces exactly the format's pixel width, sync
+  value mapping, connector dedupe on `(source, externalId)`, and a widget test per tab that
+  pumps on fakes without overflow at 390x844.
+- `supabase db reset` applies cleanly; `supabase test db` green; `deno check` and
+  `deno test` green for every function.
+- GitHub Actions workflow running all of the above on pull requests.
+- App runs with `USE_FAKES=true` and no keys; every screen matches its artboard.
