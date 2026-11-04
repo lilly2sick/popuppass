@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sell</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:"Ronzino";src:url("/_blob/ec60cd3296323f23985077218873722e") format("woff2");font-weight:700}
+@font-face{font-family:"BDO Grotesk";src:url("/_blob/8a391c23947730abf32d2056c2cefe7d") format("truetype");font-weight:300 900}
+body{margin:0}
+.pp-grid{position:absolute;inset:-48px;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:24px 24px;animation:pp-pan 18s linear infinite}
+.pp-iri{position:absolute;inset:-48px;background:linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9,#9C8CFF,#B9A6FF);background-size:300% 300%;-webkit-mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);-webkit-mask-size:24px 24px;mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);mask-size:24px 24px;opacity:.08;animation:pp-shift 9s ease-in-out infinite,pp-pan 18s linear infinite}
+.pp-card{animation:pp-in .28s ease-out both}
+@keyframes pp-pan{to{transform:translate(24px,24px)}}
+@keyframes pp-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes pp-in{from{transform:scale(.94);opacity:.4}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion: reduce){.pp-grid,.pp-iri,.pp-card{animation:none}}
+button:disabled{opacity:.4}
+input::placeholder{color:#A9A7B8}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0B0B0F; color: #F5F4FA; font-family: 'BDO Grotesk', sans-serif; display: flex; flex-direction: column">
+  <div class="pp-grid" aria-hidden="true"></div>
+  <div class="pp-iri" aria-hidden="true"></div>
+  <div style="position: relative"><dc-import name="EventBar" net="{{netLabel}}" hint-size="390px,112px"></dc-import></div>
+
+  <main onWheel="{{wheel}}" style="position: relative; flex-grow: 1; padding: 4px 16px 12px; display: flex; flex-direction: column; gap: 10px; overflow: hidden">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px">
+      <h1 style="margin: 0; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 26px; line-height: 1.05">Your table, in a tap.</h1>
+      <div style="display: flex; gap: 6px">
+        <button type="button" onClick="{{toggleMode}}" aria-label="{{modeAria}}" style="width: 48px; height: 48px; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); background: #1C1C24; color: #F5F4FA; display: flex; align-items: center; justify-content: center; padding: 0">
+          <sc-if value="{{isCard}}" hint-placeholder-val="{{ true }}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="4" y="4" width="6" height="6" rx="1.5"></rect><rect x="14" y="4" width="6" height="6" rx="1.5"></rect><rect x="4" y="14" width="6" height="6" rx="1.5"></rect><rect x="14" y="14" width="6" height="6" rx="1.5"></rect></svg>
+          </sc-if>
+          <sc-if value="{{isGrid}}" hint-placeholder-val="{{ false }}">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="3"></rect></svg>
+          </sc-if>
+        </button>
+        <button type="button" aria-label="Add item" style="width: 48px; height: 48px; border-radius: 14px; border: 0; background: #B9A6FF; color: #0B0B0F; display: flex; align-items: center; justify-content: center; padding: 0"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
+      </div>
+    </div>
+
+    <label style="height: 36px; flex-shrink: 0; box-sizing: border-box; border-radius: 999px; border: 1px solid rgba(255,255,255,.16); background: #1C1C24; display: flex; align-items: center; gap: 8px; padding: 0 14px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A9A7B8" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4.5-4.5"></path></svg>
+      <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search items</span>
+      <input type="search" value="{{query}}" onInput="{{onQuery}}" placeholder="Search your items" style="border: 0; outline: 0; flex-grow: 1; min-width: 0; font: 500 14px 'BDO Grotesk', sans-serif; background: #1C1C24; color: #F5F4FA">
+    </label>
+
+    <div role="group" aria-label="Paid with" style="display: flex; gap: 6px; flex-shrink: 0">
+      <sc-for list="{{methods}}" as="m" hint-placeholder-count="5">
+        <button type="button" aria-pressed="{{m.pressed}}" onClick="{{m.pick}}" style="height: 38px; padding: 0 12px; flex-shrink: 0; border-radius: 999px; border: {{m.border}}; background: {{m.bg}}; color: {{m.fg}}; font: 800 13px 'BDO Grotesk', sans-serif">{{m.label}}</button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+      <div style="border-radius: 22px; background: #1C1C24; border: 1px solid rgba(255,255,255,.1); padding: 24px; text-align: center; color: #A9A7B8">No items match "{{query}}".</div>
+    </sc-if>
+
+    <sc-if value="{{showCard}}" hint-placeholder-val="{{ true }}">
+      <section aria-roledescription="carousel" aria-label="Items" onPointerDown="{{down}}" onPointerUp="{{up}}" style="position: relative; flex-grow: 1; display: flex; flex-direction: column; gap: 10px; touch-action: pan-y">
+        <div class="pp-card" aria-live="polite" style="flex-grow: 1; border-radius: 26px; padding: 1px; background: linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9)">
+          <div style="height: 100%; box-sizing: border-box; border-radius: 25px; background: #15151B; padding: 12px; display: flex; flex-direction: column; gap: 10px">
+            <div style="flex-grow: 1; min-height: 150px; border-radius: 18px; background: {{cur.tint}}; position: relative; display: flex; align-items: center; justify-content: center; color: #0B0B0F; font-size: 12px; font-weight: 900; letter-spacing: .12em">
+              [ITEM PHOTO]
+              <span style="position: absolute; top: 10px; left: 10px; font-size: 11px; font-weight: 900; padding: 4px 9px; border-radius: 999px; background: #0B0B0F; color: #F5F4FA">{{position}}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 8px">
+              <strong style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 26px; line-height: 1.05">{{cur.name}}</strong>
+              <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 26px">{{cur.priceLabel}}</span>
+            </div>
+            <div style="display: flex; gap: 6px; flex-wrap: wrap">
+              <span style="display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px 0 3px; border-radius: 999px; background: {{cur.pillBg}}; color: {{cur.pillFg}}; border: {{cur.pillBorder}}; box-sizing: border-box; font-size: 11px; font-weight: 900">
+                <span style="width: 20px; height: 20px; border-radius: 50%; background: {{cur.dotBg}}; color: {{cur.dotFg}}; display: flex; align-items: center; justify-content: center; font-size: 12px">{{cur.icon}}</span>{{cur.stockLabel}}
+              </span>
+              <span style="display: inline-flex; align-items: center; gap: 5px; height: 26px; padding: 0 10px 0 3px; border-radius: 999px; background: #7FE7D9; color: #0B0B0F; font-size: 11px; font-weight: 900">
+                <span style="width: 20px; height: 20px; border-radius: 50%; background: #0B0B0F; color: #7FE7D9; display: flex; align-items: center; justify-content: center; font-size: 13px">+</span>{{cur.margin}}
+              </span>
+              <span style="display: inline-flex; align-items: center; height: 26px; padding: 0 10px; border-radius: 999px; background: #24242E; font-size: 11px; font-weight: 900">{{cur.sold}} SOLD</span>
+            </div>
+          </div>
+        </div>
+        <button type="button" onClick="{{prev}}" aria-label="Previous item" style="position: absolute; left: -8px; top: 90px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.2); background: #24242E; color: #F5F4FA; font-size: 18px; padding: 0">&lt;</button>
+        <button type="button" onClick="{{next}}" aria-label="Next item" style="position: absolute; right: -8px; top: 90px; width: 40px; height: 40px; border-radius: 50%; border: 1px solid rgba(255,255,255,.2); background: #24242E; color: #F5F4FA; font-size: 18px; padding: 0">&gt;</button>
+        <div aria-hidden="true" style="display: flex; justify-content: center; gap: 6px">
+          <sc-for list="{{dots}}" as="d" hint-placeholder-count="6">
+            <span style="width: {{d.w}}; height: 6px; border-radius: 3px; background: {{d.bg}}"></span>
+          </sc-for>
+        </div>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 8px">
+          <button type="button" onClick="{{unsell}}" disabled="{{noUndo}}" aria-label="{{ariaMinus}}" style="height: 68px; border-radius: 18px; border: 1px solid rgba(255,255,255,.22); background: #24242E; color: #F5F4FA; font: 700 24px 'Ronzino', sans-serif">-1</button>
+          <button type="button" onClick="{{sell}}" disabled="{{cur.out}}" aria-label="{{ariaPlus}}" style="height: 68px; border-radius: 18px; border: 0; background: {{cur.btnBg}}; color: #0B0B0F; font: 700 24px 'Ronzino', sans-serif">{{cur.btnLabel}}</button>
+        </div>
+      </section>
+    </sc-if>
+
+    <sc-if value="{{showGrid}}" hint-placeholder-val="{{ false }}">
+      <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; align-content: start">
+        <sc-for list="{{tiles}}" as="t" hint-placeholder-count="6">
+          <button type="button" onClick="{{t.open}}" aria-label="{{t.aria}}" style="border-radius: 16px; border: {{t.border}}; background: #1C1C24; color: #F5F4FA; padding: 6px; display: flex; flex-direction: column; gap: 5px; text-align: left; font-family: 'BDO Grotesk', sans-serif">
+            <span style="height: 78px; border-radius: 11px; background: {{t.tint}}; position: relative; display: block">
+              <span style="position: absolute; top: 5px; right: 5px; min-width: 22px; height: 22px; box-sizing: border-box; padding: 0 6px; border-radius: 11px; background: {{t.countBg}}; color: {{t.countFg}}; font-size: 11px; font-weight: 900; display: flex; align-items: center; justify-content: center">{{t.left}}</span>
+            </span>
+            <strong style="font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{t.name}}</strong>
+            <span style="font-size: 11px; color: #A9A7B8">{{t.priceLabel}} / {{t.sold}} sold</span>
+          </button>
+        </sc-for>
+      </div>
+      <p style="margin: 0; font-size: 12px; color: #A9A7B8; text-align: center">Tap an item to open it. Pinch in to go back.</p>
+    </sc-if>
+
+    <div style="flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; padding: 0 4px">
+      <span style="font-size: 11px; font-weight: 900; letter-spacing: .1em; color: #A9A7B8">{{lastLine}}</span>
+      <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 18px">{{grossLabel}} gross</span>
+    </div>
+  </main>
+  <div style="position: relative"><dc-import name="TabBar" active="sell" hint-size="390px,88px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      method: 'Cash', gross: 298, net: 212, last: '', idx: 0, mode: 'card', searchOpen: false, query: '',
+      stock: { cat: 3, frog: 18, mochi: 21, pack: 2, print: 9, charm: 0 },
+      sold: { cat: 37, frog: 8, mochi: 6, pack: 9, print: 5, charm: 12 },
+      session: { cat: 0, frog: 0, mochi: 0, pack: 0, print: 0, charm: 0 }
+    };
+    this.downX = null;
+  }
+  renderVals() {
+    const s = this.state;
+    const all = [
+      { id: 'cat', name: 'Cat sticker', price: 7, cost: 0.9, tint: 'linear-gradient(145deg,#D9CCFF,#FFD6EE)' },
+      { id: 'frog', name: 'Frog pin', price: 12, cost: 3.4, tint: 'linear-gradient(145deg,#CFF6F0,#D9CCFF)' },
+      { id: 'mochi', name: 'Mochi keychain', price: 10, cost: 6.8, tint: 'linear-gradient(145deg,#FFD6EE,#CFF6F0)' },
+      { id: 'pack', name: 'Sticker pack', price: 20, cost: 4.5, tint: 'linear-gradient(145deg,#D9CCFF,#CFF6F0)' },
+      { id: 'print', name: 'Art print A5', price: 15, cost: 2.1, tint: 'linear-gradient(145deg,#CFF6F0,#FFD6EE)' },
+      { id: 'charm', name: 'Acrylic charm', price: 9, cost: 2.6, tint: 'linear-gradient(145deg,#FFD6EE,#D9CCFF)' }
+    ];
+    const q = s.query.trim().toLowerCase();
+    const items = q ? all.filter((it) => it.name.toLowerCase().indexOf(q) >= 0) : all;
+    const set = (patch) => this.setState(Object.assign({}, s, patch));
+    const bump = (obj, id, d) => Object.assign({}, obj, { [id]: obj[id] + d });
+    const n = items.length;
+    const idx = n ? Math.min(s.idx, n - 1) : 0;
+    const view = (it, i) => {
+      const left = s.stock[it.id];
+      const out = left <= 0;
+      const low = !out && left <= 3;
+      return {
+        name: it.name, tint: it.tint, sold: s.sold[it.id], left, out,
+        priceLabel: '$' + it.price,
+        margin: Math.round(((it.price - it.cost) / it.price) * 100) + '% MARGIN',
+        icon: out ? 'x' : low ? '!' : '#',
+        stockLabel: out ? 'SOLD OUT' : low ? left + ' LEFT' : left + ' IN STOCK',
+        pillBg: low ? '#FF9AD5' : '#24242E',
+        pillFg: low ? '#0B0B0F' : '#F5F4FA',
+        pillBorder: low ? '0' : '1px solid rgba(255,255,255,.22)',
+        dotBg: low ? '#0B0B0F' : '#34343F',
+        dotFg: low ? '#FF9AD5' : '#F5F4FA',
+        countBg: low ? '#FF9AD5' : '#0B0B0F',
+        countFg: low ? '#0B0B0F' : '#F5F4FA',
+        border: i === idx ? '2px solid #B9A6FF' : '1px solid rgba(255,255,255,.1)',
+        btnBg: out ? '#24242E' : '#B9A6FF',
+        btnLabel: out ? 'Sold out' : '+1 sold',
+        aria: 'Open ' + it.name + ', ' + left + ' left, ' + s.sold[it.id] + ' sold',
+        open: () => set({ idx: i, mode: 'card' })
+      };
+    };
+    const tiles = items.map(view);
+    const it = items[idx];
+    const cur = n ? tiles[idx] : {};
+    const go = (d) => { if (n) set({ idx: (idx + d + n) % n }); };
+    const sell = () => {
+      if (!it || cur.out) return;
+      set({ stock: bump(s.stock, it.id, -1), sold: bump(s.sold, it.id, 1), session: bump(s.session, it.id, 1), gross: s.gross + it.price, net: s.net + it.price - it.cost, last: '+1 ' + it.name.toUpperCase() + ', ' + s.method.toUpperCase() });
+    };
+    const unsell = () => {
+      if (!it || s.session[it.id] <= 0) return;
+      set({ stock: bump(s.stock, it.id, 1), sold: bump(s.sold, it.id, -1), session: bump(s.session, it.id, -1), gross: s.gross - it.price, net: s.net - it.price + it.cost, last: 'TOOK BACK ONE ' + it.name.toUpperCase() });
+    };
+    const methods = ['Cash', 'Card', 'Zelle', 'Venmo', 'Other'].map((label) => ({
+      label,
+      pressed: s.method === label ? 'true' : 'false',
+      bg: s.method === label ? '#7FE7D9' : '#1C1C24',
+      fg: s.method === label ? '#0B0B0F' : '#F5F4FA',
+      border: s.method === label ? '0' : '1px solid rgba(255,255,255,.18)',
+      pick: () => set({ method: label })
+    }));
+    return {
+      methods, tiles, cur,
+      isCard: s.mode === 'card', isGrid: s.mode === 'grid',
+      showCard: s.mode === 'card' && n > 0, showGrid: s.mode === 'grid' && n > 0, empty: n === 0,
+      modeAria: s.mode === 'card' ? 'Zoom out to grid' : 'Back to single item',
+      toggleMode: () => set({ mode: s.mode === 'card' ? 'grid' : 'card' }),
+      wheel: (e) => { if (e.ctrlKey) set({ mode: e.deltaY > 0 ? 'grid' : 'card' }); },
+      query: s.query,
+      onQuery: (e) => set({ query: e.target.value, idx: 0 }),
+      position: (idx + 1) + ' / ' + n,
+      dots: items.map((_, i) => ({ w: i === idx ? '18px' : '6px', bg: i === idx ? '#B9A6FF' : '#34343F' })),
+      prev: () => go(-1), next: () => go(1),
+      down: (e) => { this.downX = e.clientX; },
+      up: (e) => { if (this.downX == null) return; const dx = e.clientX - this.downX; this.downX = null; if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1); },
+      sell, unsell,
+      noUndo: !it || s.session[it.id] <= 0,
+      ariaPlus: it ? 'Sell one ' + it.name : 'Sell',
+      ariaMinus: it ? 'Take back one ' + it.name + ' sale' : 'Take back',
+      grossLabel: '$' + s.gross,
+      netLabel: '+$' + Math.round(s.net),
+      lastLine: s.last || 'PAID WITH ' + s.method.toUpperCase()
+    };
+  }
+}
+</script>
+</body>
+</html>

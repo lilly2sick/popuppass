@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pop-Up Pass UI system</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:"Ronzino";src:url("/_blob/5819bb62ae426096231fb65a85ba24b6") format("woff2");font-weight:400}
+@font-face{font-family:"Ronzino";src:url("/_blob/efa3cba226188f59e13ae7fe6e45834a") format("woff2");font-weight:500}
+@font-face{font-family:"Ronzino";src:url("/_blob/ec60cd3296323f23985077218873722e") format("woff2");font-weight:700}
+@font-face{font-family:"BDO Grotesk";src:url("/_blob/8a391c23947730abf32d2056c2cefe7d") format("truetype");font-weight:300 900}
+body{margin:0}
+a{color:#B9A6FF}a:hover{color:#FFFFFF}
+.pp-grid{position:absolute;inset:-48px;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:24px 24px;animation:pp-pan 18s linear infinite}
+.pp-iri{position:absolute;inset:-48px;background:linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9,#9C8CFF,#B9A6FF);background-size:300% 300%;-webkit-mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);-webkit-mask-size:24px 24px;mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);mask-size:24px 24px;opacity:.08;animation:pp-shift 9s ease-in-out infinite,pp-pan 18s linear infinite}
+.pp-glow{position:absolute;border-radius:50%;filter:blur(70px);opacity:.07;animation:pp-float 14s ease-in-out infinite alternate}
+@keyframes pp-pan{to{transform:translate(24px,24px)}}
+@keyframes pp-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@keyframes pp-float{to{transform:translate(80px,140px) scale(1.25)}}
+@media (prefers-reduced-motion: reduce){.pp-grid,.pp-iri,.pp-glow{animation:none}}
+</style>
+</helmet>
+<div style="width: 1280px; height: 1720px; position: relative; overflow: hidden; background: #0B0B0F; color: #F5F4FA; font-family: 'BDO Grotesk', sans-serif">
+  <div class="pp-grid" aria-hidden="true"></div>
+  <div class="pp-iri" aria-hidden="true"></div>
+  <div class="pp-glow" aria-hidden="true" style="width: 520px; height: 520px; left: -120px; top: -160px; background: #B9A6FF"></div>
+  <div class="pp-glow" aria-hidden="true" style="width: 420px; height: 420px; right: -80px; top: 600px; background: #7FE7D9"></div>
+
+  <div style="position: relative; box-sizing: border-box; height: 100%; padding: 64px; display: flex; flex-direction: column; gap: 44px">
+    <header style="display: flex; align-items: flex-end; justify-content: space-between; gap: 32px">
+      <div style="display: flex; flex-direction: column; gap: 12px">
+        <span style="font-size: 13px; font-weight: 800; letter-spacing: .16em; color: #B9A6FF">POP UP PASS / UI SYSTEM 0.2</span>
+        <h1 style="margin: 0; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 72px; line-height: .95; letter-spacing: -.01em">Your table.<br>Your big break.</h1>
+        <p style="margin: 0; font-size: 18px; color: #A9A7B8; max-width: 640px">Black ground, light grid with an iridescent shimmer that drifts behind everything. Pastel violet, pink and teal are reserved for things you tap and toggle, so they pop in a loud, dim hall.</p>
+      </div>
+      <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end; max-width: 380px">
+        <span style="font-size: 12px; font-weight: 800; letter-spacing: .08em; padding: 8px 12px; background: #1C1C24; border: 1px solid rgba(255,255,255,.18); border-radius: 999px">NO EMOJI, ICONS ONLY</span>
+        <span style="font-size: 12px; font-weight: 800; letter-spacing: .08em; padding: 8px 12px; background: #1C1C24; border: 1px solid rgba(255,255,255,.18); border-radius: 999px">48PX TAPS, 56 ON SELL</span>
+        <span style="font-size: 12px; font-weight: 800; letter-spacing: .08em; padding: 8px 12px; background: #1C1C24; border: 1px solid rgba(255,255,255,.18); border-radius: 999px">REDUCED MOTION RESPECTED</span>
+      </div>
+    </header>
+
+    <section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .16em; color: #A9A7B8">01 / COLOR</h2>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="height: 64px; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); background: #0B0B0F"></div><strong style="font-size: 14px">Ground</strong><span style="font-size: 12px; color: #A9A7B8">#0B0B0F + grid</span></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="height: 64px; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); background: #1C1C24"></div><strong style="font-size: 14px">Card</strong><span style="font-size: 12px; color: #A9A7B8">#1C1C24, raised #24242E</span></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="height: 64px; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); background: #F5F4FA"></div><strong style="font-size: 14px">Text</strong><span style="font-size: 12px; color: #A9A7B8">#F5F4FA / muted #A9A7B8</span></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="height: 64px; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); background: linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9)"></div><strong style="font-size: 14px">Iridescent</strong><span style="font-size: 12px; color: #A9A7B8">grid shimmer, live edges</span></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="height: 64px; border-radius: 14px; background: #B9A6FF"></div><strong style="font-size: 14px">Violet</strong><span style="font-size: 12px; color: #A9A7B8">#B9A6FF primary buttons</span></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="height: 64px; border-radius: 14px; background: #7FE7D9"></div><strong style="font-size: 14px">Teal</strong><span style="font-size: 12px; color: #A9A7B8">#7FE7D9 on toggles, profit up</span></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="height: 64px; border-radius: 14px; background: #FF9AD5"></div><strong style="font-size: 14px">Pink</strong><span style="font-size: 12px; color: #A9A7B8">#FF9AD5 Sell, low stock, down</span></div>
+          <div style="display: flex; flex-direction: column; gap: 6px"><div style="height: 64px; border-radius: 14px; background: #D9CCFF"></div><strong style="font-size: 14px">Lilac</strong><span style="font-size: 12px; color: #A9A7B8">#D9CCFF badge, PUP</span></div>
+        </div>
+        <p style="margin: 0; font-size: 14px; color: #A9A7B8">Pastel fills always carry dark #0B0B0F text (12:1 or better). Up and down also carry a sign and an icon, never color alone.</p>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .16em; color: #A9A7B8">02 / TYPE</h2>
+        <div style="background: #1C1C24; border: 1px solid rgba(255,255,255,.1); border-radius: 22px; padding: 24px; display: flex; flex-direction: column; gap: 14px">
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px"><span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 56px; line-height: 1">+$412</span><span style="font-size: 12px; color: #A9A7B8">NUMBER 56 / RONZINO BOLD</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px"><span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 32px; line-height: 1.05">Your table, in a tap.</span><span style="font-size: 12px; color: #A9A7B8">TITLE 32 / RONZINO</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px"><span style="font-family: 'Ronzino', sans-serif; font-weight: 500; font-size: 20px">Cat sticker, holo</span><span style="font-size: 12px; color: #A9A7B8">HEADING 20 / RONZINO MEDIUM</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px"><span style="font-size: 16px">Tap to track each sale while you meet your people.</span><span style="font-size: 12px; color: #A9A7B8">BODY 16 / BDO GROTESK</span></div>
+          <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 16px"><span style="font-size: 12px; font-weight: 800; letter-spacing: .14em">BOOTH A-14 / DAY 2</span><span style="font-size: 12px; color: #A9A7B8">LABEL 12 / BDO 800 TRACKED</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 14px">
+      <h2 style="margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .16em; color: #A9A7B8">03 / COMPONENTS</h2>
+      <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; align-items: start">
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <span style="font-size: 12px; color: #A9A7B8">BUTTONS AND TOGGLES</span>
+          <button type="button" style="height: 56px; border-radius: 16px; border: 0; background: #B9A6FF; color: #0B0B0F; font: 800 17px 'BDO Grotesk', sans-serif">Start free</button>
+          <button type="button" style="height: 48px; border-radius: 16px; border: 1px solid rgba(255,255,255,.22); background: #24242E; color: #F5F4FA; font: 700 16px 'BDO Grotesk', sans-serif">Add item</button>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <button type="button" aria-pressed="true" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 0; background: #7FE7D9; color: #0B0B0F; font: 800 14px 'BDO Grotesk', sans-serif">Cash</button>
+            <button type="button" aria-pressed="false" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.22); background: #1C1C24; color: #F5F4FA; font: 700 14px 'BDO Grotesk', sans-serif">Card</button>
+            <button type="button" aria-pressed="false" style="height: 40px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.22); background: #1C1C24; color: #F5F4FA; font: 700 14px 'BDO Grotesk', sans-serif">Zelle</button>
+          </div>
+          <span style="font-size: 12px; color: #A9A7B8">STATUS PILLS</span>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap">
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px 0 4px; border-radius: 999px; background: #FF9AD5; color: #0B0B0F; font-size: 12px; font-weight: 800"><span style="width: 20px; height: 20px; border-radius: 50%; background: #0B0B0F; color: #FF9AD5; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 900">!</span>3 LEFT</span>
+            <span style="display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px 0 4px; border-radius: 999px; background: #7FE7D9; color: #0B0B0F; font-size: 12px; font-weight: 800"><span style="width: 20px; height: 20px; border-radius: 50%; background: #0B0B0F; color: #7FE7D9; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900">+</span>87% MARGIN</span>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <span style="font-size: 12px; color: #A9A7B8">STAT TILES (FILL THE BOX)</span>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+            <div style="height: 76px; box-sizing: border-box; border-radius: 16px; background: #1C1C24; border: 1px solid rgba(255,255,255,.1); padding: 10px; display: flex; flex-direction: column; justify-content: space-between"><span style="font-size: 10px; font-weight: 800; letter-spacing: .12em; color: #A9A7B8">GROSS</span><span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 28px; line-height: .9">$298</span></div>
+            <div style="height: 76px; box-sizing: border-box; border-radius: 16px; background: #1C1C24; border: 1px solid rgba(255,255,255,.1); padding: 10px; display: flex; flex-direction: column; justify-content: space-between"><span style="font-size: 10px; font-weight: 800; letter-spacing: .12em; color: #A9A7B8">SOLD</span><span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 28px; line-height: .9">41</span></div>
+            <div style="height: 76px; box-sizing: border-box; border-radius: 16px; background: #FF9AD5; color: #0B0B0F; padding: 10px; display: flex; flex-direction: column; justify-content: space-between"><span style="font-size: 10px; font-weight: 800; letter-spacing: .12em">! LOW</span><span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 28px; line-height: .9">2</span></div>
+          </div>
+          <span style="font-size: 12px; color: #A9A7B8">MONEY DELTA</span>
+          <div style="border-radius: 22px; padding: 1px; background: linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9)">
+            <div style="border-radius: 21px; background: #15151B; padding: 16px; display: flex; align-items: center; gap: 12px">
+              <div style="width: 44px; height: 44px; border-radius: 50%; background: #7FE7D9; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0B0B0F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg></div>
+              <div style="display: flex; flex-direction: column"><span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 34px; line-height: 1">+$212</span><span style="font-size: 13px; color: #A9A7B8">net today</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <span style="font-size: 12px; color: #A9A7B8">SELL TILE WITH -1 / +1</span>
+          <div style="background: #1C1C24; border: 1px solid rgba(255,255,255,.1); border-radius: 20px; padding: 10px; display: flex; flex-direction: column; gap: 8px">
+            <div style="display: flex; gap: 10px; align-items: center">
+              <div style="width: 48px; height: 48px; flex-shrink: 0; border-radius: 12px; background: linear-gradient(145deg,#D9CCFF,#FFD6EE 58%,#CFF6F0)"></div>
+              <div style="display: flex; flex-direction: column; min-width: 0"><strong style="font-size: 15px">Cat sticker</strong><span style="font-size: 13px; color: #A9A7B8">$7 / sold 37</span></div>
+            </div>
+            <span style="align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px 0 3px; border-radius: 999px; background: #FF9AD5; color: #0B0B0F; font-size: 12px; font-weight: 800"><span style="width: 20px; height: 20px; border-radius: 50%; background: #0B0B0F; color: #FF9AD5; display: flex; align-items: center; justify-content: center; font-weight: 900">!</span>3 LEFT</span>
+            <div style="display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 8px">
+              <button type="button" aria-label="Remove one sale" style="height: 56px; border-radius: 14px; border: 1px solid rgba(255,255,255,.22); background: #24242E; color: #F5F4FA; font: 700 18px 'Ronzino', sans-serif">-1</button>
+              <button type="button" style="height: 56px; border-radius: 14px; border: 0; background: #B9A6FF; color: #0B0B0F; font: 700 20px 'Ronzino', sans-serif">+1 sold</button>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px">
+          <span style="font-size: 12px; color: #A9A7B8">PUP CORNER + ASCII PUPS</span>
+          <div style="display: flex; align-items: center; gap: 12px">
+            <button type="button" aria-label="Ask PUP" style="width: 60px; height: 60px; border-radius: 50%; border: 2px solid #D9CCFF; background: #1C1C24; display: flex; align-items: center; justify-content: center; padding: 0">
+              <svg width="42" height="36" viewBox="0 0 220 188" aria-hidden="true"><path d="M46 77C27 65 23 39 39 25c15-13 37 3 43 26 9-6 19-9 29-9 13 0 25 4 35 11 3-23 24-40 40-29 18 13 14 43-6 56 1 6 2 12 2 19 0 42-30 69-71 69-42 0-73-27-73-69 0-8 3-15 8-22Z" fill="#f8f6ff" stroke="#211a35" stroke-linejoin="round" stroke-width="8"></path><path d="M47 67c-12-10-13-26-6-31 8-6 22 8 27 25L47 67Zm126 0c11-10 13-26 6-31-8-6-22 8-27 25l21 6Z" fill="#ff84d6" stroke="#211a35" stroke-width="6"></path><ellipse cx="79" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><ellipse cx="143" cy="105" fill="#211a35" rx="6" ry="8"></ellipse><path d="M97 117c3-7 23-7 27 0 3 6-4 12-13 12s-17-6-14-12Z" fill="#211a35"></path></svg>
+            </button>
+            <span style="font-size: 14px; color: #A9A7B8">Sits bottom-right above the tabs. Tap for FAQs.</span>
+          </div>
+          <pre style="margin: 0; font: 700 13px/1.15 ui-monospace, Menlo, monospace; color: #FF9AD5">  /^ ^\
+ / 0 0 \
+ V\ Y /V
+  / - \
+ /    |
+V__) ||~</pre>
+          <span style="font-size: 13px; color: #A9A7B8">Bottom of Home: one pup wags, one walks across. Pauses offscreen and with reduced motion.</span>
+        </div>
+      </div>
+    </section>
+
+    <section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px">
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .16em; color: #A9A7B8">04 / BASE TEMPLATE</h2>
+        <ol style="margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 10px; font-size: 15px; line-height: 1.45">
+          <li><strong>Background, every screen.</strong> Black ground, light grid, iridescent shimmer on the grid lines, two slow color glows.</li>
+          <li><strong>Event bar.</strong> A mini lanyard badge: event, Live / Day N, booth, today's net, Offline / Synced. Tap opens Events.</li>
+          <li><strong>Page header.</strong> Title left, one primary action right, same spot on every tab.</li>
+          <li><strong>Content.</strong> Shared cards only. Tiles fill their box; no empty squares.</li>
+          <li><strong>Tab bar + PUP.</strong> Home, Shop, Sell, Create, Insights. PUP floats bottom-right for FAQs.</li>
+        </ol>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 14px">
+        <h2 style="margin: 0; font-size: 13px; font-weight: 800; letter-spacing: .16em; color: #A9A7B8">05 / MOTION AND HAPTICS</h2>
+        <div style="background: #1C1C24; border: 1px solid rgba(255,255,255,.1); border-radius: 22px; overflow: hidden; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); font-size: 14px">
+          <div style="padding: 10px 16px; background: #24242E; font-size: 12px; font-weight: 800; letter-spacing: .1em">MOMENT</div><div style="padding: 10px 16px; background: #24242E; font-size: 12px; font-weight: 800; letter-spacing: .1em">FEEDBACK</div>
+          <div style="padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,.06)">App opening</div><div style="padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,.06)">Lanyard swings, PUP says hi</div>
+          <div style="padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,.06)">+1 sold</div><div style="padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,.06)">Medium impact</div>
+          <div style="padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,.06)">-1 sold (fix a double tap)</div><div style="padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,.06)">Light impact</div>
+          <div style="padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,.06)">Low stock / sold out</div><div style="padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,.06)">Warning / heavy twice</div>
+          <div style="padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,.06)">Swipe, toggle</div><div style="padding: 9px 16px; border-bottom: 1px solid rgba(255,255,255,.06)">Selection tick</div>
+          <div style="padding: 9px 16px">Saved, synced / error</div><div style="padding: 9px 16px">Success / error</div>
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":1720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

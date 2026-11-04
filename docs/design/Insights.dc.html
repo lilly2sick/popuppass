@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Insights</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+@font-face{font-family:"Ronzino";src:url("/_blob/ec60cd3296323f23985077218873722e") format("woff2");font-weight:700}
+@font-face{font-family:"BDO Grotesk";src:url("/_blob/8a391c23947730abf32d2056c2cefe7d") format("truetype");font-weight:300 900}
+body{margin:0}
+input::placeholder{color:#A9A7B8}
+.pp-grid{position:absolute;inset:-48px;background-image:linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);background-size:24px 24px;animation:pp-pan 18s linear infinite}
+.pp-iri{position:absolute;inset:-48px;background:linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9,#9C8CFF,#B9A6FF);background-size:300% 300%;-webkit-mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);-webkit-mask-size:24px 24px;mask-image:linear-gradient(#000 1px,transparent 1px),linear-gradient(90deg,#000 1px,transparent 1px);mask-size:24px 24px;opacity:.08;animation:pp-shift 9s ease-in-out infinite,pp-pan 18s linear infinite}
+@keyframes pp-pan{to{transform:translate(24px,24px)}}
+@keyframes pp-shift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+@media (prefers-reduced-motion: reduce){.pp-grid,.pp-iri{animation:none}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #0B0B0F; color: #F5F4FA; font-family: 'BDO Grotesk', sans-serif; display: flex; flex-direction: column">
+  <div class="pp-grid" aria-hidden="true"></div>
+  <div class="pp-iri" aria-hidden="true"></div>
+  <div style="position: relative"><dc-import name="EventBar" status="ENDED" net="+$412" hint-size="390px,112px"></dc-import></div>
+  <main style="position: relative; flex-grow: 1; padding: 4px 16px 12px; display: flex; flex-direction: column; gap: 12px; overflow: hidden">
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px">
+      <h1 style="margin: 0; font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 28px; line-height: 1.05">Look what you did.</h1>
+      <button type="button" style="height: 48px; padding: 0 18px; flex-shrink: 0; border-radius: 16px; border: 0; background: #B9A6FF; color: #0B0B0F; font: 800 16px 'BDO Grotesk', sans-serif">Export</button>
+    </div>
+
+    <label style="height: 36px; flex-shrink: 0; box-sizing: border-box; border-radius: 999px; border: 1px solid rgba(255,255,255,.16); background: #1C1C24; display: flex; align-items: center; gap: 8px; padding: 0 14px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A9A7B8" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6"></circle><path d="M20 20l-4.5-4.5"></path></svg>
+      <span style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Search</span>
+      <input type="search" placeholder="Search items and events" style="border: 0; outline: 0; flex-grow: 1; min-width: 0; font: 500 14px 'BDO Grotesk', sans-serif; background: #1C1C24; color: #F5F4FA">
+    </label>
+    <div style="border-radius: 22px; padding: 1px; background: linear-gradient(115deg,#B9A6FF,#FF9AD5,#7FE7D9)">
+      <div style="border-radius: 21px; background: #15151B; padding: 16px; display: flex; align-items: center; gap: 14px">
+        <div style="width: 60px; height: 60px; flex-shrink: 0; border-radius: 50%; background: #7FE7D9; display: flex; align-items: center; justify-content: center"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0B0B0F" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg></div>
+        <div style="display: flex; flex-direction: column; gap: 2px">
+          <span style="font-size: 10px; font-weight: 900; letter-spacing: .14em; color: #A9A7B8">NET PROFIT, 2 DAYS</span>
+          <span style="font-family: 'Ronzino', sans-serif; font-weight: 700; font-size: 48px; line-height: 1">+$412</span>
+          <span style="font-size: 13px; color: #A9A7B8">$618 gross, $86 cost, $120 booth. 74 sold.</span>
+        </div>
+      </div>
+    </div>
+
+    <section aria-labelledby="per" style="border-radius: 18px; background: #1C1C24; border: 1px solid rgba(255,255,255,.1); padding: 12px 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; justify-content: space-between; align-items: baseline"><h2 id="per" style="margin: 0; font-size: 15px; font-weight: 800">Profit by item</h2><span style="font-size: 10px; font-weight: 900; letter-spacing: .12em; color: #A9A7B8">UNITS / PROFIT</span></div>
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="4">
+        <div style="display: grid; grid-template-columns: 108px minmax(0, 1fr) 80px; align-items: center; gap: 8px">
+          <span style="font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.name}}</span>
+          <div style="height: 12px; border-radius: 6px; background: rgba(255,255,255,.07); overflow: hidden"><div style="height: 12px; width: {{r.pct}}; background: {{r.color}}; border-radius: 6px"></div></div>
+          <span style="font-size: 13px; font-weight: 800; text-align: right; color: {{r.textColor}}">{{r.units}} / {{r.profit}}</span>
+        </div>
+      </sc-for>
+    </section>
+
+    <section aria-labelledby="pay" style="border-radius: 18px; background: #1C1C24; border: 1px solid rgba(255,255,255,.1); padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+      <h2 id="pay" style="margin: 0; font-size: 15px; font-weight: 800">How they paid</h2>
+      <div role="img" aria-label="Cash 58 percent, card 34 percent, Zelle 8 percent" style="height: 14px; border-radius: 7px; overflow: hidden; display: flex; gap: 2px">
+        <div style="width: 58%; background: #F5F4FA"></div><div style="width: 34%; background: #B9A6FF"></div><div style="width: 8%; background: #FF9AD5"></div>
+      </div>
+      <div style="display: flex; gap: 14px; font-size: 12px">
+        <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #F5F4FA"></span>Cash $358</span>
+        <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #B9A6FF"></span>Card $210</span>
+        <span style="display: flex; align-items: center; gap: 6px"><span style="width: 10px; height: 10px; border-radius: 3px; background: #FF9AD5"></span>Zelle $50</span>
+      </div>
+    </section>
+
+    <section aria-labelledby="sum" style="border-radius: 18px; background: #2A2740; border: 1px solid rgba(185,166,255,.3); padding: 14px; display: flex; flex-direction: column; gap: 6px">
+      <h2 id="sum" style="margin: 0; font-size: 10px; font-weight: 900; letter-spacing: .14em; color: #D9CCFF">YOUR RECAP</h2>
+      <p style="margin: 0; font-size: 14px; line-height: 1.45">Cat sticker sold out by 2pm on day 2. Keychains lost $18 after materials. Make 30 more cat stickers and test the frog pin at a lower price.</p>
+    </section>
+  </main>
+  <div style="position: relative"><dc-import name="TabBar" active="insights" hint-size="390px,88px"></dc-import></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const data = [['Cat sticker', 40, 244], ['Sticker pack', 9, 140], ['Frog pin', 8, 69], ['Mochi keychain', 6, -18]];
+    const rows = data.map(([name, units, p]) => ({
+      name, units,
+      profit: (p < 0 ? '-$' : '+$') + Math.abs(p),
+      pct: Math.max(6, Math.round((Math.abs(p) / 244) * 100)) + '%',
+      color: p < 0 ? '#FF9AD5' : 'linear-gradient(90deg,#B9A6FF,#7FE7D9)',
+      textColor: p < 0 ? '#FF9AD5' : '#F5F4FA'
+    }));
+    return { rows };
+  }
+}
+</script>
+</body>
+</html>
