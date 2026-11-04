@@ -1,0 +1,73 @@
+name: popup_pass
+description: Phone-first toolkit for convention artists and pop-up vendors.
+publish_to: none
+version: 0.1.0+1
+
+environment:
+  sdk: ">=3.5.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # app
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.6.2
+  intl: ^0.19.0
+
+  # local data (source of truth)
+  drift: ^2.22.1
+  drift_flutter: ^0.2.4
+  path_provider: ^2.1.5
+  uuid: ^4.5.1
+
+  # network, identity, purchases
+  dio: ^5.7.0
+  crypto: ^3.0.6
+  connectivity_plus: ^6.1.1
+  flutter_secure_storage: ^9.2.2
+  supabase_flutter: ^2.8.2
+  sign_in_with_apple: ^6.1.4
+  google_sign_in: ^6.2.2
+  purchases_flutter: ^8.4.0
+
+  # ui
+  flutter_card_swiper: ^7.0.2
+  flutter_svg: ^2.0.16
+  gal: ^2.3.0 # save PNGs to Photos / Gallery
+  fl_chart: ^0.70.0
+  image_picker: ^1.1.2
+  file_picker: ^8.1.4
+  share_plus: ^10.1.3
+
+  # exports
+  csv: ^6.0.0
+  excel: ^4.0.6
+  pdf: ^3.11.1
+  printing: ^5.13.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.13
+  drift_dev: ^2.22.1
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/sample/
+    - assets/pup.svg
+  # Brand fonts, bundled so they work offline (both OFL; licenses alongside).
+  fonts:
+    - family: Ronzino
+      fonts:
+        - asset: assets/fonts/Ronzino-Regular.otf
+          weight: 400
+        - asset: assets/fonts/Ronzino-Medium.otf
+          weight: 500
+        - asset: assets/fonts/Ronzino-Bold.otf
+          weight: 700
+    - family: BDOGrotesk
+      fonts:
+        - asset: assets/fonts/BDO-Grotesk-VF.ttf
