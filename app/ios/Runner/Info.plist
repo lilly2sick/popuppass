@@ -72,5 +72,21 @@
 	<string>Pop-Up Pass lets you pick a product photo from your Photos.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Pop-Up Pass lets you take a product photo with the camera.</string>
+	<key>LSApplicationQueries</key>
+	<array>
+		<string>instagram-stories</string>
+		<string>facebook-stories</string>
+	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>com.popuppass.square</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>popuppass</string>
+			</array>
+		</dict>
+	</array>
 </dict>
 </plist>

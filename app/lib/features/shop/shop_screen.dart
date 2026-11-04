@@ -34,7 +34,7 @@ class _ShopScreenState extends ConsumerState<ShopScreen> {
     );
     final bytes = picked?.files.single.bytes;
     if (bytes == null) return;
-    final importer = ref.read(csvImportProvider)..pendingText = utf8.decode(bytes);
+    final importer = ref.read(csvProductImportProvider)..pendingText = utf8.decode(bytes);
     await importer.ingest();
   }
 

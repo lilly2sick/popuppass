@@ -17,6 +17,8 @@ import '../../domain/money.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../../services/haptics_service.dart';
+import 'recommendation_schedule_sheet.dart';
+import 'saved_ideas_sheet.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -296,6 +298,7 @@ class HomeScreen extends ConsumerWidget {
             ],
           ),
           const SizedBox(height: PPSpace.lg),
+          const _BestSellerDraft(),
           const _TrendDeck(),
           const SizedBox(height: PPSpace.xl),
           const AsciiPups(),
@@ -349,7 +352,7 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(l10n.homeExperiment, style: PPType.title(size: 20)),
+          const _DeckHeader(),
           const SizedBox(height: PPSpace.sm),
           EmptyState(title: l10n.homeCaughtUpTitle, message: l10n.homeCaughtUpMessage),
         ],
@@ -359,17 +362,7 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.baseline,
-          textBaseline: TextBaseline.alphabetic,
-          children: [
-            Expanded(child: Text(l10n.homeExperiment, style: PPType.title(size: 20))),
-            Text(
-              l10n.homeDeckCount(_done + 1, ranked.length + _done),
-              style: PPType.label(size: 11, color: PPColors.muted),
-            ),
-          ],
-        ),
+        _DeckHeader(count: l10n.homeDeckCount(_done + 1, ranked.length + _done)),
         const SizedBox(height: PPSpace.sm),
         SizedBox(
           height: 236,
@@ -409,6 +402,77 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
               ),
             ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+/// SPEC 16's "post your best seller" suggestion: one tap opens Create with
+/// that item and its template caption already filled in.
+class _BestSellerDraft extends ConsumerWidget {
+  const _BestSellerDraft();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final best = ref.watch(bestSellerProvider);
+    if (best == null) return const SizedBox.shrink();
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: PPSpace.lg),
+      child: StickerCard(
+        radius: 20,
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(l10n.homeBestSellerTitle, style: PPType.title(size: 20)),
+            const SizedBox(height: 4),
+            Text(
+              l10n.homeBestSellerBody(best.name),
+              style: PPType.body(size: 14, color: PPColors.muted),
+            ),
+            const SizedBox(height: PPSpace.sm),
+            PPButton(
+              label: l10n.homeCreateDraft,
+              icon: Icons.arrow_forward_rounded,
+              onPressed: () {
+                ref.read(createDraftProductProvider.notifier).state = best.id;
+                context.go(AppTab.create.path);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// "Room to experiment" with the SPEC 16 controls: saved ideas and the
+/// reminder schedule.
+class _DeckHeader extends StatelessWidget {
+  const _DeckHeader({this.count});
+
+  final String? count;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return Row(
+      children: [
+        Expanded(child: Text(l10n.homeExperiment, style: PPType.title(size: 20))),
+        if (count != null) Text(count!, style: PPType.label(size: 11, color: PPColors.muted)),
+        IconButton(
+          tooltip: l10n.homeSavedIdeas,
+          constraints: const BoxConstraints(minWidth: PPTap.min, minHeight: PPTap.min),
+          icon: const Icon(Icons.bookmark_border_rounded),
+          onPressed: () => showSavedIdeas(context),
+        ),
+        IconButton(
+          tooltip: l10n.homeIdeaReminders,
+          constraints: const BoxConstraints(minWidth: PPTap.min, minHeight: PPTap.min),
+          icon: const Icon(Icons.notifications_none_rounded),
+          onPressed: () => showRecommendationSchedule(context),
         ),
       ],
     );

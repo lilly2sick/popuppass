@@ -126,6 +126,77 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeExperiment => 'Room to experiment';
 
   @override
+  String get homeBestSellerTitle => 'Post your best seller';
+
+  @override
+  String homeBestSellerBody(String name) {
+    return '$name is leading. A draft is ready.';
+  }
+
+  @override
+  String get homeCreateDraft => 'Create draft';
+
+  @override
+  String get homeIdeaReminders => 'Idea reminders';
+
+  @override
+  String get homeSavedIdeas => 'Saved ideas';
+
+  @override
+  String get savedIdeasEmptyTitle => 'Nothing saved yet';
+
+  @override
+  String get savedIdeasEmptyMessage => 'Swipe right on an idea to keep it here.';
+
+  @override
+  String savedIdeasSources(String sources) {
+    return 'Sources: $sources';
+  }
+
+  @override
+  String get recommendationTitle => 'New ideas';
+
+  @override
+  String get recommendationHowOften => 'How often';
+
+  @override
+  String get recommendationTimeOfDay => 'Time of day';
+
+  @override
+  String get recommendationFrequencyOff => 'Off';
+
+  @override
+  String get recommendationFrequencyDaily => 'Daily';
+
+  @override
+  String get recommendationFrequencyWeekly => 'Weekly';
+
+  @override
+  String get recommendationFrequencyBiweekly => 'Every two weeks';
+
+  @override
+  String recommendationSummary(String frequency, String time) {
+    return '$frequency at $time';
+  }
+
+  @override
+  String get recommendationExplain =>
+      'A reminder with fresh post and restock ideas. Built on your phone from the trend board, so it works offline.';
+
+  @override
+  String get recommendationNotificationTitle => 'New ideas for your table';
+
+  @override
+  String recommendationNotificationBody(int count) {
+    return '$count fresh trend cards are ready.';
+  }
+
+  @override
+  String recommendationNotificationBodyBest(String name, int count) {
+    return 'Post $name, your best seller, and see $count fresh trend cards.';
+  }
+
+  @override
   String get homeCaughtUpTitle => 'All caught up';
 
   @override
@@ -172,6 +243,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String settingsCardReader(String name) {
     return 'Card reader: $name';
   }
+
+  @override
+  String get settingsIdeaReminders => 'Idea reminders';
 
   @override
   String get settingsConnect => 'Connect';

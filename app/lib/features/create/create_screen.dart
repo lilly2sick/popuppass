@@ -21,6 +21,7 @@ import '../../render/post_format.dart';
 import '../../render/post_template.dart';
 import '../../services/entitlements.dart';
 import '../../services/haptics_service.dart';
+import '../../services/social_share_service.dart';
 
 /// The look the vendor picks. Each share destination then exports at its own
 /// platform size for that look.
@@ -127,7 +128,9 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
     await WidgetsBinding.instance.endOfFrame;
     final bytes = await capturePng(_boundary, targetWidth: f.width);
     setState(() => _renderFormat = null);
-    final dir = await getTemporaryDirectory();
+    // share_plus's FileProvider (also used for direct Stories intents) serves
+    // only <cache>/share_plus/.
+    final dir = await Directory('${(await getTemporaryDirectory()).path}/share_plus').create();
     final name =
         '${(_product?.name ?? 'post').replaceAll(RegExp(r'[^A-Za-z0-9]+'), '-').toLowerCase()}-${f.sizeLabel}.png';
     return File('${dir.path}/$name').writeAsBytes(bytes, flush: true);
@@ -153,10 +156,15 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
       }
       return;
     }
-    // TODO(share): Instagram Stories / Facebook direct share intents need a
-    // Meta app id; until then every social target opens the system share
-    // sheet with the right-size image and caption attached.
-    await Share.shareXFiles([XFile(file.path, mimeType: 'image/png')], text: _caption.text);
+    final social = ref.read(socialShareProvider);
+    switch (t) {
+      case ShareTarget.instagram:
+        await social.share(SocialApp.instagram, file, _caption.text);
+      case ShareTarget.facebook:
+        await social.share(SocialApp.facebook, file, _caption.text);
+      case _:
+        await Share.shareXFiles([XFile(file.path, mimeType: 'image/png')], text: _caption.text);
+    }
   }
 
   void _openShare() {
@@ -194,8 +202,18 @@ class _CreateScreenState extends ConsumerState<CreateScreen> {
         ? all
         : all.where((p) => p.name.toLowerCase().contains(_query.toLowerCase())).toList();
     final brand = ref.watch(brandProvider).valueOrNull;
+    final draftId = ref.watch(createDraftProductProvider);
+    final draft = all.where((x) => x.id == draftId).firstOrNull;
+    if (draft != null) {
+      // Home's best seller suggestion: open on that item.
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        ref.read(createDraftProductProvider.notifier).state = null;
+        _pick(draft);
+      });
+    }
     final p = _product;
-    if (p == null && all.isNotEmpty) {
+    if (p == null && all.isNotEmpty && draft == null) {
       // The artboard opens with the first item already chosen.
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted && _product == null) _pick(all.first);

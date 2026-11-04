@@ -4,19 +4,24 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'app/router.dart';
 import 'config.dart';
 import 'l10n/app_localizations.dart';
 import 'l10n/app_localizations_en.dart';
 import 'connectors/ai/ai_provider.dart';
-import 'connectors/connector.dart';
-import 'connectors/csv/csv_import_connector.dart';
-import 'connectors/events/event_sources.dart';
-import 'connectors/events/ics_codec.dart';
+import 'connectors/csv/csv_product_import.dart';
+import 'connectors/csv/csv_sales_import.dart';
+import 'connectors/events/animecons_feed.dart';
+import 'connectors/events/con_source.dart';
+import 'connectors/events/fake_con_source.dart';
+import 'connectors/events/ics_connector.dart';
 import 'connectors/payment/fake_payment_provider.dart';
 import 'connectors/payment/payment_provider.dart';
 import 'connectors/payment/square_provider.dart';
+import 'connectors/sync_cursor.dart';
 import 'connectors/trends/trend_feed.dart';
 import 'data/db/database.dart';
 import 'data/repos/event_repo.dart';
@@ -28,6 +33,7 @@ import 'data/sample_seed.dart';
 import 'domain/analytics_service.dart';
 import 'domain/enums.dart';
 import 'domain/pricing_service.dart';
+import 'domain/recommendation_schedule.dart';
 import 'domain/recommendation_service.dart';
 import 'export/export_service.dart';
 import 'services/auth_service.dart';
@@ -35,6 +41,9 @@ import 'services/entitlements.dart';
 import 'services/haptics_service.dart';
 import 'services/job_runner.dart';
 import 'services/purchase_service.dart';
+import 'services/recommendation_notifier.dart';
+import 'services/recommendation_schedule_store.dart';
+import 'services/social_share_service.dart';
 import 'services/sync_service.dart';
 
 // ---------------- core ----------------
@@ -57,6 +66,10 @@ final supabaseProvider = Provider<SupabaseClient?>((ref) {
 });
 
 final hapticsProvider = Provider((_) => HapticsService());
+
+final socialShareProvider = Provider(
+  (ref) => SocialShareService(metaAppId: ref.watch(configProvider).metaAppId),
+);
 
 /// Strings for code that runs outside the widget tree (labels derived in
 /// providers). English is the only shipped locale; override when adding more.
@@ -132,20 +145,23 @@ final salesRepoProvider = Provider(
 
 // ---------------- connectors ----------------
 
-final cursorStoreProvider = Provider((ref) => CursorStore(ref.watch(dbProvider)));
+final syncCursorProvider = Provider((ref) => SyncCursor(ref.watch(dbProvider)));
 
 final paymentProviderProvider = Provider<PaymentProvider>((ref) {
   final c = ref.watch(configProvider);
-  final cursors = ref.watch(cursorStoreProvider);
+  final cursors = ref.watch(syncCursorProvider);
   final sales = ref.watch(salesRepoProvider);
   final client = ref.watch(supabaseProvider);
   if (c.useFakes || client == null) return FakePaymentProvider(cursors, sales);
   return SquareProvider(
     cursors,
     sales,
+    appId: c.squareAppId,
     storage: ref.watch(secureStorageProvider),
     tokenExchange: (body) async =>
         (await client.functions.invoke('square-token', body: body)).data as Map<String, dynamic>,
+    authorize: (url, callbackScheme) =>
+        FlutterWebAuth2.authenticate(url: url.toString(), callbackUrlScheme: callbackScheme),
   );
 });
 
@@ -157,14 +173,22 @@ final conSourceProvider = Provider<ConSource>((ref) {
 });
 
 final icsConnectorProvider = Provider(
-  (ref) => IcsConnector(ref.watch(cursorStoreProvider), ref.watch(eventRepoProvider)),
+  (ref) => IcsConnector(ref.watch(syncCursorProvider), ref.watch(eventRepoProvider)),
 );
 
-final csvImportProvider = Provider(
+final csvProductImportProvider = Provider(
   (ref) => CsvProductImport(
-    ref.watch(cursorStoreProvider),
+    ref.watch(syncCursorProvider),
     ref.watch(productRepoProvider),
     (id, qty) => ref.read(inventoryRepoProvider).restock(id, qty),
+  ),
+);
+
+final csvSalesImportProvider = Provider(
+  (ref) => CsvSalesImport(
+    ref.watch(syncCursorProvider),
+    ref.watch(salesRepoProvider),
+    ref.watch(productRepoProvider),
   ),
 );
 
@@ -172,7 +196,7 @@ final trendFeedProvider = Provider<TrendFeed?>((ref) {
   final c = ref.watch(configProvider);
   if (!c.hasBackend || c.useFakes) return null;
   return TrendFeed(
-    ref.watch(cursorStoreProvider),
+    ref.watch(syncCursorProvider),
     ref.watch(dbProvider),
     supabaseUrl: c.supabaseUrl,
     anonKey: c.supabaseAnonKey,
@@ -202,6 +226,78 @@ final pricingProvider = Provider((_) => const PricingService());
 final analyticsProvider = Provider((ref) => AnalyticsService(ref.watch(salesRepoProvider)));
 final recommendationProvider = Provider((_) => const RecommendationService());
 
+final recommendationNotifierProvider = Provider<RecommendationNotifier>(
+  (_) => LocalRecommendationNotifier(),
+);
+
+final recommendationScheduleStoreProvider = Provider(
+  (ref) => RecommendationScheduleStore(ref.watch(secureStorageProvider)),
+);
+
+/// The vendor's SPEC 16 choice (default weekly at 9:00). Changing it saves
+/// it and re-queues the local notifications.
+class RecommendationScheduleController extends AsyncNotifier<RecommendationSchedule> {
+  @override
+  Future<RecommendationSchedule> build() => ref.read(recommendationScheduleStoreProvider).read();
+
+  Future<void> choose({RecommendationFrequency? frequency, int? hour, int? minute}) async {
+    final current = await future;
+    final next = current.copyWith(
+      frequency: frequency,
+      hour: hour,
+      minute: minute,
+      // Weekly and biweekly land on the weekday the choice was made.
+      anchor: frequency != null && frequency != current.frequency ? DateTime.now() : null,
+    );
+    state = AsyncData(next);
+    await ref.read(recommendationScheduleStoreProvider).write(next);
+    await apply();
+  }
+
+  /// Re-queues notifications from the saved choice and today's batch. Runs
+  /// on every start so the lookahead window keeps moving.
+  Future<void> apply() async {
+    final schedule = await future;
+    final l10n = ref.read(l10nProvider);
+    final trends = await ref.read(trendsProvider.future);
+    final swiped = await ref.read(swipedIdsProvider.future);
+    final brand = await ref.read(brandProvider.future);
+    final cards = ref
+        .read(recommendationProvider)
+        .batch(trends: trends, shopTags: {...?brand?.nicheTags}, swipedIds: swiped);
+    final best = ref.read(bestSellerProvider);
+    await ref
+        .read(recommendationNotifierProvider)
+        .replaceAll(
+          schedule.upcoming(DateTime.now()),
+          title: l10n.recommendationNotificationTitle,
+          body: best == null
+              ? l10n.recommendationNotificationBody(cards.length)
+              : l10n.recommendationNotificationBodyBest(best.name, cards.length),
+        );
+  }
+}
+
+final recommendationScheduleProvider =
+    AsyncNotifierProvider<RecommendationScheduleController, RecommendationSchedule>(
+      RecommendationScheduleController.new,
+    );
+
+/// The product with the most units sold, if anything has sold.
+final bestSellerProvider = Provider<Product?>((ref) {
+  final products = ref.watch(productsProvider).valueOrNull ?? const <Product>[];
+  final sold = ref.watch(soldCountsProvider).valueOrNull ?? const <String, int>{};
+  Product? best;
+  for (final p in products) {
+    if ((sold[p.id] ?? 0) > (best == null ? 0 : sold[best.id] ?? 0)) best = p;
+  }
+  return best;
+});
+
+/// Product id Create should open with a draft ready. Set by Home's best
+/// seller suggestion; Create clears it once it has picked the item.
+final createDraftProductProvider = StateProvider<String?>((_) => null);
+
 final exportServiceProvider = Provider((ref) {
   final brand = ref.watch(brandProvider).valueOrNull;
   return ExportService(
@@ -230,6 +326,19 @@ final trendsProvider = StreamProvider((ref) {
 final swipedIdsProvider = StreamProvider<Set<String>>((ref) {
   final db = ref.watch(dbProvider);
   return db.select(db.swipeFeedback).watch().map((rows) => {for (final r in rows) r.trendId});
+});
+
+/// Right-swiped cards, newest first, with the trend they came from. The
+/// Home inspiration board's "Saved ideas" list.
+final savedIdeasProvider = StreamProvider<List<CachedTrend>>((ref) {
+  final db = ref.watch(dbProvider);
+  final q =
+      db.select(db.swipeFeedback).join([
+          innerJoin(db.trendCache, db.trendCache.id.equalsExp(db.swipeFeedback.trendId)),
+        ])
+        ..where(db.swipeFeedback.liked.equals(true))
+        ..orderBy([OrderingTerm.desc(db.swipeFeedback.at)]);
+  return q.watch().map((rows) => [for (final r in rows) r.readTable(db.trendCache)]);
 });
 
 class TodayStats {
@@ -383,4 +492,8 @@ final bootstrapProvider = FutureProvider<void>((ref) async {
 
   ref.read(jobRunnerProvider).start();
   unawaited(ref.read(trendFeedProvider)?.ingest());
+
+  final notifier = ref.read(recommendationNotifierProvider);
+  await notifier.init(onOpen: () => ref.read(routerProvider).go(AppTab.home.path));
+  unawaited(ref.read(recommendationScheduleProvider.notifier).apply());
 });

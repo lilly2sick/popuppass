@@ -18,4 +18,14 @@ class RecommendationService {
     ]..sort((a, b) => b.$2.compareTo(a.$2));
     return [for (final s in scored) s.$1];
   }
+
+  /// SPEC 16's batch: the top ranked cards (new ideas) plus, when there is a
+  /// best seller, one more suggestion to post it. Built entirely on device
+  /// from the cached feed, so it works offline.
+  List<CachedTrend> batch({
+    required List<CachedTrend> trends,
+    required Set<String> shopTags,
+    required Set<String> swipedIds,
+    int limit = 5,
+  }) => rank(trends: trends, shopTags: shopTags, swipedIds: swipedIds).take(limit).toList();
 }

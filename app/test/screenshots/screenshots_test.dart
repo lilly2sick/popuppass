@@ -133,6 +133,21 @@ void main() {
     await _shoot(tester, 'settings');
   });
 
+  testWidgets('reminders', (tester) async {
+    usePhone(tester);
+    final harness = await AppHarness.create();
+    addTearDown(harness.dispose);
+    await _mount(tester, harness);
+    await tester.scrollUntilVisible(
+      find.byTooltip('Idea reminders'),
+      300,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.tap(find.byTooltip('Idea reminders'));
+    await settle(tester);
+    await _shoot(tester, 'reminders');
+  });
+
   testWidgets('splash', (tester) async {
     usePhone(tester);
     final harness = await AppHarness.create(seed: false, bootstrapped: false);

@@ -14,6 +14,7 @@ import 'package:popup_pass/config.dart';
 import 'package:popup_pass/data/db/database.dart';
 import 'package:popup_pass/data/sample_seed.dart';
 import 'package:popup_pass/providers.dart';
+import 'package:popup_pass/services/recommendation_notifier.dart';
 
 /// The phone the artboards are drawn for.
 const phone = Size(390, 844);
@@ -32,6 +33,19 @@ Future<void> loadBrandFonts() async {
   await ronzino.load();
   await bdo.load();
 
+  // ASCII pups name the generic `monospace` family; map it to a real
+  // monospace face so the art keeps its grid. Roboto Mono ships with the
+  // Dart SDK's DevTools assets.
+  final dartSdk = Platform.environment['FLUTTER_ROOT'];
+  final mono = dartSdk == null
+      ? null
+      : File(
+          '$dartSdk/bin/cache/dart-sdk/bin/resources/devtools/assets/fonts/Roboto_Mono/RobotoMono-Bold.ttf',
+        );
+  if (mono != null && mono.existsSync()) {
+    await (FontLoader('monospace')..addFont(bytes(mono.path))).load();
+  }
+
   // Material icons ship with the SDK, not the app; load them so icons paint
   // as glyphs instead of placeholder boxes.
   final root = Platform.environment['FLUTTER_ROOT'];
@@ -45,10 +59,13 @@ Future<void> loadBrandFonts() async {
 
 /// A running copy of the app on fakes with seeded sample data.
 class AppHarness {
-  AppHarness._(this.db, this.container);
+  AppHarness._(this.db, this.container, this.notifier);
 
   final AppDatabase db;
   final ProviderContainer container;
+
+  /// What the recommendation schedule asked the OS to deliver.
+  final FakeRecommendationNotifier notifier;
 
   GoRouter get router => container.read(routerProvider);
 
@@ -61,16 +78,18 @@ class AppHarness {
     FlutterSecureStorage.setMockInitialValues({if (introSeen) 'pup_intro_seen': '1'});
     final db = AppDatabase(NativeDatabase.memory());
     if (seed) await SampleSeed(db).seedIfEmpty();
+    final notifier = FakeRecommendationNotifier();
     final container = ProviderContainer(
       overrides: [
         dbProvider.overrideWithValue(db),
         bootstrapProvider.overrideWith(
           (_) => bootstrapped ? Future<void>.value() : Completer<void>().future,
         ),
+        recommendationNotifierProvider.overrideWithValue(notifier),
         connectionLabelProvider.overrideWith((_) => Stream.value('Saved on phone')),
       ],
     );
-    return AppHarness._(db, container);
+    return AppHarness._(db, container, notifier);
   }
 
   Widget get app => UncontrolledProviderScope(

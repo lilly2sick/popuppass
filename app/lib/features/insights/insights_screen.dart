@@ -13,6 +13,7 @@ import '../../export/export_service.dart';
 import '../../export/exporter.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
+import '../../render/capture.dart';
 
 final _reportProvider = FutureProvider.autoDispose<EventReport>((ref) async {
   ref.watch(todayStatsProvider); // recompute whenever sales change
@@ -22,8 +23,19 @@ final _reportProvider = FutureProvider.autoDispose<EventReport>((ref) async {
   return ref.watch(analyticsProvider).report(event: event, names: names);
 });
 
-class InsightsScreen extends ConsumerWidget {
+/// Width of the exported stat-card PNG, a standard feed image size.
+const _pngWidth = 1080;
+
+class InsightsScreen extends ConsumerStatefulWidget {
   const InsightsScreen({super.key});
+
+  @override
+  ConsumerState<InsightsScreen> createState() => _InsightsScreenState();
+}
+
+class _InsightsScreenState extends ConsumerState<InsightsScreen> {
+  /// The stat and chart cards that the PNG export captures.
+  final _cards = GlobalKey();
 
   Future<void> _export(BuildContext context, WidgetRef ref, EventReport r) async {
     final l10n = AppLocalizations.of(context);
@@ -48,7 +60,18 @@ class InsightsScreen extends ConsumerWidget {
         ),
       ),
     );
-    if (format == null || format == ExportFormat.png) return; // PNG: long-press any card (TODO)
+    if (format == null) return;
+    if (format == ExportFormat.png) {
+      final png = await capturePng(_cards, targetWidth: _pngWidth);
+      await svc.share(
+        format,
+        ExportRequest(
+          title: l10n.insightsReportTitle(event?.name ?? l10n.insightsAllSales),
+          pngBytes: png,
+        ),
+      );
+      return;
+    }
     final rows = await ref.read(salesRepoProvider).linesFor(eventId: event?.id);
     try {
       await svc.share(
@@ -89,7 +112,7 @@ class InsightsScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final report = ref.watch(_reportProvider).valueOrNull;
     final event = ref.watch(currentEventProvider).valueOrNull;
@@ -105,21 +128,35 @@ class InsightsScreen extends ConsumerWidget {
           : Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                MoneyDelta(
-                  cents: report.netCents,
-                  eyebrow: l10n.insightsNetProfit,
-                  large: true,
-                  caption: l10n.insightsNetCaption(
-                    Money.format(report.grossCents),
-                    Money.format(report.costCents),
-                    Money.format(report.boothFeeCents),
-                    report.units,
+                RepaintBoundary(
+                  key: _cards,
+                  child: ColoredBox(
+                    color: PPColors.bg,
+                    child: Padding(
+                      padding: const EdgeInsets.all(PPSpace.md),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          MoneyDelta(
+                            cents: report.netCents,
+                            eyebrow: l10n.insightsNetProfit,
+                            large: true,
+                            caption: l10n.insightsNetCaption(
+                              Money.format(report.grossCents),
+                              Money.format(report.costCents),
+                              Money.format(report.boothFeeCents),
+                              report.units,
+                            ),
+                          ),
+                          const SizedBox(height: PPSpace.md),
+                          _PerItem(report: report),
+                          const SizedBox(height: PPSpace.md),
+                          _PaidWith(report: report),
+                        ],
+                      ),
+                    ),
                   ),
                 ),
-                const SizedBox(height: PPSpace.md),
-                _PerItem(report: report),
-                const SizedBox(height: PPSpace.md),
-                _PaidWith(report: report),
                 const SizedBox(height: PPSpace.md),
                 Container(
                   padding: const EdgeInsets.all(14),

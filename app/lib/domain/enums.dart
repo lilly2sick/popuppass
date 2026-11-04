@@ -40,3 +40,30 @@ enum AiJobKind { caption, hashtags, eventSummary, restockIdeas }
 enum JobStatus { queued, running, done, failed }
 
 enum SyncOp { upsert, delete }
+
+/// SPEC 16: how often the recommendation schedule delivers fresh cards.
+/// Off disables the local notification entirely.
+enum RecommendationFrequency {
+  off,
+  daily,
+  weekly,
+  biweekly;
+
+  /// Default per SPEC 16.
+  static const defaultValue = RecommendationFrequency.weekly;
+
+  /// Days between notifications; null when off.
+  int? get intervalDays => switch (this) {
+    RecommendationFrequency.off => null,
+    RecommendationFrequency.daily => 1,
+    RecommendationFrequency.weekly => 7,
+    RecommendationFrequency.biweekly => 14,
+  };
+
+  String localized(AppLocalizations l10n) => switch (this) {
+    RecommendationFrequency.off => l10n.recommendationFrequencyOff,
+    RecommendationFrequency.daily => l10n.recommendationFrequencyDaily,
+    RecommendationFrequency.weekly => l10n.recommendationFrequencyWeekly,
+    RecommendationFrequency.biweekly => l10n.recommendationFrequencyBiweekly,
+  };
+}

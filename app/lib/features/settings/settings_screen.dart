@@ -7,6 +7,7 @@ import '../../design/tokens.dart';
 import '../../l10n/app_localizations.dart';
 import '../../providers.dart';
 import '../../services/haptics_service.dart';
+import '../home/recommendation_schedule_sheet.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -45,6 +46,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final pro = ref.watch(entitlementsProvider).isPro;
     final auth = ref.watch(authProvider);
     final payments = ref.watch(paymentProviderProvider);
+    final schedule = ref.watch(recommendationScheduleProvider).valueOrNull;
     final l10n = AppLocalizations.of(context);
 
     return GridBackground(
@@ -92,6 +94,14 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 onChanged: haptics.enabled ? (v) => setState(() => haptics.intensity = v) : null,
                 onChangeEnd: (_) => haptics.play(HapticMoment.sold),
               ),
+            ),
+            ListTile(
+              title: Text(l10n.settingsIdeaReminders),
+              subtitle: schedule == null
+                  ? null
+                  : Text(recommendationSummary(context, l10n, schedule)),
+              trailing: const Icon(Icons.chevron_right_rounded),
+              onTap: () => showRecommendationSchedule(context),
             ),
             ListTile(
               title: Text(l10n.settingsCardReader(payments.displayName)),

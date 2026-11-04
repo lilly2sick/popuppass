@@ -302,6 +302,126 @@ abstract class AppLocalizations {
   /// **'Room to experiment'**
   String get homeExperiment;
 
+  /// No description provided for @homeBestSellerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Post your best seller'**
+  String get homeBestSellerTitle;
+
+  /// No description provided for @homeBestSellerBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{name} is leading. A draft is ready.'**
+  String homeBestSellerBody(String name);
+
+  /// No description provided for @homeCreateDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Create draft'**
+  String get homeCreateDraft;
+
+  /// No description provided for @homeIdeaReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Idea reminders'**
+  String get homeIdeaReminders;
+
+  /// No description provided for @homeSavedIdeas.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved ideas'**
+  String get homeSavedIdeas;
+
+  /// No description provided for @savedIdeasEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing saved yet'**
+  String get savedIdeasEmptyTitle;
+
+  /// No description provided for @savedIdeasEmptyMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe right on an idea to keep it here.'**
+  String get savedIdeasEmptyMessage;
+
+  /// No description provided for @savedIdeasSources.
+  ///
+  /// In en, this message translates to:
+  /// **'Sources: {sources}'**
+  String savedIdeasSources(String sources);
+
+  /// No description provided for @recommendationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New ideas'**
+  String get recommendationTitle;
+
+  /// No description provided for @recommendationHowOften.
+  ///
+  /// In en, this message translates to:
+  /// **'How often'**
+  String get recommendationHowOften;
+
+  /// No description provided for @recommendationTimeOfDay.
+  ///
+  /// In en, this message translates to:
+  /// **'Time of day'**
+  String get recommendationTimeOfDay;
+
+  /// No description provided for @recommendationFrequencyOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Off'**
+  String get recommendationFrequencyOff;
+
+  /// No description provided for @recommendationFrequencyDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get recommendationFrequencyDaily;
+
+  /// No description provided for @recommendationFrequencyWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get recommendationFrequencyWeekly;
+
+  /// No description provided for @recommendationFrequencyBiweekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Every two weeks'**
+  String get recommendationFrequencyBiweekly;
+
+  /// No description provided for @recommendationSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{frequency} at {time}'**
+  String recommendationSummary(String frequency, String time);
+
+  /// No description provided for @recommendationExplain.
+  ///
+  /// In en, this message translates to:
+  /// **'A reminder with fresh post and restock ideas. Built on your phone from the trend board, so it works offline.'**
+  String get recommendationExplain;
+
+  /// No description provided for @recommendationNotificationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New ideas for your table'**
+  String get recommendationNotificationTitle;
+
+  /// No description provided for @recommendationNotificationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} fresh trend cards are ready.'**
+  String recommendationNotificationBody(int count);
+
+  /// No description provided for @recommendationNotificationBodyBest.
+  ///
+  /// In en, this message translates to:
+  /// **'Post {name}, your best seller, and see {count} fresh trend cards.'**
+  String recommendationNotificationBodyBest(String name, int count);
+
   /// No description provided for @homeCaughtUpTitle.
   ///
   /// In en, this message translates to:
@@ -391,6 +511,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Card reader: {name}'**
   String settingsCardReader(String name);
+
+  /// No description provided for @settingsIdeaReminders.
+  ///
+  /// In en, this message translates to:
+  /// **'Idea reminders'**
+  String get settingsIdeaReminders;
 
   /// No description provided for @settingsConnect.
   ///
