@@ -27,5 +27,5 @@ export function nicheFor(keyword: string, hint?: string): string {
 
 /** Stable slug used as the primary key of a published trend. */
 export function trendId(keyword: string): string {
-  return keyword.replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  return keyword.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }

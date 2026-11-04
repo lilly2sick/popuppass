@@ -1,6 +1,6 @@
 // The one place that talks to Anthropic. Handlers depend on the LlmClient
 // interface so tests can inject a fake or a mocked fetch.
-import Anthropic from "npm:@anthropic-ai/sdk";
+import Anthropic from "npm:@anthropic-ai/sdk@1.4";
 
 export const MODEL = "claude-opus-5-5";
 
