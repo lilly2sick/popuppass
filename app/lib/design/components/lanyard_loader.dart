@@ -18,27 +18,49 @@ class LanyardLoader extends StatefulWidget {
   State<LanyardLoader> createState() => _LanyardLoaderState();
 }
 
-class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProviderStateMixin {
+class _LanyardLoaderState extends State<LanyardLoader> with TickerProviderStateMixin {
   late final _swing = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 2200),
   );
+  late final _dots = AnimationController(vsync: this, duration: const Duration(milliseconds: 1200));
+  bool _reducedMotion = false;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (MediaQuery.disableAnimationsOf(context)) {
+    _reducedMotion = MediaQuery.disableAnimationsOf(context);
+    if (_reducedMotion) {
       _swing.stop();
-    } else if (!_swing.isAnimating) {
-      _swing.repeat();
+      _dots.stop();
+    } else {
+      if (!_swing.isAnimating) _swing.repeat();
+      if (!_dots.isAnimating) _dots.repeat();
     }
   }
 
   @override
   void dispose() {
     _swing.dispose();
+    _dots.dispose();
     super.dispose();
   }
+
+  Widget _dot(Color color, double delay) => AnimatedBuilder(
+    animation: _dots,
+    builder: (_, __) {
+      final t = _reducedMotion ? 1.0 : (_dots.value + delay) % 1.0;
+      final opacity = 0.25 + 0.75 * (0.5 + 0.5 * sin(t * 2 * pi));
+      return Opacity(
+        opacity: opacity,
+        child: Container(
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+        ),
+      );
+    },
+  );
 
   Widget _strap(List<Color> colors, double skew) => Transform(
     transform: Matrix4.skewX(skew),
@@ -115,6 +137,28 @@ class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProvider
               ),
               const SizedBox(height: 6),
               Text('PUP', style: PPType.title(size: 26, color: const Color(0xFF211A35))),
+              const SizedBox(height: 5),
+              DecoratedBox(
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: Color(0x4D544575))),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 5),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.passRole,
+                        style: PPType.label(size: 7, color: const Color(0xFF776D8A)),
+                      ),
+                      Text(
+                        l10n.passAccess,
+                        style: PPType.label(size: 7, color: const Color(0xFF776D8A)),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -147,17 +191,34 @@ class _LanyardLoaderState extends State<LanyardLoader> with SingleTickerProvider
                 children: [
                   Text(l10n.appTitle, style: PPType.title(size: 30)),
                   const SizedBox(height: PPSpace.sm),
-                  Semantics(
-                    liveRegion: true,
-                    child: Text(
-                      widget.hasError ? l10n.loaderError : l10n.loaderSettingUp,
-                      textAlign: TextAlign.center,
-                      style: PPType.body(
-                        size: 14,
-                        color: widget.hasError ? PPColors.pink : PPColors.muted,
+                  if (widget.hasError)
+                    Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        l10n.loaderError,
+                        textAlign: TextAlign.center,
+                        style: PPType.body(size: 14, color: PPColors.pink),
+                      ),
+                    )
+                  else
+                    Semantics(
+                      liveRegion: true,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            l10n.loaderSettingUp,
+                            style: PPType.body(size: 14, color: PPColors.muted),
+                          ),
+                          const SizedBox(width: 6),
+                          _dot(PPColors.violet, 0),
+                          const SizedBox(width: 4),
+                          _dot(PPColors.pink, 0.2),
+                          const SizedBox(width: 4),
+                          _dot(PPColors.teal, 0.4),
+                        ],
                       ),
                     ),
-                  ),
                 ],
               ),
             ),

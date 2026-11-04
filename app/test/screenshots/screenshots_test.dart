@@ -91,6 +91,39 @@ void main() {
     await _shoot(tester, 'events');
   });
 
+  testWidgets('create-share', (tester) async {
+    usePhone(tester);
+    final harness = await AppHarness.create();
+    addTearDown(harness.dispose);
+    await _mount(tester, harness);
+    harness.router.go(AppTab.create.path);
+    await settle(tester);
+    await tester.tap(find.text('Share or save'));
+    await settle(tester);
+    await _shoot(tester, 'create-share');
+  });
+
+  testWidgets('pup-faq', (tester) async {
+    usePhone(tester);
+    final harness = await AppHarness.create();
+    addTearDown(harness.dispose);
+    await _mount(tester, harness);
+    await tester.tap(find.bySemanticsLabel('Ask PUP'));
+    await settle(tester);
+    await _shoot(tester, 'pup-faq');
+  });
+
+  testWidgets('search', (tester) async {
+    usePhone(tester);
+    final harness = await AppHarness.create();
+    addTearDown(harness.dispose);
+    await _mount(tester, harness);
+    await tester.enterText(find.byType(TextField).first, 'frog');
+    await tester.testTextInput.receiveAction(TextInputAction.search);
+    await settle(tester);
+    await _shoot(tester, 'search');
+  });
+
   testWidgets('settings', (tester) async {
     usePhone(tester);
     final harness = await AppHarness.create();
