@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
 
 import '../connectors/ai/ai_provider.dart';
@@ -77,14 +78,24 @@ class JobRunner {
     }
   }
 
+  /// 4xx responses are final. Network errors, timeouts and 5xx are retried.
+  /// 408 and 429 are the exceptions among 4xx: they are transient.
+  static bool isTerminal(Object error) {
+    if (error is! DioException) return false;
+    final code = error.response?.statusCode;
+    return code != null && code >= 400 && code < 500 && code != 408 && code != 429;
+  }
+
   Future<void> _run(AiJob job) async {
     final q = db.update(db.aiJobs)..where((j) => j.id.equals(job.id));
     await q.write(const AiJobsCompanion(status: Value(JobStatus.running)));
     try {
       final text = await ai.run(job.kind, jsonDecode(job.input) as Map<String, dynamic>);
       await q.write(AiJobsCompanion(status: const Value(JobStatus.done), result: Value(text)));
-    } catch (_) {
-      final attempts = job.attempts + 1;
+    } catch (e) {
+      // A 4xx from the proxy (pro_required, declined, bad input) will not fix
+      // itself, so exhaust the attempts and let callers keep the template text.
+      final attempts = isTerminal(e) ? maxAttempts : job.attempts + 1;
       await q.write(
         AiJobsCompanion(
           status: const Value(JobStatus.failed),
