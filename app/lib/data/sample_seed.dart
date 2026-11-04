@@ -43,13 +43,14 @@ class SampleSeed {
           );
 
       final items = [
-        ('Cat sticker, holo', 700, 90, 3, 40),
-        ('Frog pin', 1200, 340, 6, 25),
-        ('Mochi keychain', 1000, 680, 22, 24),
-        ('Art print A5', 1500, 210, 4, 20),
-        ('Sticker pack of 5', 2000, 450, 10, 15),
+        ('Cat sticker, holo', 700, 90, 3, 40, 37),
+        ('Frog pin', 1200, 340, 6, 25, 8),
+        ('Mochi keychain', 1000, 680, 22, 24, 3),
+        ('Art print A5', 1500, 210, 4, 20, 2),
+        ('Sticker pack of 5', 2000, 450, 10, 15, 9),
       ];
-      for (final (name, price, cost, mins, qty) in items) {
+      var minute = 0;
+      for (final (name, price, cost, mins, qty, sold) in items) {
         final id = newId();
         await db
             .into(db.products)
@@ -73,6 +74,10 @@ class SampleSeed {
                 eventId: Value(eventId),
               ),
             );
+        for (var i = 0; i < sold; i++) {
+          minute += 3;
+          await _sell(id, eventId, price, cost, today.add(Duration(hours: 8, minutes: minute)));
+        }
       }
 
       final trends = [
@@ -121,5 +126,45 @@ class SampleSeed {
             );
       }
     });
+  }
+
+  /// One cash sale of one unit, with its stock move.
+  Future<void> _sell(String productId, String eventId, int price, int cost, DateTime at) async {
+    final saleId = newId();
+    final lineId = newId();
+    await db
+        .into(db.sales)
+        .insert(
+          SalesCompanion.insert(
+            id: Value(saleId),
+            eventId: Value(eventId),
+            soldAt: Value(at),
+            paymentMethod: PaymentMethod.cash,
+            totalCents: price,
+          ),
+        );
+    await db
+        .into(db.saleLines)
+        .insert(
+          SaleLinesCompanion.insert(
+            id: Value(lineId),
+            saleId: saleId,
+            productId: Value(productId),
+            qty: 1,
+            unitPriceCents: price,
+            unitCostCents: cost,
+          ),
+        );
+    await db
+        .into(db.inventoryMoves)
+        .insert(
+          InventoryMovesCompanion.insert(
+            productId: productId,
+            delta: -1,
+            reason: MoveReason.sale,
+            eventId: Value(eventId),
+            saleLineId: Value(lineId),
+          ),
+        );
   }
 }
