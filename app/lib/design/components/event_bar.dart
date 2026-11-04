@@ -125,7 +125,7 @@ class EventBar extends ConsumerWidget {
                     children: [
                       Text('NET TODAY', style: PPType.label(size: 10, color: PPColors.muted)),
                       Text(
-                        Money.signed(s.netTodayCents),
+                        Money.signedWhole(s.netTodayCents),
                         style: PPType.number(size: 26, color: up ? PPColors.teal : PPColors.pink),
                       ),
                     ],
