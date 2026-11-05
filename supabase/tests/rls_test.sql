@@ -179,9 +179,11 @@ select is_empty(
 select is_empty(
   $$ with d as (delete from public.products where id = '11111111-0000-0000-0000-000000000001' returning 1) select * from d $$,
   'B delete of A row matches no rows');
+select set_config('storage.allow_delete_query', 'true', true);  -- real storage blocks direct deletes; RLS still applies
 select is_empty(
   $$ with d as (delete from storage.objects where name like 'aaaaaaaa-%' returning 1) select * from d $$,
   'B delete of A photo matches no rows');
+select set_config('storage.allow_delete_query', 'false', true);
 
 select is((select count(*)::int from public.products), 1, 'free user can still read own rows');
 select throws_ok(
