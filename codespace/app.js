@@ -9,6 +9,32 @@
         { id: "mushroom-sticker", name: "Logo Sticker", mark: "LOGO", price: 6, stock: 10, sold: 0 }
       ];
       const storageKey = "popUpPassDemoV2";
+          let hashtagData = [];
+
+fetch("./hashtags.json")
+  .then(response => {
+    if (!response.ok) {
+      throw new Error("Could not load hashtags");
+    }
+    return response.json();
+  })
+  .then(data => {
+    hashtagData = data.hashtags || [];
+  })
+  .catch(error => {
+    console.error("Hashtag loading error:", error);
+  });
+
+
+function recommendHashtags(product, brand) {
+  return hashtagData
+    .filter(entry =>
+      entry.products.includes(product) &&
+      (entry.brands || []).includes(brand)
+    )
+    .map(entry => entry.tag)
+    .join(" ");
+}
       let items = sampleItems;
       let sales = [];
       let payment = "Cash";
@@ -252,8 +278,27 @@
         updatePostPreview();
       }));
       function renderCaption() {
-        if (captionItem) qs("#captionOutput").textContent = t("Meet your new favorite {name}. Find me at Anime Convention, booth A-14! #artistalley #smallartist #animeconvention", { name: itemName(captionItem).toLowerCase() });
-      }
+  if (!captionItem) return;
+
+  const id = captionItem.id.toLowerCase();
+
+  const product = id.includes("sticker") ? "stickers"
+    : id.includes("print") ? "prints"
+    : id.includes("keychain") ? "keychains"
+    : id.includes("pin") ? "pins"
+    : "";
+
+  const brand = qs("#brandStyle")?.value || "anime";
+  const hashtags = recommendHashtags(product, brand);
+
+  const caption = t(
+    "Meet your new favorite {name}. Find me at Anime Convention, booth A-14!",
+    { name: itemName(captionItem).toLowerCase() }
+  );
+
+  qs("#captionOutput").textContent =
+    `${caption} ${hashtags}`.trim();
+}
       qs("#captionButton").addEventListener("click", () => {
         captionItem = items.find(entry => entry.id === qs("#postItem").value) || items[0];
         renderCaption();
