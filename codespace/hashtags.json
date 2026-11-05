@@ -1,0 +1,28 @@
+{
+  "hashtags": [
+    {
+  "tag": "#animeart",
+  "niche": "anime",
+  "brands": ["anime", "fanart"],
+  "products": ["stickers", "prints"],
+  "source": "TikTok",
+  "verified_active": true
+},
+    {
+      "tag": "#artistalley",
+      "niche": "convention",
+      "brands": ["anime", "fanart", "kawaii", "gothic"],
+      "products": ["stickers", "prints", "keychains", "pins"],
+      "source": "TikTok",
+      "verified_active": true
+    },
+    {
+      "tag": "#animestickers",
+      "niche": "anime",
+      "brands": ["anime", "fanart"],
+      "products": ["stickers"],
+      "source": "suggested",
+      "verified_active": false
+    }
+  ]
+}
