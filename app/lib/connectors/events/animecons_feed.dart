@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
 
@@ -28,10 +29,7 @@ class AnimeConsFeed implements ConSource {
   Future<List<EventsCompanion>> upcoming() async {
     final res = await http.get<List<dynamic>>(
       '$supabaseUrl/rest/v1/cons',
-      queryParameters: {
-        'select': '*',
-        'ends_at': 'gte.${DateTime.now().toUtc().toIso8601String()}',
-      },
+      queryParameters: {'select': '*', 'ends_at': 'gte.${clock.now().toUtc().toIso8601String()}'},
       options: Options(headers: {'apikey': anonKey}),
     );
     return [for (final c in res.data ?? const []) _toEvent(c as Map<String, dynamic>)];

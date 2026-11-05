@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
 
 import '../../domain/enums.dart';
@@ -23,7 +24,7 @@ class EventRepo extends Repository<ShopEvent> {
 
   /// The live event, else the next upcoming one, else the most recent.
   Stream<ShopEvent?> watchCurrent({DateTime? now}) => watchAll().map((events) {
-    final t = now ?? DateTime.now();
+    final t = now ?? clock.now();
     for (final e in events) {
       if (!t.isBefore(e.startsAt) && !t.isAfter(e.endsAt)) return e;
     }
@@ -38,7 +39,7 @@ class EventRepo extends Repository<ShopEvent> {
     await db
         .into(db.events)
         .insertOnConflictUpdate(
-          data.copyWith(id: Value(id), updatedAt: Value(DateTime.now()), deviceId: Value(deviceId)),
+          data.copyWith(id: Value(id), updatedAt: Value(clock.now()), deviceId: Value(deviceId)),
         );
     await touched(id);
     return id;
@@ -66,7 +67,7 @@ class EventRepo extends Repository<ShopEvent> {
   @override
   Future<void> softDelete(String id) async {
     await (db.update(db.events)..where((e) => e.id.equals(id))).write(
-      EventsCompanion(deleted: const Value(true), updatedAt: Value(DateTime.now())),
+      EventsCompanion(deleted: const Value(true), updatedAt: Value(clock.now())),
     );
     await touched(id, SyncOp.delete);
   }

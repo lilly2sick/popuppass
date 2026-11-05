@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import '../../data/db/database.dart';
 
 /// Minimal RFC 5545 reader/writer for VEVENTs: UID, SUMMARY, DTSTART,
@@ -51,7 +52,7 @@ class IcsCodec {
       b
         ..writeln('BEGIN:VEVENT')
         ..writeln('UID:${e.id}@popuppass')
-        ..writeln('DTSTAMP:${fmt(DateTime.now())}')
+        ..writeln('DTSTAMP:${fmt(clock.now())}')
         ..writeln('DTSTART:${fmt(e.startsAt)}')
         ..writeln('DTEND:${fmt(e.endsAt)}')
         ..writeln('SUMMARY:${esc(e.name)}');

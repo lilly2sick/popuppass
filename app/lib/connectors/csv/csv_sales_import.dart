@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import '../../data/repos/product_repo.dart';
 import '../../data/repos/sales_repo.dart';
 import '../../domain/enums.dart';
@@ -38,7 +39,7 @@ class CsvSalesImport extends CsvImportConnector<ImportedSale> {
     final qty = int.tryParse(raw['qty'] ?? '') ?? 1;
     final unit = codec.cents(raw['unit_price']);
     final item = raw['item'] ?? '';
-    final soldAt = DateTime.tryParse(raw['sold_at'] ?? '') ?? DateTime.now();
+    final soldAt = DateTime.tryParse(raw['sold_at'] ?? '') ?? clock.now();
     final payment = (raw['payment'] ?? '').toLowerCase();
     return ImportedSale(
       source: RecordSource.csv,

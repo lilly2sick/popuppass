@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:clock/clock.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drift/drift.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -247,7 +248,7 @@ class RecommendationScheduleController extends AsyncNotifier<RecommendationSched
       hour: hour,
       minute: minute,
       // Weekly and biweekly land on the weekday the choice was made.
-      anchor: frequency != null && frequency != current.frequency ? DateTime.now() : null,
+      anchor: frequency != null && frequency != current.frequency ? clock.now() : null,
     );
     state = AsyncData(next);
     await ref.read(recommendationScheduleStoreProvider).write(next);
@@ -269,7 +270,7 @@ class RecommendationScheduleController extends AsyncNotifier<RecommendationSched
     await ref
         .read(recommendationNotifierProvider)
         .replaceAll(
-          schedule.upcoming(DateTime.now()),
+          schedule.upcoming(clock.now()),
           title: l10n.recommendationNotificationTitle,
           body: best == null
               ? l10n.recommendationNotificationBody(cards.length)
@@ -351,7 +352,7 @@ class TodayStats {
 
 final todayStatsProvider = StreamProvider<TodayStats>((ref) {
   final db = ref.watch(dbProvider);
-  final now = DateTime.now();
+  final now = clock.now();
   final start = DateTime(now.year, now.month, now.day);
   return db
       .customSelect(
@@ -413,7 +414,7 @@ final eventBarProvider = Provider<EventBarState>((ref) {
   final today = ref.watch(todayStatsProvider).valueOrNull ?? const TodayStats();
   final l10n = ref.watch(l10nProvider);
   final conn = ref.watch(connectionLabelProvider).valueOrNull ?? l10n.connectionSavedOnPhone;
-  final now = DateTime.now();
+  final now = clock.now();
   if (event == null) {
     return EventBarState(
       eventName: l10n.eventBarNoEvent,

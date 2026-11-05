@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:clock/clock.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
 import 'package:drift/drift.dart';
@@ -65,7 +66,7 @@ class JobRunner {
                   (j) =>
                       j.status.isIn([JobStatus.queued.name, JobStatus.failed.name]) &
                       j.attempts.isSmallerThanValue(maxAttempts) &
-                      j.nextAttemptAt.isSmallerOrEqualValue(DateTime.now()),
+                      j.nextAttemptAt.isSmallerOrEqualValue(clock.now()),
                 )
                 ..orderBy([(j) => OrderingTerm.asc(j.createdAt)])
                 ..limit(10))
@@ -100,7 +101,7 @@ class JobRunner {
         AiJobsCompanion(
           status: const Value(JobStatus.failed),
           attempts: Value(attempts),
-          nextAttemptAt: Value(DateTime.now().add(Duration(seconds: 30 * (1 << attempts)))),
+          nextAttemptAt: Value(clock.now().add(Duration(seconds: 30 * (1 << attempts)))),
         ),
       );
     }

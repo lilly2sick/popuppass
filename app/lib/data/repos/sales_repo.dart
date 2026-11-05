@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
 
 import '../../domain/enums.dart';
@@ -208,7 +209,7 @@ class SalesRepo extends Repository<Sale> {
   @override
   Future<void> softDelete(String id) async {
     await (db.update(db.sales)..where((s) => s.id.equals(id))).write(
-      SalesCompanion(deleted: const Value(true), updatedAt: Value(DateTime.now())),
+      SalesCompanion(deleted: const Value(true), updatedAt: Value(clock.now())),
     );
     await touched(id);
   }

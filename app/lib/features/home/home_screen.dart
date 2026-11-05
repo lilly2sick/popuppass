@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
@@ -334,7 +335,7 @@ class _TrendDeckState extends ConsumerState<_TrendDeck> {
     await db
         .into(db.swipeFeedback)
         .insertOnConflictUpdate(
-          SwipeFeedbackCompanion.insert(trendId: t.id, liked: liked, at: Value(DateTime.now())),
+          SwipeFeedbackCompanion.insert(trendId: t.id, liked: liked, at: Value(clock.now())),
         );
   }
 

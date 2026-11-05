@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
 
 import '../data/db/database.dart';
@@ -20,7 +21,7 @@ class SyncCursor {
         ConnectorCursorsCompanion.insert(
           connectorId: connectorId,
           cursor: Value(cursor),
-          lastRunAt: Value(DateTime.now()),
+          lastRunAt: Value(clock.now()),
         ),
       );
 }

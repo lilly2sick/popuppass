@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../domain/enums.dart';
@@ -22,7 +23,7 @@ class RecommendationScheduleStore {
     );
     final hour = int.tryParse(await storage.read(key: _hourKey) ?? '') ?? 9;
     final minute = int.tryParse(await storage.read(key: _minuteKey) ?? '') ?? 0;
-    final anchor = DateTime.tryParse(await storage.read(key: _anchorKey) ?? '') ?? DateTime.now();
+    final anchor = DateTime.tryParse(await storage.read(key: _anchorKey) ?? '') ?? clock.now();
     return RecommendationSchedule(frequency: frequency, hour: hour, minute: minute, anchor: anchor);
   }
 

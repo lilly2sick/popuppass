@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import '../../data/repos/sales_repo.dart';
 import '../../domain/enums.dart';
 import 'payment_provider.dart';
@@ -31,7 +32,7 @@ class FakePaymentProvider extends PaymentProvider {
     return [
       ExternalPayment(
         id: 'fake-$_n',
-        createdAt: DateTime.now(),
+        createdAt: clock.now(),
         json: {'amount': 700, 'name': 'Cat sticker'},
       ),
     ];

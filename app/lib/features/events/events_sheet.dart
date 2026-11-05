@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:clock/clock.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -49,8 +50,8 @@ class _EventsSheet extends ConsumerWidget {
     final name = TextEditingController();
     final range = await showDateRangePicker(
       context: context,
-      firstDate: DateTime.now().subtract(const Duration(days: 365)),
-      lastDate: DateTime.now().add(const Duration(days: 730)),
+      firstDate: clock.now().subtract(const Duration(days: 365)),
+      lastDate: clock.now().add(const Duration(days: 730)),
     );
     if (range == null || !context.mounted) return;
     final ok = await showDialog<bool>(

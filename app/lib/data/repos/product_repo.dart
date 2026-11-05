@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
 
 import '../../domain/enums.dart';
@@ -39,7 +40,7 @@ class ProductRepo extends Repository<Product> {
     final id = data.id.present ? data.id.value : makeId();
     final row = data.copyWith(
       id: Value(id),
-      updatedAt: Value(DateTime.now()),
+      updatedAt: Value(clock.now()),
       deviceId: Value(deviceId),
     );
     await db.into(db.products).insertOnConflictUpdate(row);
@@ -51,7 +52,7 @@ class ProductRepo extends Repository<Product> {
   @override
   Future<void> softDelete(String id) async {
     await (db.update(db.products)..where((p) => p.id.equals(id))).write(
-      ProductsCompanion(deleted: const Value(true), updatedAt: Value(DateTime.now())),
+      ProductsCompanion(deleted: const Value(true), updatedAt: Value(clock.now())),
     );
     await touched(id, SyncOp.delete);
   }
@@ -67,7 +68,7 @@ class ProductRepo extends Repository<Product> {
     await db
         .into(db.bomLines)
         .insertOnConflictUpdate(
-          line.copyWith(id: Value(id), updatedAt: Value(DateTime.now()), deviceId: Value(deviceId)),
+          line.copyWith(id: Value(id), updatedAt: Value(clock.now()), deviceId: Value(deviceId)),
         );
     await tracker.record('bom_lines', id, SyncOp.upsert);
   }

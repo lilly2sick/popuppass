@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
 
 import '../../data/db/database.dart';
@@ -14,7 +15,7 @@ class FakeConSource implements ConSource {
 
   @override
   Future<List<EventsCompanion>> upcoming() async {
-    final now = DateTime.now();
+    final now = clock.now();
     EventsCompanion con(String name, int inDays, double lat, double lng) => EventsCompanion.insert(
       name: name,
       startsAt: now.add(Duration(days: inDays)),

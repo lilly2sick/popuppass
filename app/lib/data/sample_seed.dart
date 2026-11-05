@@ -1,3 +1,4 @@
+import 'package:clock/clock.dart';
 import 'package:drift/drift.dart';
 
 import '../domain/enums.dart';
@@ -13,7 +14,7 @@ class SampleSeed {
 
   Future<void> seedIfEmpty() async {
     if ((await db.select(db.products).get()).isNotEmpty) return;
-    final now = DateTime.now();
+    final now = clock.now();
     final today = DateTime(now.year, now.month, now.day);
 
     await db.transaction(() async {

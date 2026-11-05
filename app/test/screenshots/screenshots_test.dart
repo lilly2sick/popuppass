@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 
+import 'package:clock/clock.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -36,6 +37,15 @@ Future<void> _shoot(WidgetTester tester, String name) async {
   File('${_outDir.path}/$name.png').writeAsBytesSync(bytes!);
 }
 
+/// Every render uses the same moment, so sample dates ("NOV 3-5", cons near you)
+/// and the committed PNGs do not drift from day to day.
+final _frozenNow = DateTime(2026, 11, 4, 12);
+
+void _shot(String description, WidgetTesterCallback callback) => testWidgets(
+  description,
+  (tester) => withClock(Clock.fixed(_frozenNow), () => callback(tester)),
+);
+
 void main() {
   setUpAll(loadBrandFonts);
 
@@ -51,13 +61,13 @@ void main() {
     await _shoot(tester, name);
   }
 
-  testWidgets('home', (t) => shootTab(t, AppTab.home, 'home'));
-  testWidgets('shop', (t) => shootTab(t, AppTab.shop, 'shop'));
-  testWidgets('sell', (t) => shootTab(t, AppTab.sell, 'sell'));
-  testWidgets('create', (t) => shootTab(t, AppTab.create, 'create'));
-  testWidgets('insights', (t) => shootTab(t, AppTab.insights, 'insights'));
+  _shot('home', (t) => shootTab(t, AppTab.home, 'home'));
+  _shot('shop', (t) => shootTab(t, AppTab.shop, 'shop'));
+  _shot('sell', (t) => shootTab(t, AppTab.sell, 'sell'));
+  _shot('create', (t) => shootTab(t, AppTab.create, 'create'));
+  _shot('insights', (t) => shootTab(t, AppTab.insights, 'insights'));
 
-  testWidgets('home-bottom', (tester) async {
+  _shot('home-bottom', (tester) async {
     usePhone(tester);
     final harness = await AppHarness.create();
     addTearDown(harness.dispose);
@@ -67,7 +77,7 @@ void main() {
     await _shoot(tester, 'home-bottom');
   });
 
-  testWidgets('sell-grid', (tester) async {
+  _shot('sell-grid', (tester) async {
     usePhone(tester);
     final harness = await AppHarness.create();
     addTearDown(harness.dispose);
@@ -81,7 +91,7 @@ void main() {
     await _shoot(tester, 'sell-grid');
   });
 
-  testWidgets('events', (tester) async {
+  _shot('events', (tester) async {
     usePhone(tester);
     final harness = await AppHarness.create();
     addTearDown(harness.dispose);
@@ -91,7 +101,7 @@ void main() {
     await _shoot(tester, 'events');
   });
 
-  testWidgets('create-share', (tester) async {
+  _shot('create-share', (tester) async {
     usePhone(tester);
     final harness = await AppHarness.create();
     addTearDown(harness.dispose);
@@ -103,7 +113,7 @@ void main() {
     await _shoot(tester, 'create-share');
   });
 
-  testWidgets('pup-faq', (tester) async {
+  _shot('pup-faq', (tester) async {
     usePhone(tester);
     final harness = await AppHarness.create();
     addTearDown(harness.dispose);
@@ -113,7 +123,7 @@ void main() {
     await _shoot(tester, 'pup-faq');
   });
 
-  testWidgets('search', (tester) async {
+  _shot('search', (tester) async {
     usePhone(tester);
     final harness = await AppHarness.create();
     addTearDown(harness.dispose);
@@ -124,7 +134,7 @@ void main() {
     await _shoot(tester, 'search');
   });
 
-  testWidgets('settings', (tester) async {
+  _shot('settings', (tester) async {
     usePhone(tester);
     final harness = await AppHarness.create();
     addTearDown(harness.dispose);
@@ -133,7 +143,7 @@ void main() {
     await _shoot(tester, 'settings');
   });
 
-  testWidgets('reminders', (tester) async {
+  _shot('reminders', (tester) async {
     usePhone(tester);
     final harness = await AppHarness.create();
     addTearDown(harness.dispose);
@@ -148,7 +158,7 @@ void main() {
     await _shoot(tester, 'reminders');
   });
 
-  testWidgets('splash', (tester) async {
+  _shot('splash', (tester) async {
     usePhone(tester);
     final harness = await AppHarness.create(seed: false, bootstrapped: false);
     addTearDown(harness.dispose);
